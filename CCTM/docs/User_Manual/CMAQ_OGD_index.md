@@ -1,8 +1,7 @@
-Welcome to the CMAQ documentation wiki!
+CMAQ Operational Guidance Document
+==
 
-CMAQ Operational Guidance Document: About this manual
-
-This manual is an operational guidance document for users of the CMAQ modeling system, and is designed to support the installation, configuration, and execution of CMAQ on Linux systems. CMAQ users should be familiar with Linux scripting conventions and have some familiarity with the Fortran programming language. Users should also have some familiarity with atmospheric structure, and the physical and chemical processes that occur in the atmosphere.
+This manual is an operational guidance document for users of the Community Multiscale Air Quality (CMAQ) modeling system, and is designed to support the installation, configuration, and execution of CMAQ on Linux systems. CMAQ users should be familiar with Linux scripting conventions and have some familiarity with the Fortran programming language. Users should also have some familiarity with atmospheric structure, and the physical and chemical processes that occur in the atmosphere.
 
 In brief, the following sections are included in this manual:
 
