@@ -1,4 +1,5 @@
-[Previous: Inputs](CMAQ_OGD_ch08_input_files.md)
+[<< Previous Chapter](CMAQ_OGD_ch08_input_files.md) - [Home](CMAQ_OGD_index.md) - [Next Chapter >>](CMAQ_OGD_ch10_new_simulation.md)
+
 DEFINING GRIDS, LAYERS, DOMAINS, AND CHEMISTRY
 ==============================================
 
@@ -165,4 +166,5 @@ When mechanisms are modified or created in CMAQ, new namelist files must be crea
 -   The Euler Backward Iterative (EBI) chemistry solver is mechanism-dependent. If a chemical mechanism is modified, then the default EBI solver cannot be used for the new mechanism. The Rosenbrock and SMVGEAR solvers are the only mechanism-independent choices of chemistry solvers with CCTM.
 -   When adding new species to CMAQ, it is important to check that the sources of these new species into the modeling domain are accounted for correctly in the mechanism INCLUDE files. If species are added to the domain through the emissions files, the namelist files that define the mechanism species must contain these new species.
 
-[Next: New Simulation](CMAQ_OGD_ch10_new_simulation.md)
+
+[<< Previous Chapter](CMAQ_OGD_ch08_input_files.md) - [Home](CMAQ_OGD_index.md) - [Next Chapter >>](CMAQ_OGD_ch10_new_simulation.md)

@@ -1,5 +1,6 @@
-[Previous: Libraries](CMAQ_OGD_ch06_req_lib.md)
-<a id=Section7></a>
+
+[<< Previous Chapter](CMAQ_OGD_ch06_req_lib.md) - [Home](CMAQ_OGD_index.md) - [Next Chapter >>](CMAQ_OGD_ch08_input_files.md)
+
 CMAQ Programs and Libraries
 ===========================
 
@@ -1854,4 +1855,5 @@ Weil. J. C., 1988: Dispersion in the convective boundary layer. Chapter 4, in Le
 
 Wesely, M. L., 1989: Parameterization of surface resistances to gaseous dry deposition in regional-scale numerical models. *Atmos. Environ.,* **23**, 1293–1304.
 
-[Next: Inputs](CMAQ_OGD_ch08_input_files.md)
+
+[<< Previous Chapter](CMAQ_OGD_ch06_req_lib.md) - [Home](CMAQ_OGD_index.md) - [Next Chapter >>](CMAQ_OGD_ch08_input_files.md)
