@@ -1,5 +1,6 @@
-[Previous: Grid](CMAQ_OGD_ch09_grid_defn.md)
-<span id=Section10></span>
+
+[<< Previous Chapter](CMAQ_OGD_ch09_grid_defn.md) - [Home](CMAQ_OGD_index.md) - [Next Chapter >>](CMAQ_OGD_ch11_code_management.md)
+
 DEVELOPING NEW CMAQ SIMULATIONS
 ===============================
 
@@ -74,7 +75,7 @@ Standard operation of CMAQ uses boundary conditions that remain time independent
 
 <span id=Figure10-1></span>
 
-<center> ![](./images/Figure10-1.png "Figure10-1.png") </center> 
+<center> ![](./images/Figure10-1.png "Figure10-1.png") </center>
 
 <center> **Figure 10-1. 36-km four-day modeling period IC/BC schematic** </center>
 
@@ -113,4 +114,5 @@ GEOS-CHEM (2009) <http://wiki.seas.harvard.edu/geos-chem/index.php/Main_Page>
 
 MOZART (2009), <http://www.mpimet.mpg.de/en/wissenschaft/modelle/mozart.html>
 
-[Next: Code Management](CMAQ_OGD_ch11_code_management.md)
+
+[<< Previous Chapter](CMAQ_OGD_ch09_grid_defn.md) - [Home](CMAQ_OGD_index.md) - [Next Chapter >>](CMAQ_OGD_ch11_code_management.md)
