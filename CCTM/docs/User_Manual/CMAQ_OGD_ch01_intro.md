@@ -293,4 +293,29 @@ CMAQ is designed to meet the needs of the multiple groups contained within the a
 7.  *Computational Efficiency* – Provide scientifically acceptable results without compro­mising the speed at which the results are generated
 8.  ''Open-Source Design ''– Enable no-cost distribution and application by the modeling community
 
+References for Section: Introduction
+------------------------------------
+
+Byun, D., and J. K. S. Ching, 1999: Science Algorithms of the EPA Models-3 Community Multiscale Air Quality (CMAQ) Modeling System. U. S. Environmental Protection Agency Rep. EPA‑600/R‑99/030, 727 pp. [Available from Office of Research and Development, EPA, Washington, DC 20460.]
+
+Byun, D., and K. L. Schere, 2006: Review of the governing equations, computational algorithms, and other components of the Models‑3 Community Multiscale Air Quality (CMAQ) modeling system. *Appl. Mech. Rev*., **59**, 51–77.
+
+Carter, W. P. L., 1990: A detailed mechanism for the gas-phase atmospheric reactions of organic compounds. *Atmos. Environ*., **24A**, 481–518.
+
+Carter, W. P. L., 2000: Implementation of the SAPRC‑99 chemical mechanism into the Models‑3 Framework. Report to the U.S. Environmental Protection Agency, 29 January 2000. [Available online at http://pah.cert.ucr.edu/\~carter/reactdat.htm.]
+
+IE (UNC Institute for the Environment), 2008: SMOKE version 2.5 User’s Manual. [Available online at [<http://www.smoke-model.org/>](http://www.smoke-model.org/)]
+
+Davis, J.M., P.V. Bhave, and K.M Foley, 2008: Parameterization of N2O5 reaction probabilities on the surface of particles containing ammonium, sulfate, and nitrate. Atmos. Chem. Phys. **8**, 5295-5311.
+
+Grell, G. A., J, Dudhia, and D. R. Stauffer, 1994: A Description of the Fifth Generation Penn State/NCAR Mesoscale Model (MM5). NCAR Technical Note NCAR/TN‑398+STR, 138 pp.
+
+Seinfeld, J., and S. Pandis, 1998: Atmospheric Chemistry and Physics: From Air Pollution to Climate Change. John Wiley & Sons, New York, NY.
+
+Skamarock, W. C., J. B. Klemp, J. Dudhia, D. O. Gill, D. M. Barker, W. Wang, and J. G. Powers, 2005: A Description of the Advanced Research WRF Version 2. NCAR Technical Note NCAR/TN‑468+STR, 88 pp.
+
+U.S. EPA, 2008: National Ambient Air Quality Standards (NAAQS). [Available online at [<http://www.epa.gov/air/criteria.html>](http://www.epa.gov/air/criteria.html).]
+
+Yarwood, G., S. Rao, M. Yocke, and G. Whitten, 2005: Updates to the Carbon Bond chemical mechanism: CB05. Final Report to the U.S. EPA, RT‑0400675. [Available online at www.camx.com.]
+
 [Next Chapter](CMAQ_OGD_ch02_overview.md)
