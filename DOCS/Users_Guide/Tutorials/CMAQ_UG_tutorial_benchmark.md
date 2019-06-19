@@ -16,8 +16,8 @@ The following support software are required for compiling and running CMAQ.
 1. Fortran and C compilers, e.g., [Intel](https://software.intel.com/en-us/fortran-compilers), [Portland Group](http://www.pgroup.com), [Gnu](https://gcc.gnu.org/wiki/GFortran)
 2. [Git](https://git-scm.com/book/en/v2/Getting-Started-Installing-Git)
 2. Message Passing Interface (MPI), e.g., [OpenMPI](https://www.open-mpi.org) or [MVAPICH2](http://www.mcs.anl.gov/research/projects/mpich2).
-3. [netCDF](http://www.unidata.ucar.edu/software/netcdf), need the latest release of netCDF-C and netCDF-Fortran and to follow the build instructions for [netcdf-C](https://www.unidata.ucar.edu/software/netcdf/docs/getting_and_building_netcdf.html) with the following configure options (to support consistency with the I/O API library) ./configure --disable-netcdf-4 --disable-dap and [netCDF-Fortran](https://www.unidata.ucar.edu/software/netcdf/docs/building_netcdf_fortran.html)
-4. [I/O API](http://www.cmascenter.org/ioapi)
+3. Latest release of [netCDF-C](https://www.unidata.ucar.edu/software/netcdf/docs/getting_and_building_netcdf.html) and [netCDF-Fortran](https://www.unidata.ucar.edu/software/netcdf/docs/building_netcdf_fortran.html) **built without netCDF4, HDF5, HDF4, DAP client, PnetCDF, or zlib support** 
+4. [I/O API](http://www.cmascenter.org/ioapi) version 3.2 or later
 
 
 The suggested hardware requirements for running the CMAQ Southeast Benchmark case on a Linux workstation are:
@@ -233,10 +233,10 @@ Check the last few lines of the CCTM output log for messages to help diagnose wh
 ## Check the CMAQ Benchmark Results
 
 To determine if CMAQ is correctly installed on your Linux system compare the results from your benchmark simulation to the reference output data downloaded from the CMAS Center. This data was generated on a Linux system with the following specifications:
-- Red Hat Enterprise Linux Server release 5.11 (Tikanga)
-- Linux Kernel 2.6.18-238.12.1.el5 x86_64
-- Intel v15.0 compiler, 8 processors with OpenMPI
-- CMAQv5.2
+- Red Hat Enterprise Linux Server release 7.6 (Maipo)
+- Linux Kernel 3.10.0-957.12.2.el7.x86_64
+- Intel v18.0 compiler, 32 processors with OpenMPI
+- CMAQv5.3
 
 The CMAQv5.3 reference data include output from BCON, ICON, and the CCTM. You will only need to compare the results for the CCTM to evaluate the benchmark results.
 
