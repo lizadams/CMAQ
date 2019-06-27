@@ -61,13 +61,11 @@ Users can download the MPI library source code from one of these sites and follo
 
 ## 3.2.2 netCDF library
 
-Most of the CMAQ input files and all output files are in netCDF format (the rest are in ASCII format). Hence the netCDF library is an essential component of the CMAQ model. The netCDF library is avaialbe for download at http://www.unidata.ucar.edu/software/netcdf/ and users should follow the instructions for proper installation. Users should install **classic shared netCDF C and Fortran libraries only without netCDF4, HDF5, HDF4, DAP client, PnetCDF, or zlib support.** In order to do so, users should provide the appropriate flags to build and install minimal netCDF-3 with no DAP client support, such as --disable-netcdf-4 and --disable-dap, at the configure stage for netCDF C.  
+Most of the CMAQ input files and all output files are in netCDF format (the rest are in ASCII format). Hence the netCDF library is an essential component of the CMAQ model. The netCDF library is avaialbe for download at http://www.unidata.ucar.edu/software/netcdf/ and users should follow the instructions for proper installation. Users should install **classic shared netCDF C and Fortran libraries only without netCDF4, HDF5, HDF4, DAP client, PnetCDF, or zlib support.** In order to do so, users should provide the appropriate flags to build and install minimal netCDF-3 with no DAP client support, such as --disable-netcdf-4 and --disable-dap, at the configure stage for netCDF C. After successful installation, check the environment PATH & LD_LIBRARY_PATH to ensure that the paths have been updated to include the path of the netCDF C and Fortran libraries and bin. Note you may have to set these paths manually if not set, and these paths have to be loaded every time you start a new shell. 
 
 ## 3.2.3 IOAPI library
 
 The IOAPI library provides an interface between the netCDF libraries and CMAQ to handle input and output (I/O) calls throughout the CMAQ code. The lastest version of the IOAPI library (version 3.2) is available for download at https://www.cmascenter.org/ioapi/documentation/all_versions/html/AVAIL.html#v32. Users should note that the IOAPI library requires netCDF files to be adhere to a strict formatting guidelines that can be found in the IOAPI documentation. For simplicity, files following the IOAPI-netCDF formatting guidelines will be called "IOAPI FILES" from now on.
-
-**>>COMMENT<<**  Testing the latest IOAPI 3.2 library from CMAS is incompatible with the parallel I/O turned on. 
 
 The general steps for installation of IOAPI libraries on a Linux system (with C-shell and GNU compilers) are below. These instructions are an example and we recommend using the latest release available at the time of your CMAQ installation.
 
@@ -87,7 +85,7 @@ setenv BIN Linux2_x86_64gfort
 Edit the top level Makefile with the following steps:
 
 1. comment out the line with BIN ="
-2. Add explicit netCDF C and Fortran libray paths in front of -lnetcdf -lnetcdff, respectively , the following is an example:
+2. Add explicit netCDF C and Fortran library paths in front of -lnetcdf -lnetcdff, respectively , the following is an example:
 
 ```
 NCFLIBS = -L/usr/local/apps/netcdf-c-4.7.0/gcc-9.1.0/lib -lnetcdf -L/usr/local/apps/netcdf-fortran-4.4.5/gcc-9.1.0/lib -lnetcdff
