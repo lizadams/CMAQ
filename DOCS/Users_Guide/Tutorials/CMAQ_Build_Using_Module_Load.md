@@ -49,7 +49,7 @@ make check install
 ```
 
 ## Verify that the following message is obtained
-+-------------------------------------------------------------+
+
 | Congratulations! You have successfully installed netCDF!    |
 
 1. Download netCDF-Fortran from the following website https://www.unidata.ucar.edu/downloads/netcdf/index.jsp
