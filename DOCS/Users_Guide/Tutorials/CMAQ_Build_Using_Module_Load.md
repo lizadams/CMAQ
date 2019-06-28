@@ -142,11 +142,12 @@ make check
 
 Output if successful:
 
-============================================================================
+```
 Testsuite summary for netCDF-Fortran 4.4.5
-============================================================================
+==========================================
 # TOTAL: 6
 # PASS:  6
+```
 
 14. Run the make install command
 
@@ -156,7 +157,7 @@ make install
 
 Output successful if you see:
 
-
+```
 Libraries have been installed in:
    /proj/ie/proj/staff/lizadams/netcdf-fortran-4.4.5/openmpi_4.0.1_gcc_9.1.0/lib
 
@@ -170,6 +171,7 @@ flag during linking and do at least one of the following:
      during linking
    - use the '-Wl,-rpath -Wl,LIBDIR' linker flag
    - have your system administrator add LIBDIR to '/etc/ld.so.conf'
+```
 
 ## Install I/O API
 
