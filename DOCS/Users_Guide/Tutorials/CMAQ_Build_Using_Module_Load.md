@@ -175,3 +175,42 @@ flag during linking and do at least one of the following:
 
 ## Install I/O API
 
+1. Download I/O API
+
+```
+git clone https://github.com/cjcoats/ioapi-3.2
+```
+
+2. Change the BIN setting in the Makefile to include the loaded module name
+
+```
+BIN        = Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
+```
+
+3. copy an existing Makeinclude file to have this BIN name at the end
+
+```
+cd ioapi
+cp Makeinclude.Linux2_x86_64gfort Makeinclude.Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
+```
+
+4. create a BIN directory
+
+```
+mkdir $BIN
+```
+
+5. link the netcdf-C and netcdf-Fortran library in the $BIN directory
+
+```
+cd $BIN
+ln -s /proj/ie/proj/staff/lizadams/netcdf-fortran-4.4.5/openmpi_4.0.1_gcc_9.1.0/lib/libnetcdff.a
+ln -s /proj/ie/proj/staff/lizadams/netcdf-c-4.7.0/openmpi_4.0.1_gcc_9.1.0/lib/libnetcdf.a
+```
+
+6. Run the make command to compile and link the ioapi library
+
+```
+make |& tee make.log
+```
+
