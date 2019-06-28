@@ -309,3 +309,5 @@ cd $CMAQ_HOME/CCTM/scripts
 ```
 2. ./bldit_cctm.csh gcc |& tee ./bldit_cctm.gcc.log
 
+
+currently getting undefined references, as the config_cmaq.csh doesn't include instructions on how to set up the netcdf-fortran libraries and include files.
