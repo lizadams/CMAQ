@@ -156,7 +156,7 @@
         setenv myLINK_FLAG #"-openmp"
         setenv extra_lib ""
         #setenv mpi_lib "-lmpi_mpifh"   #> -lmpich for mvapich or -lmpi for openmpi
-        setenv mpi_lib ""   #> -lmpich for mvapich or -lmpi for openmpi
+        setenv mpi_lib "-lmpi"   #> -lmpich for mvapich or -lmpi for openmpi
     
         breaksw
 
@@ -179,7 +179,8 @@
 #===============================================================================
  
 #> I/O API, netCDF, and MPI libraries
- setenv netcdf_lib "-lnetcdf -lnetcdff"  #> -lnetcdff -lnetcdf for netCDF v4.2.0 and later
+ setenv netcdf_lib "-lnetcdf"
+ setenv netcdff_lib "-lnetcdff" 
  setenv ioapi_lib "-lioapi" 
  setenv pnetcdf_lib "-lpnetcdf"
 
@@ -192,6 +193,7 @@
  setenv CMAQ_LIB    ${lib_basedir}/${system}/${compilerString}
  setenv MPI_DIR     $CMAQ_LIB/mpi
  setenv NETCDF_DIR  $CMAQ_LIB/netcdf
+ setenv NETCDFF_DIR  $CMAQ_LIB/netcdff
  setenv PNETCDF_DIR $CMAQ_LIB/pnetcdf
  setenv IOAPI_DIR   $CMAQ_LIB/ioapi
 
@@ -202,6 +204,9 @@
  if ( ! -d $NETCDF_DIR )  mkdir $NETCDF_DIR
  if ( ! -e $NETCDF_DIR/lib ) ln -s $NETCDF_LIB_DIR $NETCDF_DIR/lib
  if ( ! -e $NETCDF_DIR/include ) ln -s $NETCDF_INCL_DIR $NETCDF_DIR/include
+ if ( ! -d $NETCDFF_DIR )  mkdir $NETCDFF_DIR
+ if ( ! -e $NETCDFF_DIR/lib ) ln -s $NETCDFF_LIB_DIR $NETCDFF_DIR/lib
+
  if ( ! -d $IOAPI_DIR ) then 
     mkdir $IOAPI_DIR
     ln -s $IOAPI_MOD_DIR  $IOAPI_DIR/modules
@@ -212,6 +217,10 @@
 #> Check for netcdf and I/O API libs/includes, error if they don't exist
  if ( ! -e $NETCDF_DIR/lib/libnetcdf.a ) then 
     echo "ERROR: $NETCDF_DIR/lib/libnetcdf.a does not exist in your CMAQ_LIB directory!!! Check your installation before proceeding with CMAQ build."
+    exit
+ endif
+ if ( ! -e $NETCDFF_DIR/lib/libnetcdff.a ) then
+    echo "ERROR: $NETCDFF_DIR/lib/libnetcdff.a does not exist in your CMAQ_LIB directory!!! Check your installation before proceeding with CMAQ build."
     exit
  endif
  if ( ! -e $IOAPI_DIR/lib/libioapi.a ) then 
