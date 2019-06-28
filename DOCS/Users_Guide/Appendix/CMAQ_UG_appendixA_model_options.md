@@ -1,5 +1,5 @@
 
- [Home](README.md) - [Next Appendix >>](CMAQ_UG_appendixB_emissions_control.md)
+ [Home](../README.md) - [Next Appendix >>](CMAQ_UG_appendixB_emissions_control.md)
 
 <!-- END COMMENT -->
 
@@ -7,7 +7,32 @@
 
 # Appendix A: Model options
 
-## A.1 config_cmaq.csh
+<a id=TOC_A></a>
+## Table of Contents:
+
+* [A.1 Configuration Options (config_cmaq.csh)](#config_cmaq.csh)
+* [A.2 Compilation Options (bldit_cctm.csh)](#bldit_cctm.csh)
+* [A.3 Execution Options (run_cctm.csh)](#run_cctm.csh)
+	* [MPI Configuration](#MPI_Config)
+	* [Vertical Extent](#Vertical_Ext)
+	* [Timestep Configuration](#Timestep_Config)
+	* [CCTM Configuration Options](#CCTM_Config_Options)
+	* [Synchronization Time Step and Tolerance Options](#Syn_time_Option)
+	* [Science Options](#Science_Options)
+	* [Process Analysis Options](#Process_Analysis_Options)
+	* [I/O Controls](#I/O_Controls)
+	* [Aerosol Diagnostics Controls](#Aersol_Diagnostics_Controls)
+	* [Diagnostic Output Flags](#Diagnostic_Output_Flags)
+	* [Inline Emissions Configuration](#Inline_Emissions_Config)
+	* [Lightning NOx Configuration](#Lightning_NOx_Config)
+	* [In-line Biogenic Emissions Configuration](#In-line_Bio_Config)
+    * [Windblown Dust Emissions Configuration](#windblown_dust_config)
+
+<a id=config_cmaq.csh></a>
+## A.1 Configuration Options (config_cmaq.csh)
+
+[Return to Top](#TOC_A)
+
 Consistency of configuration variables is critical for building CMAQ itself, not just its libraries. Accordingly CMAQ includes the configuration script config_cmaq.csh to help enforce consistent environment settings for CMAQ and its associated libraries. The following lists the config_cmaq.csh variables defined for the build process and suggests values to which to set those variables.
 
 Note that for multiprocessor applications it is recommended that the Fortran MPI wrapper script mpif90 be specified for the Fortran compiler (myFC). Using this script, instead of a direct call to the Fortran compiler, will ensure that the full suite of MPI components (libraries and include files) for the compiler are included in the parallel build.
@@ -88,7 +113,10 @@ Note that for multiprocessor applications it is recommended that the Fortran MPI
 -   `CMAQ_REPO` <a id=CMAQ_REPO></a>
 **>>COMMENT<<** Needs description
 
-## A.2 Compilation Configuration Variables
+<a id=bldit_cctm.csh></a>
+## A.2 Compilation Options (bldit_cctm.csh)
+
+[Return to Top](#TOC_A)
 
 The configuration options listed here are set during compilation of the CCTM executable through the build script, bldit_cctm.csh, located under the CCTM/scripts folder. When these options are invoked they create a binary executable that is fixed to the specified configuration. To change these options you must recompile CCTM and create a new executable.
 
@@ -223,8 +251,11 @@ Calculate in-line plume rise for large point sources using the Briggs algorithm 
 -   `ModPvO3: [default: pv_o3]`<a id=ModPvO3></a>
     Potential vorticity parameterization for free-troposphere exhange of ozone. This option is configured using the potvorO3 variable in the CCTM build script. Do not change this module setting.
     - `pv_o3`
+    
+<a id=run_cctm.csh></a>
+## A.3 Execution Options (run_cctm.csh)
 
-## A3. Execution Configuration Variables
+[Return to Top](#TOC_A)
 
 The environment variables listed below are invoked during execution of the CCTM and are set in the CCTM run script, run_cctm.csh located under the CCTM/scripts folder.
 
@@ -248,17 +279,28 @@ Sets if the CCTM will run in multi-processor or serial mode.
 -   `EXEC [default: CCTM_$APPL_$EXECID]`<a id=EXEC></a>  
     The name of the CCTM executable.
 
+<a id=MPI_Config></a>
 ### MPI Configuration
+
+[Return to Top](#TOC_A)
+
 -   `NPCOL_NPROW [default: 1 1]`<a id=NPCOL_NPROW></a>  
     The numbers of columns and rows for decomposing the modeling domain in an MPI configuration. The product of this pair of numbers must equal the total number of processors allocated to the CCTM simulation. For serial or single-processor MPI runs set to `1 1`. For multi-processor simulations, the number of columns (i.e, the first number in the pair) should be greater than or equal to the number of rows.  For example, for an 8 processor MPI simulation, set to `4 2`
 -   `NPROCS [default: 1]`<a id=NPROCS></a>  
     Number of processors to allocate for the CCTM simulation; equal to the product of NPCOL x NPROW. For serial or single-processor MPI runs set to `1`, otherwise set to the product of the two numbers used in NPCOL_NPROW.
 
+<a id=Vertical_Ext></a>
 ### Vertical extent
+
+[Return to Top](#TOC_A)
+
 -    `NZ [default: 35]`<a id=NZ></a>
       Set the number of vertical layers.
 
+<a id=Timestep_Config></a>
 ### Timestep Configuration
+
+[Return to Top](#TOC_A)
 
 -   `NEW_START [default: TRUE]`<a id=NEW_START></a>
      For a model restart set to FALSE  **>>COMMENT<<** This is related to soil.  Ask Jesse to add description.  
@@ -273,7 +315,10 @@ Sets if the CCTM will run in multi-processor or serial mode.
 -   `TSTEP [default: 010000]`<a id=TSTEP></a>  
     Simulation output time step interval (HHMMSS)
 
+<a id=CCTM_Config_Options></a>
 ### CCTM Configuration Options
+
+[Return to Top](#TOC_A)
 
 -   `LOGFILE [default: $BASE/$APPL.log]`<a id=LOGFILE></a>  
     Uncomment to capture CCTM standard output to a log file; the LOGFILE variable sets the name and location of the log.
@@ -298,7 +343,10 @@ Sets if the CCTM will run in multi-processor or serial mode.
 -   `EXECUTION_ID`<a id=EXECUTION_ID></a>  
     The name of the CCTM executable; automatically set by the script.
 
+<a id=Syn_time_Option></a>
 ### Synchronization Time Step and Tolerance Options
+
+[Return to Top](#TOC_A)
 
 -   `CTM_MAXSYNC [default: 300]`<a id=CTM_MAXSYNC></a>  
     Maximum synchronization time step in seconds
@@ -313,7 +361,11 @@ Sets if the CCTM will run in multi-processor or serial mode.
 -   `RB_ATOL [default: 1.0E-09]`<a id=RB_ATOL></a>  
     Global Rosenbrock (ROS3) chemistry solver absolute tolerance
 
+<a id=Science_Options></a>
 ### Science Options
+
+[Return to Top](#TOC_A)
+
 -   `CTM_SS_AERO`<a id=CTM_SS_AERO></a>   
     Use inline Sea Spray Aerosol emissions [ default: Y ]   
     **>>COMMENT<<** Needs more description
@@ -358,8 +410,10 @@ Sets if the CCTM will run in multi-processor or serial mode.
 -   `CTM_BIOGEMIS [default: Y]`<a id=CTM_BIOGEMIS></a>  
     Calculate biogenic emissions. Comment out or set to Y to turn on; set to N to turn off.  If this option is activated, several additional variables must be set (see the In-line biogenic emissions configuration settings)     
 
-
+<a id=Process_Analysis_Options></a>
 ### Process analysis options
+
+[Return to Top](#TOC_A)
 
 -   `CTM_PROCAN [default: N]`<a id=CTM_PROCAN></a>  
     Activate process analysis in the CCTM. Set this to Y and use $CMAQ_DATA/pacp/pacp.inp to configure the integrated process rate and integrated reaction rate settings for the CCTM.  Additional process analysis output files will be created when this setting is activated.
@@ -373,7 +427,11 @@ Sets if the CCTM will run in multi-processor or serial mode.
      Input file that specifies the desired output information (read by pa_read.F). See Table 1 in [Chapter 10](../CMAQ_UG_ch10_process_analysis.md) for details on the types of equations and operators that can be used in this file. **>>COMMENT<<** Is a sample file available?
 -   `PACM_REPORT` <a id=PACM_REPORT></a>  
      The output file that displays how CMAQ translates the variables listed in `PACM_INFILE`, and lists the reactions (including reactants, products and yields) that will be used in calculating the IPR and IRR values.
+
+<a id=I/O_Controls></a>
 ### I/O Controls
+
+[Return to Top](#TOC_A)
 
 -   `IOAPI_LOG_WRITE [default: Y]`<a id=IOAPI_LOG_WRITE></a>  
     Set to T to turn on excess WRITE3 logging by the I/O API.
@@ -384,7 +442,10 @@ Sets if the CCTM will run in multi-processor or serial mode.
 -   `IOAPI_OFFSET_64 [default: N]`<a id=IOAPI_OFFSET_64></a>  
     I/O API setting for large time step records. If your output time step is going to produce data that are >2GB per time step, then this needs to be set to YES.
 
+<a id=Aersol_Diagnostics_Controls></a>
 ### Aerosol Diagnostics Controls
+
+[Return to Top](#TOC_A)
 
 -   `CTM_PMDIAG [default: N]`<a id=CTM_PMDIAG></a>  
     Output aerosol diagnostics and properties file. Set to Y to turn on; comment out or set to N to turn off.
@@ -393,7 +454,10 @@ Sets if the CCTM will run in multi-processor or serial mode.
 -   `APMDIAG_BLEV_ELEV [default: None]`<a id=APMDIAG_BLEV_ELEV></a>  
     Modeling grid domain layer range for the hourly average aerosol diagnostics and properties file. Set to the two digits representing the bottom and top layer numbers to bound the output domain.
 
+<a id=Diagnostic_Output_Flags></a>
 ### Diagnostic Output Flags
+
+[Return to Top](#TOC_A)
 
 -   `CTM_CKSUM [default: Y]`<a id=CTM_CKSUM></a>  
     Write science processes summaries to the standard output. Impacts run speed and log file output size. Comment out or set to Y to turn on; set to N to turn off.
@@ -416,15 +480,16 @@ Sets if the CCTM will run in multi-processor or serial mode.
 -   `LTNGDIAG [default: N]`<a id=LTNGDIAG></a>  
     Output a lightning NO emissions diagnostics file. Set to `Y` to turn on; comment out or set to `N` to turn off.
 
-
+<a id=Inline_Emissions_Config></a>
 ### Inline emissions configuration
 
+[Return to Top](#TOC_A)
 
 -   `STK_GRPS_## `<a id=STK_GRPS_##></a>  
-    Directory path and file name of the stack groups file for sector ##, where ## = 01, 02,…,NPTGRPS. Each ## refers to one of the plume rise point-source sectors.
+    Directory path and file name of the stack groups file for sector ##, where ## = 01, 02,…,N_EMIS_PT. Each ## refers to one of the plume rise point-source sectors.
 
 -   `STK_EMIS_##`<a id=STK_EMIS_##></a>  
-    Directory path and file name of the point emissions file for sector ##, where ## = 01, 02,…,NPTGRPS. Each ## refers to the one of the plume rise point-source sectors.
+    Directory path and file name of the point emissions file for sector ##, where ## = 01, 02,…,N_EMIS_PT. Each ## refers to the one of the plume rise point-source sectors.
 
 -   `LAYP_STDATE [HHMMSS]`<a id=LAYP_STDATE></a>  
     Start date for calculating elevated-point-source emissions.
@@ -444,7 +509,10 @@ Sets if the CCTM will run in multi-processor or serial mode.
 -   `REP_LAYER_MIN [default: -1]`<a id=REP_LAYER_MIN></a>  
     Minimum layer number for reporting plume rise values to the plume rise diagnostics file. Set to `-1` or comment out to report all layers.
 
+<a id=Lightning_NOx_Config></a>
 ### Lightning NOx configuration
+
+[Return to Top](#TOC_A)
 
 -   `LTNGNO [default:InLine]`<a id=LTNGNO></a>  
     Setting to define whether the lightning emissions calculation will be in-line or off-line. This variable can be set to a gridded netCDF file of lightning NO emissions to use emissions calculated with a preprocessor outside of CCTM. Setting this variable to “inline” activates the in-line emissions calculation in CCTM and requires the LTNGPARMS_FILE variable (see below) to provide parameters for generating in-line lightning NO emissions.
@@ -464,7 +532,10 @@ Sets if the CCTM will run in multi-processor or serial mode.
 -  `CTM_LTNGDIAG_2`<a id=LTNGOUT></a>  
     Lightning diagnostics output 2D netCDF file (column total lightning NO emissions); ignore if `LTNGDIAG = N`
 
+<a id=In-line_Bio_Config></a>
 ### In-line biogenic emissions configuration
+
+[Return to Top](#TOC_A)
 
 -   `GSPRO [default: None]`<a id=GSPRO></a>  
     Directory path and file name for input ASCII speciation profiles.
@@ -499,8 +570,10 @@ Sets if the CCTM will run in multi-processor or serial mode.
 -   `B3GTS_S`<a id=B3GTS_S></a>  
     Diagnostic output netCDF file of biogenic emissions. This variable is ignored if B3GTS_DIAG is set to N.
 
-
+<a id=windblown_dust_config></a>
 ### Windblown dust emissions configuration
+
+[Return to Top](#TOC_A)
 
 -   `DUST_LU_1`<a id=DUST_LU_1></a>  
     Input BELD "A" landuse netCDF file gridded to the modeling domain. Used if `CTM_WBDUST_BELD` is set to BELD3.
@@ -523,5 +596,5 @@ Sets if the CCTM will run in multi-processor or serial mode.
 -   `CROPMAP08`<a id=CROPMAP08></a>  
     Input end harvesting dates netCDF file gridded to the modeling domain.
 
- [Home](README.md) - [Next Appendix >>](CMAQ_UG_appendixB_emissions_control.md)<br>
+ [Home](../README.md) - [Next Appendix >>](CMAQ_UG_appendixB_emissions_control.md)<br>
  CMAQ User's Guide (c) 2019<br>

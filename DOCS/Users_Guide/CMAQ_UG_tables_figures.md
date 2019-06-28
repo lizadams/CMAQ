@@ -1,6 +1,6 @@
 <!-- BEGIN COMMENT -->
 
-[<< Acronyms](CMAQ_UG_acronyms.md) - [Home](README.md)
+[Home](README.md)
 
 <!-- END COMMENT -->
 
@@ -10,13 +10,11 @@
 
 [Figure 2-1. Overview of the CMAQ System](CMAQ_UG_ch02_program_structure.md#Figure2-1)
 
-[Figure 5-1.](CMAQ_UG_ch05_compile_and_run.md#Figure5-1) **>>COMMENT:<<** missing a figure title and No label in text
+[Figure 5-1. CMAQ repository structure](CMAQ_UG_ch05_compile_and_run.md#Figure5-1) 
 
-[Figure 6-1.](CMAQ_UG_ch06_model_configuration_options.md#Figure6-1) **>>COMMENT:<<** no label in text & change image file name 8-1 to 6-1
+[Figure 9-1. Relative contribution of oxidation pathways for VOCs using Process Analysis](CMAQ_UG_ch09_process_analysis.md#Figure9-1) 
 
-[Figure10-1. Relative contribution of oxidation pathways for VOCs using Process Analysis](CMAQ_UG_ch10_process_analysis.md#Figure10-1)  **>>COMMENT:<<** change image file name from bars_VOC_fate to Figure10-1
-
-[Figure10-2. Relative contribution of HNO3 formation pathways at three grid locations](CMAQ_UG_ch10_process_analysis.md#Figure10-2)  **>>COMMENT:<<** change image file name from HNO3_formulation_pbl_pie to Figure10-2
+[Figure 9-2. Relative contribution of HNO3 formation pathways at three grid locations](CMAQ_UG_ch09_process_analysis.md#Figure9-2) 
 
 ## List of Tables
 
@@ -48,23 +46,25 @@
 
 [Table 4-12.](CMAQ_UG_ch04_model_inputs.md#Table4-12) **>>COMMENT:<<** missing table title
 
+[Table 6-1. Chemical Mechanisms Available with CMAQv5.3](CMAQ_UG_ch06_model_configuration_options.md#Table6-1)
+
 [Table 7-1. CMAQ Output files](CMAQ_UG_ch07_model_outputs.md#Table7-1)
 
 [Table 8-1. Software Programs for Evaluating and Visualizing CMAQ Data](CMAQ_UG_ch08_analysis_tools.md#Table8-1)
 
-[Table 10-1. Parameters used in PACM_INFILE](CMAQ_UG_ch10_process_analysis.md#Table10-1)
+[Table 9-1. Parameters used in PACM_INFILE](CMAQ_UG_ch09_process_analysis.md#Table9-1)
 
-[Table 10-2. Allowable parameters for Process outputs](CMAQ_UG_ch10_process_analysis.md#Table10-2)
+[Table 9-2. Allowable parameters for Process outputs](CMAQ_UG_ch09_process_analysis.md#Table9-2)
 
-[Table 10-3. Allowable operators for Integrated Reaction Rate outputs](CMAQ_UG_ch10_process_analysis.md#Table10-3)
+[Table 9-3. Allowable operators for Integrated Reaction Rate outputs](CMAQ_UG_ch09_process_analysis.md#Table9-3)
 
-[Table 12-1. ISAM run script variables](CMAQ_UG_ch12_ISAM.md#Table12-1)
+[Table 11-1. ISAM run script variables](CMAQ_UG_ch11_ISAM.md#Table11-1)
 
-[Table 13-1. Sulfur Tracking Species List](CMAQ_UG_ch13_sulfur_tracking.md#Table13-1)
+[Table 12-1. Sulfur Tracking Species List](CMAQ_UG_ch12_sulfur_tracking.md#Table12-1)
 
 
 <!-- BEGIN COMMENT -->
 
-[<< Acronyms](CMAQ_UG_acronyms.md) - [Home](README.md)
+[Home](README.md)
 
 <!-- END COMMENT -->
