@@ -262,13 +262,15 @@ go to the case gcc section
         
 change this to
 
-        #> I/O API, netCDF, and MPI library locations
-        setenv IOAPI_MOD_DIR   /proj/ie/proj/staff/lizadams/ioapi-3.2/  #> I/O API precompiled modules
-        setenv IOAPI_INCL_DIR  iopai_inc_gcc  #> I/O API include header files
-        setenv IOAPI_LIB_DIR   ioapi_lib_gcc  #> I/O API libraries
-        setenv NETCDF_LIB_DIR  netcdf_lib_gcc #> netCDF directory path
-        setenv NETCDF_INCL_DIR netcdf_inc_gcc #> netCDF directory path
-        setenv MPI_LIB_DIR     mpi_lib_gcc    #> MPI directory path
+```
+ #> I/O API, netCDF, and MPI library locations
+        setenv IOAPI_MOD_DIR   /proj/ie/proj/staff/lizadams/ioapi-3.2/Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0   #> I/O API precompiled modules
+        setenv IOAPI_INCL_DIR  /proj/ie/proj/staff/lizadams/ioapi-3.2/ioapi/fixed_src   #> I/O API include header files
+        setenv IOAPI_LIB_DIR   /proj/ie/proj/staff/lizadams/ioapi-3.2/Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0  #> I/O API libraries
+        setenv NETCDF_LIB_DIR  /proj/ie/proj/staff/lizadams/netcdf-c-4.7.0/openmpi_4.0.1_gcc_9.1.0/lib  #netCDF library directory path
+        setenv NETCDF_INCL_DIR /proj/ie/proj/staff/lizadams/netcdf-c-4.7.0/openmpi_4.0.1_gcc_9.1.0/include #> netCDF include directory path
+        setenv MPI_LIB_DIR     /nas/longleaf/apps-dogwood/mpi/gcc_9.1.0/openmpi_4.0.1/include   #> MPI directory path
+```
         
   To find the MPI_LIB_DIR verify that you have the module loaded
   then use the command
@@ -299,4 +301,11 @@ should be augmented to add a check for the libnetcdff.a
  endif
 
         
+## Building CMAQ
+
+1. change to the CCTM/scripts directory
+```
+cd $CMAQ_HOME/CCTM/scripts
+```
+2. ./bldit_cctm.csh gcc |& tee ./bldit_cctm.gcc.log
 
