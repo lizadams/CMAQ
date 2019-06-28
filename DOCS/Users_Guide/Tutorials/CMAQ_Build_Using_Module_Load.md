@@ -214,3 +214,89 @@ ln -s /proj/ie/proj/staff/lizadams/netcdf-c-4.7.0/openmpi_4.0.1_gcc_9.1.0/lib/li
 make |& tee make.log
 ```
 
+7. change directories to the $BIN dir and verify that both the libioapi.a and the m3tools were successfully built
+
+```
+cd $BIN
+ls -lrt libioapi.a
+ls -rlt m3xtract
+```
+
+## Build CMAQ
+
+1. download the CMAQ code
+
+```
+git clone -b v53_20190613 https://github.com/kmfoley/CMAQ.git
+```
+
+2. edit the bldit_project.csh script to include the name of your loaded module
+
+```
+set CMAQ_HOME = /proj/ie/proj/CMAS/CMAQ/CMAQv5.3_branch_UNC5/openmpi_4.0.1_gcc_9.1.0
+```
+
+3. run the bldit_project.csh script to create your working directory
+
+```
+./bldit_project.csh
+```
+
+4. change directories to your working directory
+
+```
+cd /proj/ie/proj/CMAS/CMAQ/CMAQv5.3_branch_UNC5/openmpi_4.0.1_gcc_9.1.0
+```
+
+5. edit the config_cmaq.csh to set the netcdf-C, netcdf-Fortran and ioapi library and include locations
+
+go to the case gcc section
+
+        #> I/O API, netCDF, and MPI library locations
+        setenv IOAPI_MOD_DIR   ioapi_mod_gcc  #> I/O API precompiled modules
+        setenv IOAPI_INCL_DIR  iopai_inc_gcc  #> I/O API include header files
+        setenv IOAPI_LIB_DIR   ioapi_lib_gcc  #> I/O API libraries
+        setenv NETCDF_LIB_DIR  netcdf_lib_gcc #> netCDF directory path
+        setenv NETCDF_INCL_DIR netcdf_inc_gcc #> netCDF directory path
+        setenv MPI_LIB_DIR     mpi_lib_gcc    #> MPI directory path
+        
+change this to
+
+        #> I/O API, netCDF, and MPI library locations
+        setenv IOAPI_MOD_DIR   /proj/ie/proj/staff/lizadams/ioapi-3.2/  #> I/O API precompiled modules
+        setenv IOAPI_INCL_DIR  iopai_inc_gcc  #> I/O API include header files
+        setenv IOAPI_LIB_DIR   ioapi_lib_gcc  #> I/O API libraries
+        setenv NETCDF_LIB_DIR  netcdf_lib_gcc #> netCDF directory path
+        setenv NETCDF_INCL_DIR netcdf_inc_gcc #> netCDF directory path
+        setenv MPI_LIB_DIR     mpi_lib_gcc    #> MPI directory path
+        
+  To find the MPI_LIB_DIR verify that you have the module loaded
+  then use the command
+  ```
+  which mpirun
+  ```
+  
+  This points to
+  /nas/longleaf/apps-dogwood/mpi/gcc_9.1.0/openmpi_4.0.1/bin/mpirun
+  
+  The include directory is 
+  /nas/longleaf/apps-dogwood/mpi/gcc_9.1.0/openmpi_4.0.1/include
+  
+  edit the mpi_lib environment variable to use -lmpi
+  setenv mpi_lib "-lmpi" 
+  
+  The following section on the config_cmaq.csh 
+   if ( ! -e $NETCDF_DIR/lib/libnetcdf.a ) then
+    echo "ERROR: $NETCDF_DIR/lib/libnetcdf.a does not exist in your CMAQ_LIB directory!!! Check your installation before proceeding with CMAQ build."
+    exit
+ endif
+
+should be augmented to add a check for the libnetcdff.a 
+
+   if ( ! -e $NETCDF_DIR/lib/libnetcdff.a ) then
+    echo "ERROR: $NETCDF_DIR/lib/libnetcdff.a does not exist in your CMAQ_LIB directory!!! Check your installation before proceeding with CMAQ build."
+    exit
+ endif
+
+        
+
