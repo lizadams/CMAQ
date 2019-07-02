@@ -122,26 +122,19 @@ setenv CPPFLAGS -I${NCDIR}/include
 setenv LDFLAGS -L${NCDIR}/lib
 ```
 
-11. set your LD_LIBRARY_PATH to include the netcdf-Fortran library path for netCDF build
-
-```
-setenv NFDIR /proj/ie/proj/staff/lizadams/netcdf-fortran-4.4.5/openmpi_4.0.1_gcc_9.1.0
-setenv LD_LIBRARY_PATH ${NFDIR}/lib:${LD_LIBRARY_PATH}
-```
-
-12. check your LD_LIBRARY_PATH environment variable
+11. check your LD_LIBRARY_PATH environment variable
 
 ```
 echo $LD_LIBRARY_PATH
 ```
 
-13. Run the configure command
+12. Run the configure command
 
 ```
 ./configure --prefix=${NFDIR}
 ```
 
-14. Run the make check command
+13. Run the make check command
 
 ```
 make check
@@ -156,7 +149,7 @@ Testsuite summary for netCDF-Fortran 4.4.5
 # PASS:  6
 ```
 
-15. Run the make install command
+14. Run the make install command
 
 ```
 make install
@@ -179,6 +172,14 @@ flag during linking and do at least one of the following:
    - use the '-Wl,-rpath -Wl,LIBDIR' linker flag
    - have your system administrator add LIBDIR to '/etc/ld.so.conf'
 ```
+
+15. set your LD_LIBRARY_PATH to include the netcdf-Fortran library path for netCDF build
+
+```
+setenv NFDIR /proj/ie/proj/staff/lizadams/netcdf-fortran-4.4.5/openmpi_4.0.1_gcc_9.1.0
+setenv LD_LIBRARY_PATH ${NFDIR}/lib:${LD_LIBRARY_PATH}
+```
+(may need to add the NCDIR and NFDIR to .cshrc)
 
 ## Install I/O API
 
