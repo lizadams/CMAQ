@@ -56,7 +56,7 @@ make check install
 | Congratulations! You have successfully installed netCDF!    |
 ```
 
-## Install netCDF-Fortan
+## Install netCDF-Fortran
 
 1. Download netCDF-Fortran from the following website https://www.unidata.ucar.edu/downloads/netcdf/index.jsp
 
