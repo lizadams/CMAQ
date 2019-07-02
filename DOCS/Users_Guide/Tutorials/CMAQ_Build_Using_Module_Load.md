@@ -269,7 +269,7 @@ change this to
         setenv IOAPI_LIB_DIR   /proj/ie/proj/staff/lizadams/ioapi-3.2/Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0  #> I/O API libraries
         setenv NETCDF_LIB_DIR  /proj/ie/proj/staff/lizadams/netcdf-c-4.7.0/openmpi_4.0.1_gcc_9.1.0/lib  #netCDF library directory path
         setenv NETCDF_INCL_DIR /proj/ie/proj/staff/lizadams/netcdf-c-4.7.0/openmpi_4.0.1_gcc_9.1.0/include #> netCDF include directory path
-        setenv MPI_LIB_DIR     /nas/longleaf/apps-dogwood/mpi/gcc_9.1.0/openmpi_4.0.1/include   #> MPI directory path
+        setenv MPI_LIB_DIR     /nas/longleaf/apps-dogwood/mpi/gcc_9.1.0/openmpi_4.0.1   #> MPI directory path
 ```
         
   To find the MPI_LIB_DIR verify that you have the module loaded
