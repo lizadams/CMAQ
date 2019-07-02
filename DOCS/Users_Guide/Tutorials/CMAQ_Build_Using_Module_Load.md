@@ -122,19 +122,26 @@ setenv CPPFLAGS -I${NCDIR}/include
 setenv LDFLAGS -L${NCDIR}/lib
 ```
 
-11. check your LD_LIBRARY_PATH environment variable
+11. set your LD_LIBRARY_PATH to include the netcdf-Fortran library path for netCDF build
+
+```
+setenv NFDIR /proj/ie/proj/staff/lizadams/netcdf-fortran-4.4.5/openmpi_4.0.1_gcc_9.1.0
+setenv LD_LIBRARY_PATH ${NFDIR}/lib:${LD_LIBRARY_PATH}
+```
+
+12. check your LD_LIBRARY_PATH environment variable
 
 ```
 echo $LD_LIBRARY_PATH
 ```
 
-12. Run the configure command
+13. Run the configure command
 
 ```
 ./configure --prefix=${NFDIR}
 ```
 
-13. Run the make check command
+14. Run the make check command
 
 ```
 make check
@@ -149,7 +156,7 @@ Testsuite summary for netCDF-Fortran 4.4.5
 # PASS:  6
 ```
 
-14. Run the make install command
+15. Run the make install command
 
 ```
 make install
