@@ -16,7 +16,7 @@ Answering this type of question often requires running an air quality model twic
 
 Alternatively, running CMAQ with ISAM enabled allows the user the ability to calculate source attribution of a large number of sources directly by the model in one simulation.
 
-Note: While full model species list apportioment is in development, currently ISAM is limited to the following species classes in CMAQ:
+Note: While full model species list apportionment is in development, currently ISAM is limited to the following species classes in CMAQ:
 
 ```
 SULFATE   - ASO4J, ASO4I, SO2, SULF, SULRXN
@@ -32,13 +32,13 @@ OZONE     - all NITRATE species + all VOC species
 
 ## 11.2 Build Instructions
 
-Starting with CMAQv5.3 model release, ISAM is provided directly with the source code of the base model.  In order to use ISAM, build CMAQ as normal with the provided scripts.  Then, exercise the ISAM preprocessor compiler option using the following command, while in the BUILD directory:
+Starting with CMAQv5.3 model release, ISAM is provided directly with the source code of the base model. To use ISAM, build CMAQ as normal with the provided scripts.  Then, exercise the ISAM preprocessor compiler option using the following command, while in the BUILD directory:
 
 ```
 make isam=TRUE
 ```
 
-Note, you may want to 'make clean' first, if your scripts were configured to automatically compile the model.
+Note, you may need to 'make clean' first, to remove any object files created without the isam pre-processor flag.
 
 ## 11.3 Run Instructions
 
@@ -60,11 +60,7 @@ To begin a CMAQ simulation with apportionment enabled, the ISAM section of the r
 |SA_WD_1|path/filename|ISAM output for apportioned wet deposition|
 |SA_CGRID_1|path/filename|ISAM output for a restart file to continue the simulation further in time|
 
-Additionally, ISAM is able to track emissions confined to geographic regions.  This functionality can enabled through CMAQ's `RegionsRegistry` set in the `EmissCtrl` namelist and is discussed further below.
-
-
-**>>COMMENT<<** !!!! Add cross-reference to the map stuff wherever it is !!!!
-
+Additionally, ISAM can track emissions confined to geographic regions.  This functionality can be enabled through CMAQ's `RegionsRegistry` set in the `EmissCtrl` namelist (Appendix B.4) and is discussed further below.
 
 ### 11.3.1 ISAM control file (SA_IOLIST)
 
@@ -82,9 +78,9 @@ After setting tag classes for the simulation, information for one or more tags i
 TAG NAME        |EGU
 ```
 
-It is recommended that the text string for the tag name be kept short (ideally three characters) in order to accomodate the longer species names from some chemical mechanisms in the ISAM output files.
+It is recommended that the text string for the tag name be kept short (ideally three characters) in order to accommodate the longer species names from some chemical mechanisms in the ISAM output files.
 
-The second option is the comma delimited list of regions to track with this tag.  The keyword 'EVERYWHERE' is used to track domain-wide emissions.  To track region-constrained emissions, variable names from the regions file specified in the `EmissCtrl` namelist are used insted.
+The second option is the comma delimited list of regions to track with this tag.  The keyword 'EVERYWHERE' is used to track domain-wide emissions.  To track region-constrained emissions, variable names from the regions file specified in the `EmissCtrl` namelist are used instead of the "EVERYWHERE' keyword. The regions file requirements are identical to the optional file used to scale emissions in predetermined geographical areas (Appendix B.4).
 
 ```
 REGION(S)       |EVERYWHERE
@@ -110,9 +106,9 @@ ENDLIST eof
 
 ## 11.4 References
 
-Kwok, R.H.F, Napelenok, S.L., & Baker, K.R. (2013). Implementation and evaluation of PM2.5 source contribution analysis in a photochemical model. Atmospheric Environment, 80, 398–407. doi: 10.1016/j.atmosenv.2013.08.017.
+Kwok, R.H.F, Napelenok, S.L., & Baker, K.R. (2013). Implementation and evaluation of PM2.5 source contribution analysis in a photochemical model. Atmospheric Environment, 80, 398–407 [doi:10.1016/j.atmosenv.2013.08.017](https://doi.org/10.1016/j.atmosenv.2013.08.017).
 
-Kwok, R.H.F, Baker, K.R., Napelenok, S.L., & Tonnesen, G.S. (2015). Photochemical grid model implementation of VOC, NOx, and O3 source apportionment. Geosci. Model Dev., 8, 99-114. doi:10.5194/gmd-8-99-2015.  
+Kwok, R.H.F, Baker, K.R., Napelenok, S.L., & Tonnesen, G.S. (2015). Photochemical grid model implementation of VOC, NOx, and O3 source apportionment. Geosci. Model Dev., 8, 99-114. [doi:10.5194/gmd-8-99-2015](https://doi.org/10.5194/gmd-8-99-2015).  
 
 
 ## Contact
