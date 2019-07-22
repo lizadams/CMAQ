@@ -38,25 +38,30 @@ more INSTALL.md
 
 7. Create a target installation directory that includes the loaded module environment name
 
-8. Run the configure command
+8. Run the configure --help command to see what settings can be used for the build.
+```
+./configure --help
+```
+
+9. Run the configure command
 
 ```
 ./configure --prefix=/proj/ie/proj/staff/lizadams/netcdf-c-4.7.0/openmpi_4.0.1_gcc_9.1.0 --disable-netcdf-4 --disable-dap
 ```
 
-9. Check that the configure command worked correctly
+10. Check that the configure command worked correctly
 
 ```
 make check install
 ```
 
-10. Verify that the following message is obtained
+11. Verify that the following message is obtained
 
 ```
 | Congratulations! You have successfully installed netCDF!    |
 ```
 
-## Install netCDF-Fortran
+12. Install netCDF-Fortran
 
 1. Download netCDF-Fortran from the following website https://www.unidata.ucar.edu/downloads/netcdf/index.jsp
 
