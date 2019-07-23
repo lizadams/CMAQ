@@ -566,6 +566,7 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
 
 #> Recompile BLDMAKE from source if requested or if it does not exist
  if ( $?CompileBLDMAKE || ! -f $BLDER ) then
+   mkdir -rp ${CMAQ_REPO}/UTIL/bldmake/scripts
    cd ${CMAQ_REPO}/UTIL/bldmake/scripts
    ./bldit_bldmake.csh
  endif

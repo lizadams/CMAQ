@@ -17,7 +17,7 @@
 #> directory.
 
 
- set CMAQ_HOME = /home/user/CMAQ_Project
+ set CMAQ_HOME = /proj/ie/proj/CMAS/CMAQ/CMAQv5.3_branch_UNC8/openmpi_4.0.1_gcc_9.1.0
 
 #> This section allows users to choose explicitly which tools
 #> to make available from the repo. For each selected tool,
@@ -136,6 +136,17 @@
     endif
     cp PREP/mcip/scripts/run_mcip.csh $CMAQ_HOME/PREP/mcip/scripts/
  endif
+
+#===============================================================================
+#> Copy MCIP src 
+#===============================================================================
+ if ( $EXT_MCIP == 'Y' ) then
+    if ( ! -e "$CMAQ_HOME/PREP/mcip/src" ) then
+       mkdir -pv $CMAQ_HOME/PREP/mcip/src
+    endif
+    cp PREP/mcip/src/* $CMAQ_HOME/PREP/mcip/src
+ endif
+
  
 #===============================================================================
 #> Copy Combine Post-Processor scripts

@@ -82,8 +82,10 @@
         #> I/O API, netCDF, and MPI library locations
         setenv IOAPI_INCL_DIR  ioapi_inc_intel  #> I/O API include header files
         setenv IOAPI_LIB_DIR   ioapi_lib_intel  #> I/O API libraries
-        setenv NETCDF_LIB_DIR  netcdf_lib_intel #> netCDF directory path
-        setenv NETCDF_INCL_DIR netcdf_inc_intel #> netCDF directory path
+        setenv NETCDF_LIB_DIR  netcdf_lib_intel #> netCDF C library path
+        setenv NETCDF_INCL_DIR netcdf_inc_intel #> netCDF C include path
+        setenv NETCDF_LIB_DIR  netcdf_lib_intel #> netCDF Fortran library path
+        setenv NETCDF_INCL_DIR netcdf_inc_intel #> netCDF Fortran  include path
         setenv MPI_LIB_DIR     mpi_lib_intel    #> MPI directory path
     
         #> Compiler Aliases and Flags
@@ -110,8 +112,10 @@
         #> I/O API, netCDF, and MPI library locations
         setenv IOAPI_INCL_DIR  iopai_inc_pgi  #> I/O API include header files
         setenv IOAPI_LIB_DIR   ioapi_lib_pgi  #> I/O API libraries
-        setenv NETCDF_LIB_DIR  netcdf_lib_pgi #> netCDF directory path
-        setenv NETCDF_INCL_DIR netcdf_inc_pgi #> netCDF directory path
+        setenv NETCDF_LIB_DIR  netcdf_lib_pgi #> netCDF library path
+        setenv NETCDF_INCL_DIR netcdf_inc_pgi #> netCDF include path
+        setenv NETCDF_LIB_DIR  netcdf_lib_intel #> netCDF Fortran library path
+        setenv NETCDF_INCL_DIR netcdf_inc_intel #> netCDF Fortran  include path
         setenv MPI_LIB_DIR     mpi_lib_pgi    #> MPI directory path
     
         #> Compiler Aliases and Flags
@@ -136,8 +140,10 @@
         #> I/O API, netCDF, and MPI library locations
         setenv IOAPI_INCL_DIR  iopai_inc_gcc  #> I/O API include header files
         setenv IOAPI_LIB_DIR   ioapi_lib_gcc  #> I/O API libraries
-        setenv NETCDF_LIB_DIR  netcdf_lib_gcc #> netCDF directory path
-        setenv NETCDF_INCL_DIR netcdf_inc_gcc #> netCDF directory path
+        setenv NETCDF_LIB_DIR  netcdf_lib_gcc #> netCDF library path
+        setenv NETCDF_INCL_DIR netcdf_inc_gcc #> netCDF include path
+        setenv NETCDF_LIB_DIR  netcdf_lib_intel #> netCDF Fortran library path
+        setenv NETCDF_INCL_DIR netcdf_inc_intel #> netCDF Fortran  include path
         setenv MPI_LIB_DIR     mpi_lib_gcc    #> MPI directory path
     
         #> Compiler Aliases and Flags
@@ -164,7 +170,7 @@
  endsw
  
 #> Apply Specific Module and Library Location Settings for those working inside EPA
- source /work/MOD3DEV/cmaq_common/cmaq_env.csh  #>>> Comment out if not at EPA
+# source /work/MOD3DEV/cmaq_common/cmaq_env.csh  #>>> Comment out if not at EPA
 
 #> Add The Complier Version Number to the Compiler String if it's not empty
  setenv compilerString ${compiler}
@@ -175,7 +181,8 @@
 #===============================================================================
  
 #> I/O API, netCDF, and MPI libraries
- setenv netcdf_lib "-lnetcdf -lnetcdff"  #> -lnetcdff -lnetcdf for netCDF v4.2.0 and later
+ setenv netcdf_lib "-lnetcdf"  #> order -lnetcdff -lnetcdf for netCDF v4.2.0 and later
+ setenv netcdff_lib "-lnetcdff"
  setenv ioapi_lib "-lioapi" 
  setenv pnetcdf_lib "-lpnetcdf"
 
@@ -188,6 +195,7 @@
  setenv CMAQ_LIB    ${lib_basedir}/${system}/${compilerString}
  setenv MPI_DIR     $CMAQ_LIB/mpi
  setenv NETCDF_DIR  $CMAQ_LIB/netcdf
+ setenv NETCDFF_DIR $CMAQ_LIB/netcdff
  setenv PNETCDF_DIR $CMAQ_LIB/pnetcdf
  setenv IOAPI_DIR   $CMAQ_LIB/ioapi
 
@@ -198,6 +206,10 @@
  if ( ! -d $NETCDF_DIR )  mkdir $NETCDF_DIR
  if ( ! -e $NETCDF_DIR/lib ) ln -sfn $NETCDF_LIB_DIR $NETCDF_DIR/lib
  if ( ! -e $NETCDF_DIR/include ) ln -sfn $NETCDF_INCL_DIR $NETCDF_DIR/include
+ if ( ! -d $NETCDFF_DIR )  mkdir $NETCDFF_DIR
+ if ( ! -e $NETCDFF_DIR/lib ) ln -sfn $NETCDFF_LIB_DIR $NETCDFF_DIR/lib
+ if ( ! -e $NETCDFF_DIR/include ) ln -sfn $NETCDFF_INCL_DIR $NETCDFF_DIR/include
+
  if ( ! -d $IOAPI_DIR ) then 
     mkdir $IOAPI_DIR
     ln -sfn $IOAPI_INCL_DIR $IOAPI_DIR/include_files
