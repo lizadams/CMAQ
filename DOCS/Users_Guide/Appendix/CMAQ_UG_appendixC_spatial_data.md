@@ -9,10 +9,10 @@
 ## Geospatial Data
 
 Air quality modeling requires many spatial data to generate anthropogenic,
-biogenic, fire, sea salt, dust, and NH3 emissions. In addition, land surface characteristics such as
+biogenic, fire, sea salt, dust, and NH<sub>3</sub> emissions. In addition, land surface characteristics such as
 land cover types with vegetation leaf area index (LAI) and fraction, albedo, and soil types are required in
 modeling the exchanges of heat, moisture, and momentum between the land and atmosphere and dry deposition
-of trace chemicals (e.g. O3 and NH3). It is important to use a consistent coordinate system for all the
+of trace chemicals (e.g. O<sub>3</sub> and NH<sub>3</sub>). It is important to use a consistent coordinate system for all the
 geospatial data used in emission, meteorology, and air quality modeling. Most of the geospatial data
 required for the Sparse Matrix Operator Kernel Emissions (SMOKE)/Weather Research and Forecasting
 (WRF)/CMAQ modeling can be generated using the Spatial Allocator (SA) that includes three components
@@ -40,17 +40,11 @@ introducing spatial misalignment issues in the model datasets.
 
 ### Spatial Data Projection
 
-CMAQ can use any of the [four map projections defined for WRF](http://www2.mmm.ucar.edu/wrf/users/docs/user_guide_V3/users_guide_chap3.htm)
-The four map projection coordinate
-systems are regular latitude-longitude geographic, Lambert conformal conic, Mercator, and Polar
-stereographic. It is important to know that in projecting spatial data that is in WGS84 to the CMAQ
-projection or projecting CMAQ data to another map projection, users SHOULD NOT do any datum transformation.
-This is consistent with the WRF preprocessing system (WPS). Datum transformation will result in
- geographic location shifting.
+CMAQ can use any of the [four map projections defined for WRF.](http://www2.mmm.ucar.edu/wrf/users/docs/user_guide_V3/users_guide_chap3.htm) 
+The four map projection coordinate systems are regular latitude-longitude geographic, Lambert conformal conic, Mercator, and Polar
+stereographic. It is important to know that in projecting spatial data that is in WGS84 to the CMAQ projection or projecting CMAQ data to another map projection, users SHOULD NOT do any datum transformation. This is consistent with the WRF preprocessing system (WPS). Datum transformation will result in  geographic location shifting.
 
-The CMAQ domain projection is defined through PROJ.4 using a spherical surface with an earth radius
-of 6370000 m to match the WRF domain projection definition.  Once an input dataset is in WGS84 the
-following examples can be used to define the projection transformation needed to match the WRF data:
+The CMAQ domain projection is defined through the [PROJ](https://proj.org) coordinate transformation software library using a spherical surface with an earth radius of 6370000 m to match the WRF domain projection definition.  Once an input dataset is in WGS84 the following examples can be used to define the projection transformation needed to match the WRF data:
 
 Lambert Conformal Conic:  "+proj=lcc +a=6370000.0 +b=6370000.0 +lat_1=33 +lat_2=45 +lat_0=40 +lon_0=-97"
 
@@ -63,28 +57,28 @@ Geographic:  "+proj=latlong +a=6370000.0 +b=6370000.0"
 ### Spatial Data Generation
 
 Emission spatial allocation surrogates are required for generating anthropogenic emissions by SMOKE to
-spatially allocate county-based emission inventory to model grid cells. Emission surrogates can be based
+spatially allocate county-based emission inventories to model grid cells. Emission surrogates can be based
 on population, roads, airports, railroads, and land use spatial data sets. The SA Vector and Surrogate
 Tools can be used to generate all needed emission surrogates for SMOKE.
 
 - [SA Vector and Surrogate Tools](https://www.cmascenter.org/sa-tools/) 
 
-**Biogenic emissions** require land use input including different tree species. There are three ways to
+**Biogenic emissions** require land use input including different tree species. There are two ways to
 compute the required input for the domain covering the continental U.S. (CONUS).
 
 1. The original method—re-grid Biogenic Emissions Landuse Database, Version 3 (BELD3) using a SA Vector
 allocation tool. The BELD3 data is generated from the early 1990s AVHRR land cover data and FIA tree
-species at county.
+species at the county level.
 2. The second method—use the SA Raster BELD4 land cover generation tool to generate model domain land use
  data with tree species. Then, a provided utility is used to convert the generated land cover data into
- an I/O API format for CMAQ input. The limitation for this tool is that the early 1990s FIA tree species
- table at county is still used in allocating FIA tree species (same as the 1st approach).
+ an I/O API format for CMAQ input. The limitation for this tool is that the early 1990s county-level FIA tree species
+ table is still used in allocating FIA tree species (this is also the case for the 1st approach).
 
 - [SA Vector and Surrogate Tools](https://www.cmascenter.org/sa-tools/) 
 - [SA Raster BELD4 land cover generation tool](https://www.cmascenter.org/sa-tools/documentation/4.2/Raster_Users_Guide_4_2.pdf) 
 
 **Fire emissions** require fire location, burned areas, and detailed fuel load information.
-Fire locations are available vis satellite detections from the Hazard Mapping System (HMS) or ground
+Fire locations are available via satellite detections from the Hazard Mapping System (HMS) or ground
 level reports from the National Fire and Aviation Management web application.  Burn Area estimates can
 be obtained from GIS based sources such as the Geospatial Multi-Agency Coordination (GeoMac) website or
 the U.S. National Historical Fire Perimeters Data Basin Dataset.  Fuel loading is estimated using a
@@ -93,8 +87,8 @@ All these information sources can be used to estimate fire emissions. An example
 be used to generate fire emissions is the BlueSky modeling framework.  BlueSky modularly links a variety
 of independent models of fire information, fuel loading, fire consumption, fire emissions, and smoke
 dispersion.  Using these tools and estimating fire emissions can be quite complex so datasets of fire
-emissions have been created for the community. Examples of these datasets is the Fire INventory from
-the National Center for Atmospheric Research (FINN) or the Global Fire Emissions Database.
+emissions have been created for the community. Examples of such datasets are the Fire INventory from
+the National Center for Atmospheric Research (FINN) or the Global Fire Emissions Database (GFED).
 
 - [Hazard Mapping System Fire and Smoke Product](https://www.ospo.noaa.gov/Products/land/hms.html)
 - [National Fire and Aviation Management Web Application](https://fam.nwcg.gov/fam-web/)
@@ -105,20 +99,14 @@ the National Center for Atmospheric Research (FINN) or the Global Fire Emissions
 - [Fire INventory from the National Center for Atmospheric Research](https://www2.acom.ucar.edu/modeling/finn-fire-inventory-ncar)
 - [Global Fire Emissions Database](http://www.globalfiredata.org/)
 
-**Sea salt emissions** require open ocean and surface zone (50m) buffer fractions for the modeling grid
+**Sea spray emissions** require open ocean and surf zone (50m) buffer fractions for the modeling grid
  cells in an I/O API file. For most of North American domain, a SA Vector allocation tool can be used
  to generate the surf zone and open ocean file from a polygon shapefile with land, surf zone buffer,
  and open ocean in SA data directory. For areas outside U.S., users have to generate a surf zone polygon
- shapefile with has the same attribute as the file in the SA to use the tool.
-
-**Dust emissions** require the land use and vegetation fraction data. The land use data used for the
-biogenic emission modeling is also used for dust emission computation. In addition, MODIS fraction of
-photosynthetically active radiation (FPAR) is used as the surrogate for the vegetation fraction. Users
-can use WPS to re-grid MODIS 10-year average vegetation FPAR for their domains or use the SA raster tool
-to re-grid downloaded MODIS LAI and FPAR products. 
+ shapefile with has the same attribute as the file in the SA to use the tool.  See the [CMAQ Tutorial on creating an ocean file](Appendix/CMAQ_UG_tutorial_oceanfile.md) for step by step instructions on creating this CMAQ input file. [Chapter 6](CMAQ_UG_ch06_model_configuration_options.md#sea-spray) has additional information on sea spray module in CMAQ.
 
 **NH3 emissions** from agricultural lands can be estimated using the CMAQ bi-directional NH3 model. The
-input for the CMAQ bi-directional NH3 model is generated by the Fertilizer Emission Scenario Tool for
+input for the CMAQ bi-directional NH<sub>3</sub> model is generated by the Fertilizer Emission Scenario Tool for
 CMAQ (FEST-C) system. FEST-C contains three main components: Java interface, Environmental Policy
 Integrated Climate (EPIC) model, and SA Raster Tools. The interface guides users through generating
 required land user and crop data and EPIC input files and simulating EPIC, and extracting EPIC output
@@ -129,10 +117,10 @@ using a utility program in FEST-C for CMAQ input. Note that the BELD4 data used 
 
 **Land use and land cover data for surface flux modeling** in meteorology and air quality can be
 generated using WPS or the SA Raster Tools. It is important to use consistent land use data in both
-meteorology and air quality modeling. For most of the North America, WPS contains re-gridded 9-arc
-second (around 250 m resolution) 2011 NLCD land cover, imperviousness, and canopy data with 2011 MODIS
-land cover for the area outside the U.S. In addition, users can use the land use re-gridding tool in the
-SA Raster Tools system to generate any domain land cover data directly using NLCD (at 30 m resolution)
+meteorology and air quality modeling. For the U.S., WPS contains re-gridded 9-arc
+second (around 250 m resolution) 2011 NLCD land cover, imperviousness, and canopy data while 2011 MODIS
+land cover is used for areas outside the U.S. In addition, users can use the land use re-gridding tool in the
+SA Raster Tools system to generate land cover data for any domain directly using NLCD (at 30 m resolution)
 or/and MODIS land cover data (at 1 km or 500 m resolution). Users can use a provided R utility in SA to
 update their geogrid land cover data using the more accurate land cover data generating using SA.
 

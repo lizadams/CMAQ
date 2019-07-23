@@ -34,7 +34,9 @@ The CMAQ User's Guide is designed to support the installation, configuration, an
 
 [Chapter 11 (ISAM):](CMAQ_UG_ch11_ISAM.md) Instrumented Models - Integrated Source Apportionment Method (ISAM).
 
-[Chapter 12 (Sulfur Tracking):](CMAQ_UG_ch12_sulfur_tracking.md) Instrumented Models - Sulfur Tracking Model (STM).
+[Chapter 12 (Sulfur Tracking):](CMAQ_UG_ch12_sulfur_tracking.md) Instrumented Models - Sulfur Tracking Method (STM).
+
+[Chapter 13 (WRF-CMAQ):](CMAQ_UG_ch13_WRF-CMAQ.md) WRF-CMAQ model for simulating interactions between chemistry and weather.
 
 [Tables and Figures:](CMAQ_UG_tables_figures.md) List of Tables and Figures.
 

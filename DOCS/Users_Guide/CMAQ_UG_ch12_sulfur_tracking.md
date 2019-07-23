@@ -1,12 +1,12 @@
 
 <!-- BEGIN COMMENT -->
 
-[<< Previous Chapter](CMAQ_UG_ch11_ISAM.md) - [Home](README.md) 
+[<< Previous Chapter](CMAQ_UG_ch11_ISAM.md) - [Home](README.md) - [Next Chapter >>](CMAQ_UG_ch13_WRF-CMAQ.md)
 
 <!-- END COMMENT -->
 
 # 12. Sulfur Tracking Method
-## 12.1 Overview
+## 12.1 Introduction
 CMAQv5.3 includes a runtime diagnostic model option that provides detailed information on the modeled sulfur budget. This option, referred to as the "Sulfur Tracking Method (STM)", tracks sulfate production from gas- and aqueous-phase chemical reactions, as well as contributions from emissions and initial and boundary conditions. Each tracked species is treated as other modeled species, undergoing transport (advection, diffusion, cloud-mixing) and removal by deposition (both wet and dry).  Several notable features in the CMAQv5.3 release of STM include:
 
 - The STM is now a runtime option enabled by an environment variable.
@@ -28,6 +28,8 @@ Note that several of the standard CMAQ output files (ACONC, CONC, CGRID, DDEP, a
 -   m3tproc (to sum/average over multiple days)
 -   verdi (for data visualization)
 
+<a id=Table12-1></a>
+
 **Table 12-1. Sulfur Tracking Species List**
 
 |Species Group|Species Name| MW   | Description |
@@ -48,6 +50,8 @@ Note that several of the standard CMAQ output files (ACONC, CONC, CGRID, DDEP, a
 |AE           |ASO4ICBCK   | 96.0 |ASO4K from boundary and initial conditions |
 |NR           |SULF_ICBC   | 98.0 |Sulfuric acid vapor (SULF) from boundary and initial conditions |
 
+<a id=Table12-2></a>
+
 **Table 12-2.  Additional Tracking Species Representing Loss of Inorganic Sulfate to Organosulfate (only included if using SAPRC07TIC_AE6I, SAPRC07TIC_AE7I, CB6R3_AE7, or CB6R3M_AE7 mechanisms)**
 
 |Species Group|Species Name| MW   | Description |
@@ -66,7 +70,7 @@ Note that several of the standard CMAQ output files (ACONC, CONC, CGRID, DDEP, a
  [Shawn Roselle](mailto:roselle.shawn@epa.gov), Computational Exposure Division, U.S. EPA
 <!-- BEGIN COMMENT -->
 
-[<< Previous Chapter](CMAQ_UG_ch11_ISAM.md) - [Home](README.md) <br>
+[<< Previous Chapter](CMAQ_UG_ch11_ISAM.md) - [Home](README.md) - [Next Chapter >>](CMAQ_UG_ch13_WRF-CMAQ.md) <br>
 CMAQ User's Guide (c) 2019<br>
 
 <!-- END COMMENT -->

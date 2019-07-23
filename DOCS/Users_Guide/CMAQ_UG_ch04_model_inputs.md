@@ -7,7 +7,7 @@
 
 # 4. Model Input Files
 
-This chapter provides basic information on the format and content of CMAQ input files.  It also provides information on using the pre-processing tools provided in the repository for preparing initial and boundary conditions and meteorology inputs.  Links are provided for  the emissions processing tools that are released through their own repository or website.  A list of CMAQ input files can be found in [Table 4-1](#Input_Table). Some CMAQ input files are in ASCII format while the majority of them are in the [Network Common Data Form (netCDF)] format (http://www.unidata.ucar.edu/software/netcdf). CMAQ input and output files are self-describing netCDF-format files in which the file headers have all the dimensioning and descriptive information needed to define the resident data. Users should download the latest code for the NetCDF from the [NetCDF website](http://www.unidata.ucar.edu/software/netcdf). Compilation and configuration information for the NetCDF is available through the Unidata website.
+This chapter provides basic information on the format and content of CMAQ input files.  It also provides information on using the pre-processing tools provided in the repository for preparing initial and boundary conditions and meteorology inputs.  Links are provided for  the emissions processing tools that are released through their own repository or website.  A list of CMAQ input files can be found in [Table 4-1](#Input_Table). Some CMAQ input files are in ASCII format while the majority of them are in the [Network Common Data Form (netCDF) format](http://www.unidata.ucar.edu/software/netcdf). CMAQ input and output files are self-describing netCDF-format files in which the file headers have all the dimensioning and descriptive information needed to define the resident data. Users should download the latest code for the NetCDF from the [NetCDF website](http://www.unidata.ucar.edu/software/netcdf). Compilation and configuration information for the NetCDF is available through the Unidata website.
 
 All CMAQ input and output files are conformed to I/O API netCDF file format. Please refer to the [I/O API User's Manual](https://www.cmascenter.org/ioapi/documentation/all_versions/html) for details.
 
@@ -26,7 +26,7 @@ Most of the fields that are simulated by WRF are not modified by MCIP for the CC
 
 ICON generates a gridded netCDF file of the chemical conditions for all grid cells in the modeling domain for the initial time of a simulation. It can generate these initial conditions from either an existing CCTM output file or one of four ASCII files of vertically resolved concentration profiles distributed with CMAQ. Running ICON requires that the user already generated MCIP files for their target modeling domain. For both input file options, ICON will interpolate the data to the horizontal and vertical structure of the target domain as defined in the MCIP files. The species in the ICON output file are identical to those in the input (either CCTM output or ASCII profile) file.
 
-Using an existing CCTM output file to generate initial conditions is applicable when extrapolating initial conditions from a coarse to a fine grid simulation, as may occur when setting up nested simulations (simulations with finer-resolution grids that cover part of coarser-resolution grids). This is the preferred mode of specifying initial conditions since the spatial concentration patterns derived from the coarser-resolution simulation can be considered a first approximation of the concentration fields over the finer-resolution subdomain at the beginning of the simulation.
+Using an existing CCTM output file to generate initial conditions is applicable when interpolating initial conditions from a coarse to a fine grid domain, as may occur when setting up nested simulations (simulations with finer-resolution grids that cover part of coarser-resolution grids). This is the preferred mode of specifying initial conditions since the spatial concentration patterns derived from the coarser-resolution simulation can be considered a first approximation of the concentration fields over the finer-resolution subdomain at the beginning of the simulation.
 
 The four ASCII files of vertically resolved concentration profiles [distributed with CMAQ](../../PREP/bcon/src/profile) represent annual average concentrations at a grid cell over the Pacific derived from a simulation with the hemispheric version of CMAQv5.3 beta2 for the year 2016. As such, these concentration profiles are reflective of conditions in a remote marine environment. The simulation was performed with the cb6r3m_ae7_kmtbr chemical mechanism and profiles for racm_ae6_aq, saprc07tc_ae6_aq, and saprc07tic_ae7i_aq were derived using the species mapping approach described in Step 3 of the [CMAQ Tutorial on creating Initial and Boundary Conditions from Seasonal Average Hemispheric CMAQ Output](./Tutorials/HCMAQ_IC_BC_Tutorial.md). If one of these ASCII profile files is used to generate initial conditions, the resulting concentration fields will be uniform over the modeling domain and will not be a realistic representation of conditions over the modeling domain. As a result, simulations initialized with profile-derived rather than CCTM-derived concentration fields may require longer spin-up periods before conditions simulated within the domain no longer are influenced by these unrealistic initial concentration fields.  
 
@@ -70,11 +70,12 @@ Additional information on processing data for CMAQ inputs is provided in [Append
 
 CMAQ requires a basic set of input files: initial condition file, which is created by ICON process or previous day output; boundary condition file, which is created by BCON process; emission files; and meteorological data created by MCIP using WRF and terrain data. Additional input files may be required based on specific run time options. CMAQ output files include a basic set of files with aerosol and gas-phase species concentrations, wet and dry deposition estimates, and visibility metrics, and an auxiliary set of output files for diagnosing model performance and in-line-calculated emissions.  Model outputs are discussed in [Chapter 6](CMAQ_UG_ch06_model_outputs.md).
 
-Rather than forcing the user to deal with hard-coded file names or hard-coded unit numbers, the I/O API netCDF file format utilizes the concept of logical file names. The modelers can define the logical names as properties of a program, and then at run-time the logical names can be linked to the actual file name using environment variables. For programming purposes, the only limitations are that file names cannot contain blank spaces and must be at most 16 characters long. When a modeler runs a program that uses the I/O API format, environment variables must be used to set the values for the program’s logical file names. A complete list of CMAQ input is provided in [Table 4-1](#Input_Table).
+Rather than forcing the user to deal with hard-coded file names or hard-coded unit numbers, the I/O API netCDF file format utilizes the concept of logical file names. The modelers can define the logical names as properties of a program, and then at run-time the logical names can be linked to the actual file name using environment variables. For programming purposes, the only limitations are that logical file names cannot contain blank spaces and must be at most 16 characters long. When a modeler runs a program that uses the I/O API format, environment variables must be used to set the values for the program’s logical file names. A complete list of CMAQ input is provided in [Table 4-1](#Input_Table).
 
-This section describes each of the input files required by the various CMAQ programs. The section begins with a description of the grid definition file, GRIDDESC, which is used by several CMAQ programs, and then goes through a program-by-program listing of the CMAQ input file requirements. [Table 4-1](#Input_Table) lists the source, file type, and temporal and spatial dimensions of each CMAQ input file.   Typical time step is 1 hour; however a user can specify a finer one, e.g. 20 minutes. In addition, typical thickness of a boundary file is 1, i.e. NTHIK = 1 but it can be any positive integer.
+This section describes each of the input files required by the various CMAQ programs. The section begins with a description of the grid definition file, GRIDDESC, which is used by several CMAQ programs, and then goes through a program-by-program listing of the CMAQ input file requirements. [Table 4-1](#Input_Table) lists the source, file type (e.g. ASCII, [GRDDED3](https://www.cmascenter.org/ioapi/documentation/all_versions/html/DATATYPES.html), [BNDARY3](https://www.cmascenter.org/ioapi/documentation/all_versions/html/DATATYPES.html), etc.), and temporal and spatial dimensions of each CMAQ input file.   Typical time step is 1 hour; however a user can specify a finer one, e.g. 20 minutes. In addition, typical thickness of a boundary file is 1, i.e. NTHIK = 1 but it can be any positive integer.
 
 <a id=Input_Table></a>
+<a id=Table4-1></a>
 **Table 4-1. CMAQ input files.**  Note that when "Time-Dependence" is listed as "Hourly", it is shorthand for a time-varying file.  It is recommended that CMAQ use a time increment that is no longer than one hour.  However, CMAQ can be run with a Time Dependence that is shorter than hourly.
 
 |**Environment Variable Name for File**|**File Type**|**Time-Dependence**|**Spatial Dimensions**|**Source**|**Required**|
@@ -86,17 +87,9 @@ This section describes each of the input files required by the various CMAQ prog
 |[nr_matrix_nml](#matrix_nml) <a id=matrix_nml_t></a>|ASCII|n/a|n/a|CMAQ repo|required|
 |[tr_matrix_nml](#matrix_nml) <a id=matrix_nml_t></a>|ASCII|n/a|n/a|CMAQ repo|required|
 |**Initial Condition Inputs**|  | | ||
-|[INIT_CONC_1](#init_conc_1) <a id=init_conc_1_t></a> | GRDDED3 | Time-invariant | XYZ | ICON or CCTM|required|
-|[INIT_GASC_1](#init_conc_1) <a id=init_conc_1_t></a>|GRDDED3|Time-invariant | XYZ | ICON or CCTM |required|
-|[INIT_AERO_1](#init_conc_1) <a id=init_conc_1_t></a>|GRDDED3|Time-invariant | XYZ | ICON or CCTM|required|
-|[INIT_NONR_1](#init_conc_1) <a id=init_conc_1_t></a>|GRDDED3|Time-invariant | XYZ | ICON or CCTM|required|
-|[INIT_TRAC_1](#init_conc_1) <a id=init_conc_1_t></a>|GRDDED3|Time-invariant | XYZ | ICON or CCTM|required|
+|[INIT_CONC_1](#init_conc_1) <a id=init_conc_1_t></a>|GRDDED3|Time-invariant | XYZ | ICON or CCTM |required|
 |**Boundary Condition Inputs**| | | | ||
-|[BNDY_CONC_1](#bndy_conc_1) <a id=bndy_conc_1_t></a> | BNDARY3 | Hourly |[2(X+1)+2(Y+1)]\*Z | BCON|required|
-|[BNDY_GASC_1](#bndy_conc_1) <a id=bndy_conc_1_t></a> |BNDARY3| Hourly |[2(X+1)+2(Y+1)]\*Z|BCON|required|
-|[BNDY_AERO_1](#bndy_conc_1) <a id=bndy_conc_1_t></a> |BNDARY3| Hourly |[2(X+1)+2(Y+1)]\*Z|BCON|required|
-|[BNDY_NONR_1](#bndy_conc_1) <a id=bndy_conc_1_t></a> |BNDARY3| Hourly |[2(X+1)+2(Y+1)]\*Z|BCON|required|
-|[BNDY_TRAC_1](#bndy_conc_1) <a id=bndy_conc_1_t></a> |BNDARY3| Hourly |[2(X+1)+2(Y+1)]\*Z|BCON|required|
+|[BNDY_CONC_1](#bndy_conc_1) <a id=bndy_conc_1_t></a> |BNDARY3| Hourly |PERIM\*Z|BCON|required|
 |**MCIP**| | | | |||
 |[GRID_CRO_2D](#grid_cro_2d) <a id=grid_cro_2d_t></a>| GRDDED3 | Time-invariant | XY | MCIP|required|
 |[GRID_BDY_2D](#grid_bdy_2d) <a id=grid_bdy_2d_t></a>| BNDARY3 | Time-invariant | PERIM\*Z | MCIP|required|
@@ -105,7 +98,7 @@ This section describes each of the input files required by the various CMAQ prog
 |[MET_CRO_2D](#met_cro_2d) <a id=met_cro_2d_t></a>| GRDDED3 | Hourly | XY | MCIP|required|
 |[MET_CRO_3D](#met_cro_3d) <a id=met_cro_3d_t></a>| GRDDED3 | Hourly | XYZ | MCIP|required|
 |[MET_DOT_3D](#met_dot_3d) <a id=met_dot_3d_t></a>| GRDDED3 | Hourly | (X+1)\*(Y+1)Z | MCIP|required|
-|[LUFRAC_CRO](#lufrac_cro) <a id=lufrac_cro_t></a>| GRDDED3 | Time-invariant | XYL | MCIP|optional (contains fractional landuse by category)|
+|[LUFRAC_CRO](#lufrac_cro) <a id=lufrac_cro_t></a>| GRDDED3 | Time-invariant | XYL | MCIP|required|
 |[SOI_CRO](#soi_cro) <a id=soi_cro_t></a>| GRDDED3 | Hourly | XYS | MCIP | optional (Contains soil moisture and soil temperature in layers. A two-layer representation of those fields is currently mirrored in MET_CRO_2D.)|
 |[MOSAIC_CRO](#mosaic_cro) <a id=mosaic_cro_t></a>| GRDDED3| Hourly| XYM | MCIP|optional (Contains surface fields in mosaic land use categories if Noah Mosaic LSM was run in WRF. Can work with STAGE deposition in CCTM.)|
 |[mcip.nc](#mcip) <a id=mcip_t></a>| netCDF | varies by field | varies by field | MCIP|required if IOFORM=2 (Currently not compatible with rest of CMAQ system.)|
@@ -136,11 +129,11 @@ This section describes each of the input files required by the various CMAQ prog
 
 Used by: ICON, BCON, CCTM
 
-The CMAQ grid description file (**GRIDDESC**) is an ASCII file that contains two sections: a horizontal coordinate section, and grid description section.  The GRIDDESC file is generated automatically with MCIP; alternatively, GRIDDESC can be created using a text editor.
+The CMAQ grid description file (**GRIDDESC**) is an ASCII file that contains two sections: a horizontal coordinate section, and domain description section. The GRIDDESC file is generated automatically by MCIP; alternatively, GRIDDESC can be created using a text editor.
 
-The horizontal coordinate section consists of text records that provide the coordinate-system name, the map projection, and descriptive parameters that are relevant to the projection type (e.g. longitude for coordinate system center)
+The horizontal coordinate section consists of text records that provide the coordinate-system name, the map projection, and descriptive parameters that define the projection.  This section is used to provide projection information that is used by a family of nested domains, where the coordinate-system name is shared by each of the domains. 
 
-The grid description section consists of text records that indicate the grid name, related coordinate-system name (i.e., which GRIDDESC horizontal coordinate name that is defined in the previous section that is applied to this grid), and descriptive parameters for the coordinates of the lower-left corner of the grid, grid cell size, number of columns, and rows. For a typical CMAQ application, both "dot-point" and "cross-point" grids are defined in the GRIDDESC file; these grids are topological duals in the sense that the vertices (corners) of one correspond to the cell-centers of the other. There are at most 32 coordinate systems and 256 grids listed in one of these files. These files are small enough to be archived easily with a study and have a sufficiently simple format that new ones can easily be constructed "by hand."
+The grid description section consists of text records that indicate the grid name, related coordinate-system name (i.e., which GRIDDESC horizontal coordinate name that is defined in the previous section that is applied to this grid), and descriptive parameters for the coordinates of the lower-left corner of the grid, grid cell size, number of columns, and rows. There are at most 32 coordinate systems and 256 grids that can be listed in one of these files. These files are small enough to be archived easily with a study and have a sufficiently simple format that can easily be constructed "by hand."  The elements of the GRIDDESC files are typically included with the metadata for the output files in the CMAQ system.
 
 An example of a GRIDDESC file is shown below:
 
@@ -158,9 +151,9 @@ An example of a GRIDDESC file is shown below:
 
 ` ' '`
 
-The horizontal coordinate section (first section) in this example GRIDDESC file defines a horizontal coordinate named “LAM_40N100W”. The coordinate definition is for a Lambert conformal grid, keyed by the first column of the coordinate description line, which corresponds to the numeric code for the various I/O API-supported grid types (2 = Lambert). The next three parameters (P_ALP, P_BET, and P_GAM) have different definitions for different map projections. For Lambert conformal, P_ALP and P_BET are the true latitudes of the projection cone (30°N and 60°N in the example), and P_GAM (100°W in the example) is the central meridian of the projection. The last two parameters, XCENT and YCENT, are the latitude-longitude coordinates of the grid center of the Cartesian coordinate system, which are 100°W and 40°N in the example. If using WRF-ARW as the meteorological model, the user should be aware of differences from this method.
+The horizontal coordinate section (first section) in this example GRIDDESC file defines a horizontal coordinate named “LAM_40N100W”. The coordinate definition is for a Lambert conformal grid, keyed by the first column of the coordinate description line, which corresponds to the numeric code for the various I/O API-supported grid types (2 = Lambert). The next three parameters (P_ALP, P_BET, and P_GAM) have different definitions for different map projections. For Lambert conformal, P_ALP and P_BET are the true latitudes of the projection cone (30°N and 60°N in the example), and P_GAM (100°W in the example) is the central meridian of the projection. The last two parameters, XCENT and YCENT, are the reference longitude and latitude for the domain, which are 100°W and 40°N in the example.
 
-The example grid definition section above describes a grid named “M_32_99TUT02”. The definition of the grid begins with a reference to a coordinate name from the coordinate definition section of the file; in this example, the coordinate named “LAM_40N100W” is referenced in the grid definition. The next two parameters in the grid definition (XORIG and YORIG) are the east-west and north-south offsets from XCENT and YCENT in meters (WRF-ARW usages may differ). The next two parameters (XCELL and YCELL) are the horizontal grid spacing in meters for the X and Y directions (i.e., delta-x and delta-y). The next two parameters (NCOLS and NROWS) are the numbers of grid cells in the X and Y directions. The grid definition concludes with the number of boundary cells, NTHIK, which is typically set to 1.
+The second section in the example describes a domain named “M_32_99TUT02”. In this example, the coordinate named “LAM_40N100W” is referenced in the domain definition. The next two parameters in the domain definition (XORIG and YORIG) are the east-west and north-south offsets from XCENT and YCENT in meters. The next two parameters (XCELL and YCELL) are the horizontal grid spacing in meters for the X and Y directions (i.e., &#916;x and &#916;y). The next two parameters (NCOLS and NROWS) are the numbers of grid cells in the X and Y directions. The grid definition concludes with the number of boundary cells, NTHIK, which is typically set to 1. Note that the number of boundary cells for CMAQ differs from that used by WRF.
 
 Additional information about the parameters in the GRIDDESC file can be found in the [I/O API Documentation](https://www.cmascenter.org/ioapi/documentation/all_versions/html/GRIDS.html).
 
@@ -169,22 +162,22 @@ Additional information about the parameters in the GRIDDESC file can be found in
 ### {gc|ae|nr|tr}_matrix.nml: Species namelist files
 [Return to Table 4-1](#matrix_nml_t)
 
-Used by: BCON, CCTM, ICON, CHEMMECH
+Used by: CCTM, CHEMMECH
 
 Namelist look-up tables for different classes of simulated pollutants are used to define the parameters of different model species during the execution of the CMAQ programs. Gas-phase (gc), aerosol (ae), non-reactive (nr), and tracer (tr) species namelist files contain parameters for the model species that are included in these different classifications. The species namelist files are used to control how the different CMAQ programs and processes handle the model species. The namelist files define the following processes for each model species:
 
 
+-   Initial conditions – which initial condition species is the pollutant mapped to; if not specified, this will default to the species name.
+-   IC Factor – if the pollutant is mapped to an initial condition species, uniformly apply a scaling factor to the concentrations.
+-   Boundary conditions – which boundary condition species is the pollutant mapped to; if not specified, this will default to the species name.
+-   BC Factor – if the pollutant is mapped to a boundary condition species, uniformly apply a scaling factor to the concentrations.
 -   Deposition velocity – which (if any) deposition velocity is the deposition velocity for the pollutant mapped to; allowed velocities are specified within the model source code.
 -   Deposition velocity factor – if the pollutant is mapped to a deposition velocity, uniformly apply a scaling factor to this velocity.
--   Initial condition– which initial condition species is the pollutant mapped to; if not specified, this will default to the species name.
--   IC Factor – if the pollutant is mapped to an initial condition species, uniformly apply a scaling factor to the concentrations.
--   Boundary condition – which boundary condition species is the pollutant mapped to; if not specified, this will default to the species name.
--   BC Factor – if the pollutant is mapped to a boundary condition species, uniformly apply a scaling factor to the concentrations.
--   Scavenging - which (if any) species is the pollutant mapped to; Allowed scavenging surrogates are specified within the model source code.
+-   Scavenging - which (if any) species is the pollutant mapped to; Allowed scavenging surrogates are specified within the model source code ("[hlconst.F](../../CCTM/src/cloud/acm_ae6/hlconst.F)").
 -   Scavenging factor - if the pollutant is mapped to a species for scavenging, uniformly apply a scaling factor to the scavenging rate.
--   Gas-to-aerosol conversion – which (if any) aerosol chemistry species does the gas phase pollutant concentration go into for transformation from the gas-phase to the aerosol-phase.
--   Gas-to-aqueous Surrogate – which (if any) cloud chemistry species does the gas pollutant concentration go into for simulating chemistry within cloud water.
--   Aerosol-to-aqueous Surrogate – which (if any) cloud chemistry species does the aerosol pollutant concentration go into for simulating chemistry within cloud water.
+-   Gas-to-aerosol conversion – which (if any) aerosol chemistry species does the gas phase pollutant concentration go into for transformation from the gas-phase to the aerosol-phase.  Allowed gas-to-aerosol surrogates are specified within the model source code ("[PRECURSOR_DATA.F](../../CCTM/src/aero/aero6/PRECURSOR_DATA.F)" and "[SOA_DEFN.F](../../CCTM/src/aero/aero6/SOA_DEFN.F)")
+-   Gas-to-aqueous Surrogate – which (if any) cloud chemistry species does the gas pollutant concentration go into for simulating chemistry within cloud water. Allowed gas-to-aqueous surrogates are specified within the model source code and depends on the cloud model/aqueous chemistry being used (for example, for the acm_ae6, see "[AQ_DATA.F](../../CCTM/src/cloud/acm_ae6/AQ_DATA.F)").
+-   Aerosol-to-aqueous Surrogate – which (if any) cloud chemistry species does the aerosol pollutant concentration go into for simulating chemistry within cloud water.  Allowed aerosol-to-aqueous surrogates are specified within the model source code and depends on the cloud model/aqueous chemistry being used (for example, for the acm_ae6, see "[AQ_DATA.F](../../CCTM/src/cloud/acm_ae6/AQ_DATA.F)").
 -   Transport – is the pollutant transported by advection and diffusion in the model?
 -   Dry deposition – Write the pollutant to the dry deposition output file?
 -   Wet deposition – Write the pollutant to the wet deposition output file?
@@ -200,18 +193,18 @@ The namelist files contain header information that describe which class of speci
 |-----|-----|----------------------|----------|--------------------------------------------|----------------------------|
 | 1 || File Type |String|String to delineate Gas Phase (GC), Aerosol (AE), Non-reactive (NR) and Tracer (TR) species namelist|{&GC_nml, &AE_nml, &NR_nml, &TR_nml}|
 | 3 || Header ID | String |String to define data structure relating to namelist|{GC_SPECIES_DATA=, AE_SPECIES DATA= , NR_SPECIES_DATA= ,TR_SPECIES_DATA = }|
-| 5 |1| SPECIES | String |CMAQ Species name, i.e. NO, HNO3, PAR; dependent on chemical mechanism|-|
+| 5 |1| SPECIES | String |CMAQ Species name, i.e. NO, HNO<sub>3</sub>, PAR; dependent on chemical mechanism|-|
 ||2| MOLWT| Integer |Species Molecular Weight|-|
 |  |3| IC | String |IC surrogate species name for the CMAQ Species|{'Species name', ' '}|
-|  |4| FAC | Integer |Scaling factor for the IC concentration|{Any integer: default = -1 if IC is not specified}|
+|  |4| FAC | Integer |Scaling factor for the IC concentration|{Any real: default = -1 if IC is not specified}|
 |  |5| BC | String |BC surrogate species name for the CMAQ Species|{'Species name', ' '}|
-|  |6| FAC | Integer |Scaling factor for the BC concentration|{Any integer: default = -1 if BC is not specified}|
-| |7| DRYDEP SURR | String |Deposition velocity variable name for the CMAQ Species|-|
-| |8| FAC | Integer |Scaling factor for the deposition velocity|{Any integer: default = -1 if SURR is not specified}|
-| |9| WET-SCAV SURR | String |Wet Deposition Scavenging surrogate species|-|
-| | 10 | FAC | Integer |Scaling factor for Scavenging|{Any integer: default = -1 if SURR is not specified}|
-|| 11 | GC2AE SURR | String |Gas-to-aerosol transformation species|-|
-|| 12 | GC2AQ SURR | String |Gas-to-aqueous transformation species|-|
+|  |6| FAC | Integer |Scaling factor for the BC concentration|{Any real: default = -1 if BC is not specified}|
+| |7| DRYDEP SURR | String |Deposition velocity variable name for the CMAQ Species|{'Species name', ' '}|
+| |8| FAC | Integer |Scaling factor for the deposition velocity|{Any real: default = -1 if SURR is not specified}|
+| |9| WET-SCAV SURR | String |Wet Deposition Scavenging surrogate species|{'Species name', ' '}|
+| | 10 | FAC | Integer |Scaling factor for Scavenging|{Any real: default = -1 if SURR is not specified}|
+|| 11 | GC2AE SURR | String |Gas-to-aerosol transformation species|{'Species name', ' '}|
+|| 12 | GC2AQ SURR | String |Gas-to-aqueous transformation species|{'Species name', ' '}|
 || 13 | TRNS | String |Transport Switch. _NOTE_: Instead of using one column labeled "TRNS" to turn/off both advection and diffusion for a pollutant, two separate columns labeled "ADV" and "DIFF" can be used to switch on/off advection and diffusion separately.|{YES/NO}|
 || 14 | DDEP | String |Dry deposition output file switch|{YES/NO}|
 || 15 | WDEP | Real |Wet deposition output file switch|{YES/NO}|
@@ -241,7 +234,7 @@ Used by: CCTM
 
 CMAQ boundary condition data are of the BNDARY3 file type. Produced by the boundary condition processor, BCON, CCTM reads these data and correlates them with the interior data using a pointer system. This pointer system designates the beginning location of the data in memory that start a new side of the domain (i.e., south, east, north, or west). Consult IOAPI User Guide for a pictorial description.
 
-Each species being modeled should be in the BNDY_CONC_1 file. If some modeled species are not contained in this file, the boundary condition for these species will default to the value 1 × 10e<sup>-30</sup>. The perimeter of the CMAQ domain is NTHIK cell wide (typically NTHIK = 1), where the number of boundary cells = (2*NROW*NTHIK)+(2*NCOL*NTHIK)+(4*NTHIK*NTHIK).
+Each species being modeled should be in the BNDY_CONC_1 file. If some modeled species are not contained in this file, the boundary condition for these species will default to the value 1 × 10e<sup>-30</sup>. The perimeter of the CMAQ domain is NTHIK cell wide (typically NTHIK = 1), where the number of boundary cells = NTHIK\*(2\*NCOLS + 2\*NROWS +4\*NTHIK).
 
 ## Meteorological Inputs (Processed for the CMAQ System using MCIP)
 
@@ -274,10 +267,12 @@ Each species being modeled should be in the BNDY_CONC_1 file. If some modeled sp
 - GRIDDESC:     Grid description used throughout the CMAQ System
 - mcip.nc:      All time-invariant and time-varying 2D and 3D fields (all dimensions)
 - mcip_bdy.nc:  All required time-invariant and time-varying 2D and 3D fields along lateral boundaries
+
 [Return to Table 4-1](#grid_cro_2d_t)
 
 Used by: ICON, BCON, CCTM, and some optional programs
 
+<a id=Table4-3></a>
 
 **Table 4-3**  MCIP output variables used within the CMAQ system.  All fields are located at cell centers, except where noted in the Description.  The Dimensions are:  XY=horizontal, T=time-varying, Z=layers above ground, S=layers below ground, L=land use categories, M=mosaic land use categories.
 
@@ -290,7 +285,7 @@ Used by: ICON, BCON, CCTM, and some optional programs
 |DLUSE|dominant land use|category|XY|GRIDCRO2D and GRIDBDY2D, or mcip.nc and mcip_bdy.nc|yes|
 |LWMASK|land-water mask|1=land, 0=water|XY|GRIDCRO2D and GRIDBDY2D, or mcip.nc and mcip_bdy.nc|yes|
 |PURB|urban percent of cell based on land coverage|percent|XY|GRIDCRO2D and GRIDBDY2D, or mcip.nc and mcip_bdy.nc|no, but refines vertical mixing in urban areas|
-|LUFRAC|fraction of land use by category|1|XYL|LUFRACCRO or mcip.nc|no, but refines deposition with both M3Dry and STAGE|
+|LUFRAC|fraction of land use by category|1|XYL|LUFRACCRO or mcip.nc|yes|
 |LATD|latitude|degrees, where Northern Hemisphere is positive (at cell corners)|XY|GRIDDOT2D or mcip.nc|no|
 |LOND|longitude|degrees, where Western Hemisphere is negative (at cell corners)|XY|GRIDDOT2D or mcip.nc|no|
 |MSFD2|squared map scale factor|m<sup>2</sup> m<sup>-2</sup> (at cell corners)|XY|GRIDDOT2D or mcip.nc|no|
@@ -428,11 +423,13 @@ Used by: CCTM – lightning NO<sub>x</sub> version only
 
 The NLDN lightning strikes file is used for calculating online NO emissions from hourly observed strike counts. This file contains the following variables interpolated to the modeling grid:
 
+<a id=Table4-4></a>
+
  **Table 4-4** Variables in hourly observed lightning strike file.
 
 |**Variable Name**|**Description**|**Units**|**Required**|
  |--------|-------------------|--------------|-----------|
- |LNT|hourly flash counts per sq. km.|km-2|yes|
+ |LNT|hourly flash counts per sq. km.|km<sup>-2</sup>|yes|
 
 <a id=ltngparm_file></a>
 
@@ -446,14 +443,16 @@ This file can be downloaded from the [CMAS Data Warehouse](https://drive.google.
 
 This file contains the following variables interpolated to the modeling grid:
 
+<a id=Table4-5></a>
+
 **Table 4-5** Variables in lightning parameters file.
 
 |**Variable Name**|**Description**|**Units**|**Required**|
 |--------|---------------|--------------|-----------|
 | SLOPE|linear equation parameter for estimating lightning flash count from hourly convective precipitation|unitless|yes|
-|INTERCEPT| linear equation parameter for  lightning flash count from hourly convective precipitation|km-2*|yes|
+|INTERCEPT| linear equation parameter for  lightning flash count from hourly convective precipitation|km<sup>-2</sup>*|yes|
 |SLOPE_lg| logarithmic equation parameter for estimating lightning flash count from hourly convective precipitation|unitless|yes|
-|INTERCEPT_lg| logarithmic equation parameter for estimating lightning flash count from hourly convective precipitation|km-2*|yes|
+|INTERCEPT_lg| logarithmic equation parameter for estimating lightning flash count from hourly convective precipitation|km<sup>-2</sup>*|yes|
 |ICCG_SUM| Ratio of intercloud to cloud-to-ground flashes during the summer season|unitless|yes|
 |ICCG_WIN| Ratio of intercloud to cloud-to-ground flashes during the winter season|unitless|yes|
 |OCNMASK| Land/water mask to remove spurious flashes over the ocean|unitless|yes|
@@ -467,7 +466,9 @@ This file contains the following variables interpolated to the modeling grid:
 
 Used by: CCTM
 
-The CMAQ aerosol models AERO5 and AERO6 can compute sea spray emissions from both open ocean grid cells and surf zone grid cells. The addition of the surf zone option simulates the elevated emissions rates of sea salt in coastal regions where wave action occurs. The OCEAN_1 file contains data on the fraction of each grid cell that is either open ocean (OPEN) or in the surf zone (SURF). When CCTM is compiled with AERO5 or AERO6, it will expect the OCEAN_1 file as input.
+The CMAQ sea spray emissions module requires the input of an ocean mask file (OCEAN). OCEAN is a time-independent I/O API file that identifies the fractional [0-1] coverage in each model grid cell allocated to open ocean (OPEN) or surf zone (SURF). The CCTM uses this coverage information to calculate sea spray emission fluxes from the model grid cells online during a CCTM run.
+
+Additionally, CMAQ's gas-phase chemical mechanisms except cb6r3m_ae7_kmtbr contain an effective first order halogen mediated ozone loss over the ocean (where OPEN + SURF > 0.0). The OCEAN file is also required for this process. The cb6r3m_ae7_kmtbr mechanism contains more explicit marine chemistry, but also requires the OCEAN file.
 
 See the [CMAQ Ocean File Tutorial](Tutorials/CMAQ_UG_tutorial_oceanfile.md) for step by step instructions on creating this file. 
 
