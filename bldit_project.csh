@@ -17,7 +17,7 @@
 #> directory.
 
 
- set CMAQ_HOME = /proj/ie/proj/CMAS/CMAQ/CMAQv5.3_branch_UNC8/openmpi_4.0.1_gcc_9.1.0
+ set CMAQ_HOME = /home/user/CMAQ_Project
 
 #> This section allows users to choose explicitly which tools
 #> to make available from the repo. For each selected tool,
