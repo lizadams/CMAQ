@@ -196,6 +196,7 @@ C Local variables:
       LOGICAL          EXST, OPD
       CHARACTER( 1000 ) :: CFILE
       CHARACTER(   16 ) :: ACT
+      REAL            :: REAL_TIME
       REAL( 8 )         :: CPU_TIME_START, CPU_TIME_FINISH
 
       CHARACTER(  2 ) :: COLROW = 'CR'  ! col/row arg list order
@@ -376,11 +377,13 @@ C Initialize PARIO
             XMSG = 'Failed to initialize parallel I/O library.'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
-#endif
 
 C Initialize stencil exchange
          CALL SE_INIT( NPROCS, NPCOL, NPROW, GL_NCOLS, GL_NROWS, NLAYS,
      &                 NSPCSD, MYPE, MNDIS, MEDIS, MSDIS, MWDIS )
+
+#endif
+
 #ifdef verbose_driver
          write( logdev,* ) ' MYPE -> MNDIS:    ', mype, mndis
          write( logdev,* ) ' MYPE -> MEDIS:    ', mype, medis
