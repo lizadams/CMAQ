@@ -43,6 +43,10 @@ C                           ZSTATIC implementation
 C     05 Aug 2019 D.Wong: - Used met information in the cell where a point source resides
 C                           rather than using bi-linear interpolation (call BMATVECN) to
 C                           obtain met information for that point source
+C     06 Aug 2019 D.Wong: - For two-way model, use UWIND/VWIND (wind U/V component on the
+C                           mass point and in offline CMAQ model, use average value of 
+C                           UWINDC/VWINDC to approximate UWIND/VWIND. Hence no longer 
+C                           need UWINDC_AVAIL/VWINDC_AVAIL
 
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
@@ -238,8 +242,13 @@ C-----------------------------------------------------------------------
          call interpolate_var ('QV', jdate, jtime, loc_qv)
          call interpolate_var ('PRES', jdate, jtime, loc_pres)
          call interpolate_var ('DENS', jdate, jtime, loc_dens)
+#ifdef twoway
+         call interpolate_var ('UWIND', jdate, jtime, loc_uwind)
+         call interpolate_var ('VWIND', jdate, jtime, loc_vwind)
+#else
          call interpolate_var ('UWINDC', jdate, jtime, loc_uwind)
          call interpolate_var ('VWINDC', jdate, jtime, loc_vwind)
+#endif
 
          DO N = 1, NPTGRPS
 
@@ -272,11 +281,17 @@ C-----------------------------------------------------------------------
 
                PTMET_DATA( N )%DENS(:,s) = loc_dens(myc, myr, :)
 
+#ifdef twoway
+               PTMET_DATA( N )%UWIND(:,s) = loc_uwind(myc, myr, :)
+
+               PTMET_DATA( N )%VWIND(:,s) = loc_vwind(myc, myr, :)
+#else
                PTMET_DATA( N )%UWIND(:,s) = 0.5*( loc_uwind(myc, myr, :)
      &                                          + loc_uwind(myc+1, myr, :) )
                
                PTMET_DATA( N )%VWIND(:,s) = 0.5*( loc_vwind(myc, myr, :)
      &                                          + loc_vwind(myc, myr+1, :) )
+#endif
             END DO
 
             IF ( MY_NSRC( N ) .GT. 0 ) THEN
