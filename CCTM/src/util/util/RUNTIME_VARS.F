@@ -327,8 +327,6 @@
       CALL GET_ENV ( STRTEMP, 'GRID_NAME', GRID_NAME, VARDEV )
       GRID_NAME = STRTEMP(1:16)
 
-      ! Output Time Step
-      CALL GET_ENV ( LOCAL_TSTEP, 'CTM_TSTEP', LOCAL_TSTEP, VARDEV )
 
 #ifndef twoway
       ! Main Program Name
@@ -343,6 +341,9 @@
 
       ! Starting Time
       CALL GET_ENV ( STTIME, 'CTM_STTIME', STTIME, VARDEV )
+
+      ! Output Time Step
+      CALL GET_ENV ( LOCAL_TSTEP, 'CTM_TSTEP', LOCAL_TSTEP, VARDEV )
 
       ! Retrieve the domain decomposition processor array
       IF ( NPROCS .GT. 1 ) THEN
