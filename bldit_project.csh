@@ -17,13 +17,16 @@
 #> directory.
 
 
- set CMAQ_HOME = /home/user/CMAQ_Project
+ set CMAQ_HOME = /home/bmurphy/cmaq_projects/DESID_families
 
 #> This section allows users to choose explicitly which tools
 #> to make available from the repo. For each selected tool,
 #> extract_scripts.csh will copy any build and run scripts
 #> out of the repo for you. Set each to [Y/N]
  set EXT_CCTM    = Y
+
+ #Utilities
+ set EXT_JPROC = Y
 
  # Pre-Processing Tools
  set EXT_BCON = Y
@@ -103,6 +106,17 @@
     cp CCTM/scripts/lonlat.csv $CMAQ_HOME/CCTM/scripts/lonlat.csv
     cp CCTM/scripts/isam_control.txt $CMAQ_HOME/CCTM/scripts/isam_control.txt
     cp CCTM/scripts/run_cctm_Bench_2016_12SE1.csh $CMAQ_HOME/CCTM/scripts/run_cctm_Bench_2016_12SE1.csh
+ endif
+
+#===============================================================================
+#> Copy JPROC scripts
+#===============================================================================
+ if ( $EXT_JPROC == 'Y' ) then
+    if ( ! -e "$CMAQ_HOME/UTIL/jproc/scripts" ) then
+       mkdir -pv $CMAQ_HOME/UTIL/jproc/scripts
+    endif
+    cp UTIL/jproc/scripts/bldit_jproc.csh $CMAQ_HOME/UTIL/jproc/scripts/bldit_jproc.csh
+    cp UTIL/jproc/scripts/run_jproc.csh $CMAQ_HOME/UTIL/jproc/scripts/run_jproc.csh
  endif
 
 #===============================================================================
