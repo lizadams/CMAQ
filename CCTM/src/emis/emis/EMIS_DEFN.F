@@ -1648,7 +1648,7 @@ C and allowing the model to proceed.
                     ! only exact matches or existing relationships 
                     ! should be populated.
                     IF (   (EM_NML( IRULE )%SURR .EQ. 'ALL' .AND. 
-     &                      LSPEC_KEY( IRULE ) .EQ. .TRUE. )
+     &                      LSPEC_KEY( IRULE ) .EQV. .TRUE. )
      &                  .AND.
      &                     (EM_FILE_SURR( ISRM )%ARRY( ISUR ) .NE. 
      &                      DIFF_SPC( IDIFF ) ) ) THEN
