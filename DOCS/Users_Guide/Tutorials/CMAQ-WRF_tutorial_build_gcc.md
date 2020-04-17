@@ -102,6 +102,12 @@ module load openmpi_4.0.1/gcc_9.1.0
      INSTALL    = /proj/ie/proj/CMAS/CMAQ/from_Carlie/LIB/ioapi-3.2
       ```
       
+ ### Edit the Makefile to add a path to the combined netCDF library directory
+ 
+ ```
+ NCFLIBS    = -L /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/Build_WRF/LIBRARIES/netcdf_combined/lib/ -lnetcdff -lnetcdf
+ ```
+ 
  #### change into the ioapi directory and copy the existing Makeinclude.Linux2_x86_64gfort to have an extension that is the same as the BIN environment variable
  
  ```
