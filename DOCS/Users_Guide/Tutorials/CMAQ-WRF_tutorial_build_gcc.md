@@ -104,6 +104,13 @@ module load openmpi_4.0.1/gcc_9.1.0
       
  ### Edit the Makefile to add a path to the combined netCDF library directory
  
+ change
+ ```
+ NCFLIBS = -lnetcdff -lnetcdf
+ ```
+ 
+ to
+ 
  ```
  NCFLIBS    = -L /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/Build_WRF/LIBRARIES/netcdf_combined/lib/ -lnetcdff -lnetcdf
  ```
