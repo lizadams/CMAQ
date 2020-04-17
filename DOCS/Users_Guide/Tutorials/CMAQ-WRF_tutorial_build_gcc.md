@@ -157,6 +157,14 @@ module load openmpi_4.0.1/gcc_9.1.0
  [lizadams@dogwood-login1 Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0]$ ./juldate
 ./juldate: error while loading shared libraries: libimf.so: cannot open shared object file: No such file or directory
 ```
+
+### Need to edit my .cshrc to add the path to the library 
+
+```
+#for gcc WRF-CMAQ build
+setenv NCF_COMBO /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/Build_WRF/LIBRARIES/netcdf_combined/
+setenv LD_LIBRARY_PATH ${NCF_COMBO}/lib:${LD_LIBRARY_PATH}
+```
       
 #### Set the IOAPI environment variable to the path where it has been installed
 
