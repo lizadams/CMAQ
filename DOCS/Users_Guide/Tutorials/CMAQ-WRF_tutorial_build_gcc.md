@@ -106,12 +106,9 @@ cp -rp BLD_CCTM_v531_gcc ../../../WRF-4.1.1/cmaq
 
 The coupled model is also available as a tarball (twoway.tar.gz) from the the US EPA annoymous ftp server:
 
-ftp://newftp.epa.gov/exposure/CMAQ/V5_3/WRF-CMAQ_Coupled_Model
-
 [ftp://newftp.epa.gov/exposure/CMAQ/V5_3/WRF-CMAQ_Coupled_Mode](https://bit.ly/3cuoDyi)
 
 
-    
 
 ### Step 6: Go into directory WRFV411 and execute the following command:
 
