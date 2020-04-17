@@ -111,6 +111,11 @@ module load openmpi_4.0.1/gcc_9.1.0
  ### Edit the Makeinclude.Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0 to comment out the OMPFLAG and OMPLIB
  
  ```
+ gedit Makeinclude.Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
+ ```
+ 
+ comment out the following lines by adding a # before the setting
+ ```
  #OMPFLAGS  = -fopenmp
  #OMPLIBS   = -fopenmp
  ```
