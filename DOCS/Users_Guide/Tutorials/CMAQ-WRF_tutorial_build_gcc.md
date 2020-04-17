@@ -119,6 +119,25 @@ module load openmpi_4.0.1/gcc_9.1.0
  #OMPFLAGS  = -fopenmp
  #OMPLIBS   = -fopenmp
  ```
+ 
+ Create a install directory
+ 
+ ```
+ mkdir /[your_path]/ioapi-3.2/Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
+ ```
+ 
+ ### Build ioapi using the following command
+ 
+ 
+ ```
+ make |& tee make.log
+ ```
+ 
+ ### Verify that the libioapi.a and the m3tools have been successfully built
+ 
+ ```
+ ls -lrt /[your_path]/ioapi-3.2/Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0/libioapi.a
+ ```
       
 #### Set the IOAPI environment variable to the path where it has been installed
 
