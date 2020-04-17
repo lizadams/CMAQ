@@ -2,7 +2,17 @@
 
 ### Procedure to build the WRF-CMAQ model using gnu compiler: ###
 
-### Step 1:  Download WRF 4.1.1
+### Step 1: choose your compiler, and load it using the module command if it is available on your system
+
+```
+module avail
+```
+
+```
+module load openmpi_4.0.1/gcc_9.1.0 
+```
+
+### Step 2:  Download WRF 4.1.1
    - Please register at the WRF User site https://www2.mmm.ucar.edu/wrf/users/download/get_source.html
    - use the second method to obtain the WRF-Modeling System source code by downloading an archived version from github
    - download version 4.1.1 from https://github.com/wrf-model/WRF/releases/tag/v4.1.1
@@ -62,15 +72,15 @@
 
       - in the compile for nesting section, choose the default value
 
-### Step 2: Download IOAPI_3.2 and install it.
+### Step 3: Download IOAPI_3.2 and install it.
      - set the IOAPI environment variable to the path where it has been installed
 
-### Step 3: Install CMAQ
+### Step 4: Install CMAQ
      - follow these instructions to download the code, then use the modifications in Step 4
      
 https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/Tutorials/CMAQ_UG_tutorial_benchmark.md
 
-### Step 4: Modify the bldit_cctm.csh to uncomment the following options:
+### Step 5: Modify the bldit_cctm.csh to uncomment the following options:
 
      
       ```
@@ -98,7 +108,7 @@ example {depends on the location of your WRF-4.1.1 directory}:
 cp -rp BLD_CCTM_v531_gcc ../../../WRF-4.1.1/cmaq
 ```
 
-### Step 5: Download twoway.tar.gz and unzip it. A twoway directory is formed and move it inside WRFV411 as well.
+### Step 6: Download twoway.tar.gz and unzip it. A twoway directory is formed and move it inside WRFV411 as well.
 
 - The WRFv4.1.1-CMAQv5.3.1 coupled model is released as a tarball 
 
@@ -110,7 +120,7 @@ The coupled model is also available as a tarball (twoway.tar.gz) from the the US
 
 
 
-### Step 6: Go into directory WRFV411 and execute the following command:
+### Step 7: Go into directory WRFV411 and execute the following command:
 
     ```
     twoway/assemble
@@ -119,5 +129,5 @@ The coupled model is also available as a tarball (twoway.tar.gz) from the the US
     - This command will update all necessary files in WRF and CMAQ to create the twoway model. 
     - You can find the original files inside twoway/misc/orig directory.
 
-### Step 7: Compile the twoway model by typing "./compile em_real >& mylog"
+### Step 8: Compile the twoway model by typing "./compile em_real >& mylog"
     - If compilation is done successfully, you can find main/wrf.exe file.
