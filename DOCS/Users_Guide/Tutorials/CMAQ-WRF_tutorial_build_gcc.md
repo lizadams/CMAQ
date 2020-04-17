@@ -99,8 +99,21 @@ module load openmpi_4.0.1/gcc_9.1.0
      
      ```
      BIN        = Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
-      INSTALL    = /proj/ie/proj/CMAS/CMAQ/from_Carlie/LIB/ioapi-3.2
+     INSTALL    = /proj/ie/proj/CMAS/CMAQ/from_Carlie/LIB/ioapi-3.2
       ```
+      
+ #### change into the ioapi directory and copy the existing Makeinclude.Linux2_x86_64gfort to have an extension that is the same as the BIN environment variable
+ 
+ ```
+ cd ioapi
+ cp Makeinclude.Linux2_x86_64gfort Makeinclude.Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
+ ```
+ ### Edit the Makeinclude.Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0 to comment out the OMPFLAG and OMPLIB
+ 
+ ```
+ #OMPFLAGS  = -fopenmp
+ #OMPLIBS   = -fopenmp
+ ```
       
 #### Set the IOAPI environment variable to the path where it has been installed
 
