@@ -105,7 +105,7 @@ git checkout -b 2020104
      
      ```
      BIN        = Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
-     INSTALL    = /proj/ie/proj/CMAS/CMAQ/from_Carlie/LIB/ioapi-3.2
+     INSTALL    = /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/ioapi-3.2
       ```
       
  ### Edit the Makefile to add a path to the combined netCDF library directory
