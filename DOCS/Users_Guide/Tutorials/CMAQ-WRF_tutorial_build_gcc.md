@@ -78,8 +78,14 @@ module load openmpi_4.0.1/gcc_9.1.0
     
      
      ```
-     git clone --branch 2020085 https://github.com/cjcoats/ioapi-3.2
+     git clone https://github.com/cjcoats/ioapi-3.2
      ```
+     
+#### Change branches to 2020104 for the code updates 
+
+```
+git checkout -b 2020104
+```
      
 #### Change directories to the ioapi-3.2
      
