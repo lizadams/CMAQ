@@ -101,7 +101,7 @@ git checkout -b 2020104
      
  #### Edit the Makefile to specify the BIN and INSTALL directories:
      
-     example:
+     example: uncomment lines 141-149 and set the following environment variables 
      
      ```
      BIN        = Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
