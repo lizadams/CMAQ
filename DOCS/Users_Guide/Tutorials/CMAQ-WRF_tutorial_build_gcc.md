@@ -139,11 +139,6 @@ git checkout -b 2020104
  #OMPLIBS   = -fopenmp
  ```
  
- Create a install directory
- 
- ```
- mkdir /[your_path]/ioapi-3.2/Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
- ```
  
  ### Build ioapi using the following command
  
