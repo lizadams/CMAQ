@@ -151,6 +151,12 @@ module load openmpi_4.0.1/gcc_9.1.0
  ```
  ls -lrt /[your_path]/ioapi-3.2/Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0/libioapi.a
  ```
+ 
+ ### Note: I am getting a shared object problem when I try running m3tools
+ ```
+ [lizadams@dogwood-login1 Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0]$ ./juldate
+./juldate: error while loading shared libraries: libimf.so: cannot open shared object file: No such file or directory
+```
       
 #### Set the IOAPI environment variable to the path where it has been installed
 
