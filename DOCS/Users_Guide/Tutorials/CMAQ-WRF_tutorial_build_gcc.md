@@ -73,7 +73,36 @@ module load openmpi_4.0.1/gcc_9.1.0
       - in the compile for nesting section, choose the default value
 
 ### Step 3: Download IOAPI_3.2 and install it.
+     - follow the instructions on how to install I/O API available
+    
+     
+     ```
+     git clone --branch 2020085 https://github.com/cjcoats/ioapi-3.2
+     ```
+     
+     change directories to the ioapi-3.2
+     
+     ```
+     cd ioapi-3.2
+     ```
+     
+     - copy the Makefile.template to Makefile 
+     
+     ```
+     cp Makefile.template Makefile
+     ```
+     
+     - Edit the Makefile to specify the BIN and INSTALL directories:
+     
+     example:
+     
+     ```
+     BIN        = Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
+      INSTALL    = /proj/ie/proj/CMAS/CMAQ/from_Carlie/LIB/ioapi-3.2
+      ```
+      
      - set the IOAPI environment variable to the path where it has been installed
+    
 
 ### Step 4: Install CMAQ
      - follow these instructions to download the code, then use the modifications in Step 4
