@@ -1,6 +1,6 @@
 ## CMAQ-WRF Tutorial ## 
 
-### Procdedure to build the WRF-CMAQ model using gnu compiler: ###
+### Procedure to build the WRF-CMAQ model using gnu compiler: ###
 
 ### Step 1:  Download WRF 4.1.1
    - Please register at the WRF User site 
