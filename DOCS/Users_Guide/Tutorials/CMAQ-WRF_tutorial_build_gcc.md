@@ -106,7 +106,7 @@ cp -rp BLD_CCTM_v531_gcc ../../../WRF-4.1.1/cmaq
 
 The coupled model is also available as a tarball (twoway.tar.gz) from the the US EPA annoymous ftp server:
 
-[link to ftp://newftp.epa.gov/exposure/CMAQ/V5_3_1/Benchmark](https://newftp.epa.gov/exposure/CMAQ/V5_3_1/Benchmark)
+[link to ftp://newftp.epa.gov/exposure/CMAQ/V5_3_1/Benchmark](newftp.epa.gov/exposure/CMAQ/V5_3_1/Benchmark)
 
     
 
