@@ -3,7 +3,7 @@
 ### Procedure to build the WRF-CMAQ model using gnu compiler: ###
 
 ### Step 1:  Download WRF 4.1.1
-   - Please register at the WRF User site 
+   - Please register at the WRF User site https://www2.mmm.ucar.edu/wrf/users/download/get_source.html
    - use the second method to obtain the WRF-Modeling System source code by downloading an archived version from github
    - download version 4.1.1 from https://github.com/wrf-model/WRF/releases/tag/v4.1.1
    - extract the tar.gz file
