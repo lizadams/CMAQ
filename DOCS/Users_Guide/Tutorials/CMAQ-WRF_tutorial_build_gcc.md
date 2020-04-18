@@ -232,6 +232,17 @@ The coupled model is also available as a tarball (twoway.tar.gz) from the the US
     
     - This command will update all necessary files in WRF and CMAQ to create the twoway model. 
     - You can find the original files inside twoway/misc/orig directory.
+    
+    - Verify that the path for the I/O API library is set correctly in the configure.wrf file and modify if needed.
+    
+    ```
+    ##### BEGIN for WRF-CMAQ twoway model ####
+IOAPI   = /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/ioapi-3.2
+LIOAPI  = Linux2_x86_64gfort
+##### END for WRF-CMAQ twoway model #### 
+```
+
+     - I modified LIOAPI to Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
 
 ### Step 8: Compile the twoway model by typing "./compile em_real >& mylog"
     - If compilation is done successfully, you can find main/wrf.exe file.
