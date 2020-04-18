@@ -35,7 +35,7 @@ module load openmpi_4.0.1/gcc_9.1.0
    - set the following environment variables including the path to your combined netcdf libraries, include files
    
     ```
-    setenv NETCDF /path_to_directory/Build_WRF/LIBRARIES/netcdf_combined
+    setenv NETCDF /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/Build_WRF/LIBRARIES/netcdf_combined
     setenv CC gcc
     setenv CXX g++
     setenv FC gfortran
