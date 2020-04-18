@@ -235,19 +235,18 @@ The coupled model is also available as a tarball (twoway.tar.gz) from the the US
     twoway/assemble
    ```
    
-   - This command will update all necessary files in WRF and CMAQ to create the twoway model. 
-   - You can find the original files inside twoway/misc/orig directory.
+  - This command will update all necessary files in WRF and CMAQ to create the twoway model. 
+  - You can find the original files inside twoway/misc/orig directory.
+  - Verify that the path for the I/O API library is set correctly in the configure.wrf file and modify if needed.
     
-   - Verify that the path for the I/O API library is set correctly in the configure.wrf file and modify if needed.
-    
-  ```
-    BEGIN for WRF-CMAQ twoway model
+ ```
+    #### BEGIN for WRF-CMAQ twoway model
 IOAPI   = /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/ioapi-3.2
 LIOAPI  = Linux2_x86_64gfort
-    END for WRF-CMAQ twoway model
-  ```
+    #### END for WRF-CMAQ twoway model
+ ```
 
-   - I modified LIOAPI to Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
+ - I modified LIOAPI to Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
 
 
 ### Step 8: Compile the WRF-CMAQ twoway model
@@ -256,12 +255,12 @@ LIOAPI  = Linux2_x86_64gfort
 ./compile em_real >& mylog
 ```
 
-    - If compilation is done successfully, you can find main/wrf.exe file.
+  - If compilation is done successfully, you can find main/wrf.exe file.
     
 ### Step 9: Run the WRF-CMAQ twoway model
 
-    - Use the twoway_model_411_531_run_script and the CMAQv5.3.1 input benchmark dataset
-    - It is configured to run on 16 processors and for 1 day of model simulation
+  - Use the twoway_model_411_531_run_script and the CMAQv5.3.1 input benchmark dataset
+  - It is configured to run on 16 processors and for 1 day of model simulation
     
     ```
     set INPDIR      = /proj/ie/proj/CMAS/WRF-CMAQ/from_EPA/2016_12SE1          #Input Directory
