@@ -55,7 +55,6 @@ module load openmpi_4.0.1/gcc_9.1.0
     ```
     setenv CC /nas/longleaf/apps/gcc/9.1.0/bin/gcc
     ```
-    
 
    -  Configure WRF by typing ./configure (this creates a configure.wrf file)
    ```
@@ -63,16 +62,16 @@ module load openmpi_4.0.1/gcc_9.1.0
    ```
    
    -  Note: to configure WRF for debug mode add the '-d' option
-    ```
+   
+   ```
    ./configure -d |& tee ./configure.log
    ```
-   
 
-#### If you have never done WRF configure before, here are some guidelines:
+   -  If you have never done WRF configure before, here are some guidelines
 
-      - choose the dmpar option with the appropriate compiler platform
-
-      - in the compile for nesting section, choose the default value
+   - choose the dmpar option with the appropriate compiler platform
+   - in the compile for nesting section, choose the default value
+      
 
 ### Step 3: Download IOAPI_3.2 and install it.
 
@@ -85,9 +84,9 @@ module load openmpi_4.0.1/gcc_9.1.0
      
 #### Change branches to 2020104 for the code updates 
 
-```
-git checkout -b 2020104
-```
+    ```
+    git checkout -b 2020104
+    ```
      
 #### Change directories to the ioapi-3.2
      
@@ -245,6 +244,7 @@ LIOAPI  = Linux2_x86_64gfort
     ```
 
      - I modified LIOAPI to Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
+
 
 ### Step 8: Compile the WRF-CMAQ twoway model
 
