@@ -33,7 +33,8 @@ module load openmpi_4.0.1/gcc_9.1.0
    ```
 
    - set the following environment variables including the path to your combined netcdf libraries, include files
-     ```
+   
+    ```
     setenv NETCDF /path_to_directory/Build_WRF/LIBRARIES/netcdf_combined
     setenv CC gcc
     setenv CXX g++
@@ -44,6 +45,7 @@ module load openmpi_4.0.1/gcc_9.1.0
     ```
     
  - check to see that the path to each compiler is defined using
+ 
     ```
     which gcc
     which g++
@@ -51,12 +53,14 @@ module load openmpi_4.0.1/gcc_9.1.0
     ```
     
   - If they are not found, ask for assistance from your system administrator, 
-    or if you know the path then sepcify it using the environment varialbe
+    or if you know the path then sepcify it using the environment variable
+    
     ```
     setenv CC /nas/longleaf/apps/gcc/9.1.0/bin/gcc
     ```
 
    -  Configure WRF by typing ./configure (this creates a configure.wrf file)
+   
    ```
    ./configure |& tee ./configure.log
    ```
@@ -67,7 +71,7 @@ module load openmpi_4.0.1/gcc_9.1.0
    ./configure -d |& tee ./configure.log
    ```
 
-   -  If you have never done WRF configure before, here are some guidelines
+####  If you have never done WRF configure before, here are some guidelines
 
    - choose the dmpar option with the appropriate compiler platform
    - in the compile for nesting section, choose the default value
