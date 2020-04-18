@@ -174,7 +174,7 @@ setenv LD_LIBRARY_PATH ${NCF_COMBO}/lib:${LD_LIBRARY_PATH}
 #### Set the IOAPI environment variable to the path where it has been installed
 
 ```
-setenv IOAPI /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/ioapi-3.2/Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
+setenv IOAPI /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/ioapi-3.2
 ```
     
 
