@@ -204,7 +204,7 @@ set build_twoway                      #> uncomment to build WRF-CMAQ twoway;
 
 ### Run the bldit_cctm.csh script
 ```
-./bldit_cctm.csh |& tee bldit_cctm_twoway.log
+./bldit_cctm.csh gcc |& tee bldit_cctm_twoway.log
 ```
       
 
