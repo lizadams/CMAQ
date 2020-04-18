@@ -65,6 +65,12 @@ module load openmpi_4.0.1/gcc_9.1.0
    ```
    ./configure |& tee ./configure.log
    ```
+   
+   -  Note: to configure WRF for debug mode add the '-d' option
+    ```
+   ./configure -d |& tee ./configure.log
+   ```
+   
 
 #### If you have never done WRF configure before, here are some guidelines:
 
@@ -236,13 +242,18 @@ The coupled model is also available as a tarball (twoway.tar.gz) from the the US
     - Verify that the path for the I/O API library is set correctly in the configure.wrf file and modify if needed.
     
     ```
-    ##### BEGIN for WRF-CMAQ twoway model ####
+    BEGIN for WRF-CMAQ twoway model
 IOAPI   = /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/ioapi-3.2
 LIOAPI  = Linux2_x86_64gfort
-##### END for WRF-CMAQ twoway model #### 
-```
+    END for WRF-CMAQ twoway model
+    ```
 
      - I modified LIOAPI to Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
 
-### Step 8: Compile the twoway model by typing "./compile em_real >& mylog"
+### Step 8: Compile the WRF-CMAQ twoway model
+
+```
+./compile em_real >& mylog
+```
+
     - If compilation is done successfully, you can find main/wrf.exe file.
