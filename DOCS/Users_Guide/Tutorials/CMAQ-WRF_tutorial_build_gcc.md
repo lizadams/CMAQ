@@ -257,3 +257,13 @@ LIOAPI  = Linux2_x86_64gfort
 ```
 
     - If compilation is done successfully, you can find main/wrf.exe file.
+    
+### Step 9: Run the WRF-CMAQ twoway model
+
+    - Use the twoway_model_411_531_run_script and the CMAQv5.3.1 input benchmark dataset
+    - It is configured to run on 16 processors and for 1 day of model simulation
+    
+    ```
+    set INPDIR      = /proj/ie/proj/CMAS/WRF-CMAQ/from_EPA/2016_12SE1          #Input Directory
+    set INPDIR2     = $INPDIR/WRF-CMAQ/wrfv4.1.1_inputs
+    ```
