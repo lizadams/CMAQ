@@ -27,7 +27,9 @@ module load openmpi_4.0.1/gcc_9.1.0
   ///
   
   new method
+  ```
   git clone --branch v4.1.1 https://github.com/wrf-model/WRF.git
+  ```
    
    - follow the following instructions on how to configure download and install the netCDF Fortran and C libraries and put them in a combined directory
    https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php
