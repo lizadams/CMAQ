@@ -14,6 +14,8 @@ module load openmpi_4.0.1/gcc_9.1.0
 
 ### Step 2:  Download WRF 4.1.1
    - Please register at the WRF User site https://www2.mmm.ucar.edu/wrf/users/download/get_source.html
+   
+   ///old method
    - use the second method to obtain the WRF-Modeling System source code by downloading an archived version from github
    - download version 4.1.1 from https://github.com/wrf-model/WRF/releases/tag/v4.1.1
    - extract the tar.gz file
@@ -21,6 +23,11 @@ module load openmpi_4.0.1/gcc_9.1.0
    ```
    tar -xzvf WRF-4.1.1.tar.gz
    ```
+   
+  ///
+  
+  new method
+  git clone --branch v4.1.1 https://github.com/wrf-model/WRF.git
    
    - follow the following instructions on how to configure download and install the netCDF Fortran and C libraries and put them in a combined directory
    https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php
