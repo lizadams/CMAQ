@@ -85,7 +85,15 @@ module load openmpi_4.0.1/gcc_9.1.0
    - in the compile for nesting section, choose the default value
       
 
-### Step 3: Download IOAPI_3.2 and install it.
+### Step 3: Download IOAPI_3.2 (a specific tagged version, see below) and install it.
+
+Note The complete I/O API installation guide can be found at either of the following:
+
+https://www.cmascenter.org/ioapi/documentation/all_versions/html/AVAIL.html
+
+or
+
+https://cjcoats.github.io/ioapi/AVAIL.html
 
 #### Follow the instructions on how to install I/O API available
     
