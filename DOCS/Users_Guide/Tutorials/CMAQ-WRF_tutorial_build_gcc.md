@@ -285,11 +285,22 @@ LIOAPI  = Linux2_x86_64gfort
   - It is configured to run on 16 processors and for 2 days of model simulation
   - Edit the script to specify the paths, modify the number of processors and batch queue commands
   - Verify that the OMIfile definition matches the latest release of CMAQv5.3.1
+  
+  Modify the following section to specify your local paths
+  ```
+set ROOT_PATH   = /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0_debug/
+set WRF_DIR     = $ROOT_PATH/WRF-4.1.1  # WRF source code directory
+set INPDIR      = /proj/ie/proj/CMAS/WRF-CMAQ/from_EPA/from_gdrive/CMAQv5.3.1_Benchmark_2Day_Input/2016_12SE1
+set OMIpath     = $WRF_DIR/cmaq                              # path optics related data files
+set OUTPUT_ROOT = $ROOT_PATH/WRF-4.1.1  # output root directory
+set NMLpath     = $WRF_DIR/cmaq                              # path with *.nml file mechanism dependent
+set NMLpath2    = $WRF_DIR/cmaq                              # path with Species_Table_TR_0.nml file
+set EMISSCTRL   = $WRF_DIR/cmaq                              # path of Emissions Control File
+ ```
     
+  - Verify the following settings
     ```
     set NPROCS =    16
-    set INPDIR      = /proj/ie/proj/CMAS/WRF-CMAQ/from_EPA/2016_12SE1          #Input Directory
-    set INPDIR2     = $INPDIR/WRF-CMAQ/wrfv4.1.1_inputs
     set OMIfile    = OMI_1979_to_2019.dat
     ```
     
