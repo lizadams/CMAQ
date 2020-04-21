@@ -276,10 +276,10 @@ LIOAPI  = Linux2_x86_64gfort
     
 ### Step 10: Run the WRF-CMAQ twoway model
 
-  - Use the run_twoway_nf_Bench_2016_12SE1.csh script and the CMAQv5.3.1 input benchmark dataset
-  - It is configured to run on 64 processors and for 2 days of model simulation
+  - Use the twoway_model_411_531_run_script_nf script and the CMAQv5.3.1 input benchmark dataset to run CMAQ-WRF with no feedback
+  - It is configured to run on 16 processors and for 2 days of model simulation
   - Edit the script to specify the paths, modify the number of processors and add batch queue commands
-  - Fix the following OMIfile definition to match latest release of CMAQv5.3.1
+  - Verify that the OMIfile definition matches the latest release of CMAQv5.3.1
     
     ```
     set NPROCS =    16
