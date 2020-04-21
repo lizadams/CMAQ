@@ -83,16 +83,15 @@ module load openmpi_4.0.1/gcc_9.1.0
 
 #### Follow the instructions on how to install I/O API available
     
-     
      ```
      git clone https://github.com/cjcoats/ioapi-3.2
      ```
      
 #### Change branches to 2020104 for the code updates 
 
-    ```
-    git checkout -b 2020104
-    ```
+     ```
+     git checkout -b 2020104
+     ```
      
 #### Change directories to the ioapi-3.2
      
@@ -108,7 +107,7 @@ module load openmpi_4.0.1/gcc_9.1.0
      
  #### Edit the Makefile to specify the BIN and INSTALL directories:
      
-     example: uncomment lines 141-149 and set the following environment variables 
+  - example: uncomment lines 141-149 and set the following environment variables 
      
      ```
      BIN        = Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
@@ -117,17 +116,17 @@ module load openmpi_4.0.1/gcc_9.1.0
       
  ### Edit the Makefile to add a path to the combined netCDF library directory
  
- change
+ - change
  
  ```
  NCFLIBS = -lnetcdff -lnetcdf
  ```
  
- to
+ - to
  
- ```
- NCFLIBS    = -L /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/Build_WRF/LIBRARIES/netcdf_combined/lib/ -lnetcdff -lnetcdf
- ```
+   ```
+   NCFLIBS    = -L /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/Build_WRF/LIBRARIES/netcdf_combined/lib/ -lnetcdff -lnetcdf
+   ```
  
  #### change into the ioapi directory and copy the existing Makeinclude.Linux2_x86_64gfort to have an extension that is the same as the BIN environment variable
  
@@ -141,7 +140,8 @@ module load openmpi_4.0.1/gcc_9.1.0
  gedit Makeinclude.Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
  ```
  
- comment out the following lines by adding a # before the setting
+ - comment out the following lines by adding a # before the setting
+ 
  ```
  #OMPFLAGS  = -fopenmp
  #OMPLIBS   = -fopenmp
