@@ -55,7 +55,7 @@ module load openmpi_4.0.1/gcc_9.1.0
     ```
     
   - If they are not found, ask for assistance from your system administrator, 
-    or if you know the path then sepcify it using the environment variable
+    or if you know the path then specify it using the environment variable
     
     ```
     setenv CC /nas/longleaf/apps/gcc/9.1.0/bin/gcc
