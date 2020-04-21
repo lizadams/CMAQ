@@ -12,7 +12,7 @@ module avail
 module load openmpi_4.0.1/gcc_9.1.0 
 ```
 
-### Step 2:  Download WRF 4.1.1 and install it
+### Step 2a:  Download WRF 4.1.1 and install it
    - Please register at the WRF User site https://www2.mmm.ucar.edu/wrf/users/download/get_source.html
    - obtain the WRF-Modeling System source code
    
@@ -29,12 +29,19 @@ module load openmpi_4.0.1/gcc_9.1.0
    ```
    tar -xzvf WRF-4.1.1.tar.gz
    ```
-   
+
+### Step 2b: Download and install netCDF Fortran and C libraries
+
    - follow the following instructions on how to configure download and install the netCDF Fortran and C libraries and put them in a combined directory
+   
    https://github.com/Unidata/netcdf-c/releases
+   
    Download the following version from the assets link: netcdf-c-4.7.0.tar.gz
+   
    https://github.com/Unidata/netcdf-fortran/releases
+   
    Download the following version from the assets link: netcdf-fortran-4.4.5.tar.gz
+   
    https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php
    
 
