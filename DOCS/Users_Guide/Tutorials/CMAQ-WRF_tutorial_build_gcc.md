@@ -12,7 +12,7 @@ module avail
 module load openmpi_4.0.1/gcc_9.1.0 
 ```
 
-### Step 2:  Download WRF 4.1.1
+### Step 2:  Download WRF 4.1.1 and install it
    - Please register at the WRF User site https://www2.mmm.ucar.edu/wrf/users/download/get_source.html
    - obtain the WRF-Modeling System source code
    
