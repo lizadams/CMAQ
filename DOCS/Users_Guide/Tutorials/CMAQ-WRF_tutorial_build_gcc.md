@@ -33,12 +33,6 @@ module load openmpi_4.0.1/gcc_9.1.0
    - follow the following instructions on how to configure download and install the netCDF Fortran and C libraries and put them in a combined directory
    https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php
    
-   - Before configuring WRF, the compiler module that you are using needs to be loaded so that the compiler paths are correct:
-   - example
-   
-   ```
-   module load openmpi_4.0.1/gcc_9.1.0
-   ```
 
    - set the following environment variables including the path to your combined netcdf libraries, include files
    
