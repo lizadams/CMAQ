@@ -63,15 +63,15 @@ module load openmpi_4.0.1/gcc_9.1.0
 
    -  Configure WRF by typing ./configure (this creates a configure.wrf file)
    
-    ```
-    ./configure |& tee ./configure.log
-    ```
+      ```
+      ./configure |& tee ./configure.log
+      ```
    
    -  Note: to configure WRF for debug mode add the '-d' option
    
-    ```
-    ./configure -d |& tee ./configure.log
-    ```
+      ```
+      ./configure -d |& tee ./configure.log
+      ```
 
 ####  If you have never done WRF configure before, here are some guidelines
 
