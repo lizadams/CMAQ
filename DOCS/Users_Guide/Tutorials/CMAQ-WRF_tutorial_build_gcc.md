@@ -32,7 +32,7 @@ module load openmpi_4.0.1/gcc_9.1.0
 
 ### Step 2b: Download and install netCDF Fortran and C libraries
 
-   - follow the following instructions on how to configure download and install the netCDF Fortran and C libraries and put them in a combined directory
+   - Download the following versions of the C and Fortran Libraries
    
    https://github.com/Unidata/netcdf-c/releases
    
@@ -41,6 +41,8 @@ module load openmpi_4.0.1/gcc_9.1.0
    https://github.com/Unidata/netcdf-fortran/releases
    
    Download the following version from the assets link: netcdf-fortran-4.4.5.tar.gz
+   
+   - Follow these instructions to combine the libraries into a single combined directory
    
    https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php
    
