@@ -14,22 +14,21 @@ module load openmpi_4.0.1/gcc_9.1.0
 
 ### Step 2:  Download WRF 4.1.1
    - Please register at the WRF User site https://www2.mmm.ucar.edu/wrf/users/download/get_source.html
+   - obtain the WRF-Modeling System source code
    
-   ///old method
-   - use the second method to obtain the WRF-Modeling System source code by downloading an archived version from github
+   - Method 1: clone from github
+   
+   ```
+  git clone --branch v4.1.1 https://github.com/wrf-model/WRF.git
+  ```
+   
+   - Method 2: Downloading an archived version from github
    - download version 4.1.1 from https://github.com/wrf-model/WRF/releases/tag/v4.1.1
    - extract the tar.gz file
    
    ```
    tar -xzvf WRF-4.1.1.tar.gz
    ```
-   
-  ///
-  
-  new method
-  ```
-  git clone --branch v4.1.1 https://github.com/wrf-model/WRF.git
-  ```
    
    - follow the following instructions on how to configure download and install the netCDF Fortran and C libraries and put them in a combined directory
    https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php
@@ -265,8 +264,12 @@ LIOAPI  = Linux2_x86_64gfort
 ```
 
   - If compilation is done successfully, you can find main/wrf.exe file.
+  
+### Step 9: Download the input data
+
+[Link to CMAQv5.3.1_Benchmark_2Day_Input.tar.gz input data on Google Drive](https://drive.google.com/file/d/1fp--3dVvQHUyB_BodpU2aHBv5LjlC6E4/view?usp=sharing)
     
-### Step 9: Run the WRF-CMAQ twoway model
+### Step 10: Run the WRF-CMAQ twoway model
 
   - Use the run_twoway_nf_Bench_2016_12SE1.csh script and the CMAQv5.3.1 input benchmark dataset
   - It is configured to run on 64 processors and for 2 days of model simulation
