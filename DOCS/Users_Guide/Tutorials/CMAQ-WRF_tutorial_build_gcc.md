@@ -18,7 +18,7 @@ module load openmpi_4.0.1/gcc_9.1.0
    
    - Method 1: clone from github
    
-   ```
+  ```
   git clone --branch v4.1.1 https://github.com/wrf-model/WRF.git
   ```
    
@@ -36,22 +36,22 @@ module load openmpi_4.0.1/gcc_9.1.0
 
    - set the following environment variables including the path to your combined netcdf libraries, include files
    
-    ```
-      setenv NETCDF /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/Build_WRF/LIBRARIES/netcdf_combined
-      setenv CC gcc
-      setenv CXX g++
-      setenv FC gfortran
-      setenv FCFLAGS -m64
-      setenv F77 gfortran
-      setenv FFLAGS -m64
-    ```
+   ```
+   setenv NETCDF /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/Build_WRF/LIBRARIES/netcdf_combined
+   setenv CC gcc
+   setenv CXX g++
+   setenv FC gfortran
+   setenv FCFLAGS -m64
+   setenv F77 gfortran
+   setenv FFLAGS -m64
+   ```
     
  - check to see that the path to each compiler is defined using
  
     ```
-       which gcc
-       which g++
-       which gfortran
+    which gcc
+    which g++
+    which gfortran
     ```
     
   - If they are not found, ask for assistance from your system administrator, 
@@ -63,15 +63,15 @@ module load openmpi_4.0.1/gcc_9.1.0
 
    -  Configure WRF by typing ./configure (this creates a configure.wrf file)
    
-   ```
-   ./configure |& tee ./configure.log
-   ```
+     ```
+     ./configure |& tee ./configure.log
+     ```
    
    -  Note: to configure WRF for debug mode add the '-d' option
    
-   ```
-   ./configure -d |& tee ./configure.log
-   ```
+     ```
+     ./configure -d |& tee ./configure.log
+     ```
 
 ####  If you have never done WRF configure before, here are some guidelines
 
@@ -113,11 +113,12 @@ module load openmpi_4.0.1/gcc_9.1.0
      ```
      BIN        = Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
      INSTALL    = /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/ioapi-3.2
-      ```
+     ```
       
  ### Edit the Makefile to add a path to the combined netCDF library directory
  
  change
+ 
  ```
  NCFLIBS = -lnetcdff -lnetcdf
  ```
