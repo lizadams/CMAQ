@@ -278,7 +278,7 @@ LIOAPI  = Linux2_x86_64gfort
 
   - Use the twoway_model_411_531_run_script_nf script and the CMAQv5.3.1 input benchmark dataset to run CMAQ-WRF with no feedback
   - It is configured to run on 16 processors and for 2 days of model simulation
-  - Edit the script to specify the paths, modify the number of processors and add batch queue commands
+  - Edit the script to specify the paths, modify the number of processors and batch queue commands
   - Verify that the OMIfile definition matches the latest release of CMAQv5.3.1
     
     ```
@@ -287,3 +287,21 @@ LIOAPI  = Linux2_x86_64gfort
     set INPDIR2     = $INPDIR/WRF-CMAQ/wrfv4.1.1_inputs
     set OMIfile    = OMI_1979_to_2019.dat
     ```
+    
+  - Submit the job using the batch queueing system
+    ```
+    sbatch twoway_model_411_531_run_script_nf
+    ```
+
+### Step 11: Verify that the run was successful
+   - look for the output directory
+   
+   ```
+   cd output_12km_nf_rrtmg_20_5_1_v411531_debug
+   ```
+   If the run was successful you will see the following output
+   
+   ```
+   tail ./2016183/rsl.out.0000
+   ```
+   |>---   PROGRAM COMPLETED SUCCESSFULLY   ---<|
