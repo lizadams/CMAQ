@@ -271,7 +271,13 @@ LIOAPI  = Linux2_x86_64gfort
 ./compile em_real >& mylog
 ```
 
-  - If compilation is done successfully, you can find main/wrf.exe file.
+  - When the compilation is completed, look for the main/wrf.exe file
+  If you can find the  main/wrf.exe file, then the build was a success, enen
+  thought the mylog file will have this message at the end because it failed building emreal.
+  
+  ```
+  ---> Problems building executables, look for errors in the build log  <---
+  ```
   
 ### Step 9: Download the input data
 
