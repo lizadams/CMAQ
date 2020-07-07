@@ -298,13 +298,26 @@ LIOAPI  = Linux2_x86_64gfort
     
 ### Step 10: Run the WRF-CMAQ twoway model
 
-  - Use the twoway_model_411_531_run_script_nf script and the CMAQv5.3.1 input benchmark dataset to run CMAQ-WRF with no feedback
-  - It is configured to run on 16 processors and for 2 days of model simulation
+  - Use the twoway_model_411_531_run_script_nf script that is in the twoway directory
+    and the CMAQv5.3.1 input benchmark dataset to run CMAQ-WRF with no feedback
+  - Use the twoway_model_411_531_run_script_sf script that is in the twoway directory
+    and the CMAQv5.3.1 input benchmark dataset to run CMAQ-WRF with shortwave feedback
+  - Copy the scripts to the WRF directory
+  - They are configured to run on 32 processors and for 1 day of model simulation
   - Edit the script to specify the paths, modify the number of processors and batch queue commands
   - Verify that the OMIfile definition matches the latest release of CMAQv5.3.1
   
   Modify the following section to specify your local paths
   ```
+#SBATCH -J 12km-sf
+#SBATCH -p compute
+#SBATCH -t 10:00:00
+#SBATCH -n 32
+#SBATCH -A mod3dev
+#SBATCH -o /work/MOD3DEV/wdx/ptmp/wrf/twoway/test/new/junk/wrf-12km-nf-41153.log
+#SBATCH -e /work/MOD3DEV/wdx/ptmp/wrf/twoway/test/new/junk/wrf-12km-nf-41153.log
+
+  
 set ROOT_PATH   = /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0_debug/
 set WRF_DIR     = $ROOT_PATH/WRF-4.1.1  # WRF source code directory
 set INPDIR      = /proj/ie/proj/CMAS/WRF-CMAQ/from_EPA/from_gdrive/CMAQv5.3.1_Benchmark_2Day_Input/2016_12SE1
@@ -317,7 +330,7 @@ set EMISSCTRL   = $WRF_DIR/cmaq                              # path of Emissions
     
   - Verify the following settings
     ```
-    set NPROCS =    16
+    set NPROCS =    32
     set OMIfile    = OMI_1979_to_2019.dat
     ```
     
