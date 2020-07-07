@@ -247,8 +247,8 @@ tar -xzvf ../../WRF4.1.1_CMAQ5.3.1_Coupled_Model_20191220.tar.gz
 ### Step 7: Go into directory WRFV411 and execute the following command:
 
    ```
-   cd /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0_debug/WRF-4.1.1
-   twoway/assemble
+   cd [your path]/WRF-CMAQ/WRF/twoway
+   ./assemble
    ```
    
   - This command will update all necessary files in WRF and CMAQ to create the twoway model. 
