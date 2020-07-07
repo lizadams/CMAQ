@@ -272,8 +272,11 @@ LIOAPI  = Linux2_x86_64gfort
 ```
 
   - When the compilation is completed, look for the main/wrf.exe file
-  If you can find the  main/wrf.exe file, then the build was a success, enen
-  thought the mylog file will have this message at the end because it failed building emreal.
+  
+  If you can find the  main/wrf.exe file, 
+  Then the BUILD of WRF-CMAQ was SUCCESSFUL.
+  
+  Despite the success in building wrf.exe, the mylog file will have an error message at the end because it failed building emreal, which isn't required to run WRF-CMAQ.
   
   ```
   ---> Problems building executables, look for errors in the build log  <---
