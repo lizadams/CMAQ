@@ -101,22 +101,28 @@ https://cjcoats.github.io/ioapi/AVAIL.html
      git clone https://github.com/cjcoats/ioapi-3.2
      ```
      
-#### Change branches to 2020104 for the code updates 
-
-     ```
-     git checkout -b 2020104
-     ```
-     
 #### Change directories to the ioapi-3.2
      
      ```
      cd ioapi-3.2
      ```
      
-#### Copy the Makefile.template to Makefile 
+#### Change branches to 2020104 for the code updates 
+
+     ```
+     git checkout -b 2020104
+     ```
+
+#### Change directories to the ioapi directory
      
      ```
-     cp Makefile.template Makefile
+     cd ioapi
+     ```
+     
+#### Copy the Makefile.nocpl to Makefile 
+     
+     ```
+     cp Makefile.nocpl Makefile
      ```
      
  #### Edit the Makefile to specify the BIN and INSTALL directories:
