@@ -38,7 +38,7 @@ module load openmpi_4.0.1/gcc_9.1.0
    - Follow these instructions to combine the libraries into a single combined directory
    
    ```
-   cd /[your_path]/openmpi_4.0.1_gcc_9.1.0/LIBRARIES
+   cd /[your_install_path]/openmpi_4.0.1_gcc_9.1.0/LIBRARIES
    mkdir netcdf_combined
    cp -rp ./netcdf-fortran-4.4.5-gcc9.1.0/* ./netcdf_combined/
    cp -rp ./netcdf-c-4.7.0-gcc9.1.0/* ./netcdf_combined/
@@ -157,7 +157,7 @@ https://cjcoats.github.io/ioapi/AVAIL.html
  - to
  
    ```
-   NCFLIBS    = -L /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/Build_WRF/LIBRARIES/netcdf_combined/lib/ -lnetcdff -lnetcdf
+   NCFLIBS    = -L /[your_install_path]/LIBRARIES/netcdf_combined/lib/ -lnetcdff -lnetcdf
    ```
  
  #### change into the ioapi directory and copy the existing Makeinclude.Linux2_x86_64gfort to have an extension that is the same as the BIN environment variable
@@ -190,7 +190,7 @@ https://cjcoats.github.io/ioapi/AVAIL.html
  ### Verify that the libioapi.a and the m3tools have been successfully built
  
  ```
- ls -lrt /[your_path]/ioapi-3.2/Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0/libioapi.a
+ ls -lrt /[your_install_path]/LIBRARIES/ioapi-3.2/Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0/libioapi.a
  ```
  
  ### Note: If you get a shared object problem when trying to run m3tools such as the following:
@@ -203,7 +203,7 @@ https://cjcoats.github.io/ioapi/AVAIL.html
 
 ```
 #for gcc WRF-CMAQ build
-setenv NCF_COMBO /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/Build_WRF/LIBRARIES/netcdf_combined/
+setenv NCF_COMBO /[your_install_path]/openmpi_4.0.1_gcc_9.1.0/LIBRARIES/netcdf_combined/
 setenv LD_LIBRARY_PATH ${NCF_COMBO}/lib:${LD_LIBRARY_PATH}
 ```
 
@@ -214,7 +214,7 @@ setenv LD_LIBRARY_PATH ${NCF_COMBO}/lib:${LD_LIBRARY_PATH}
 #### Set the IOAPI environment variable to the path where it has been installed
 
 ```
-setenv IOAPI /[your install path]/openmpi_4.0.1_gcc_9.1.0/LIBRARIES/ioapi-3.2
+setenv IOAPI /[your_install_path]/openmpi_4.0.1_gcc_9.1.0/LIBRARIES/ioapi-3.2
 ```
     
 
