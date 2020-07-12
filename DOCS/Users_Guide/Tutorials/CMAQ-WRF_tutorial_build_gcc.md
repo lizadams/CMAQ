@@ -292,7 +292,15 @@ LIOAPI  = Linux2_x86_64gfort
  - I modified LIOAPI to Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
 
 
-### Step 9: Compile the WRF-CMAQ twoway model
+### Step 9: Edit the configure.wrf to link with the openmp library
+
+add -fopenmp to the the definition for LIB_EXTERNAL
+```
+LIB_EXTERNAL    = -L$(WRF_SRC_ROOT_DIR)/external/io_netcdf -lwrfio_nf -L/proj/ie/proj/CMAS/WRFv4.1.1-CMAQv5.3.2_debug/openmpi_4.0.1_gcc_9.1.0/LIBRARIES/netcdf_combined/lib -lnetcdff -lnetcdf -fopenmp
+```
+
+
+### Step 10: Compile the WRF-CMAQ twoway model
 
 ```
 ./compile em_real >& mylog
