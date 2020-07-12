@@ -268,11 +268,14 @@ cd WRF4.1.1
 tar -xzvf ../../WRF4.1.1_CMAQ5.3.1_Coupled_Model_20191220.tar.gz
 ```
 
-### Step 7: Go into directory WRFV411 and execute the following command:
+### Step 7: Go into directory WRFV411
 
    ```
    cd /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0_debug/WRF-4.1.1
-   twoway/assemble
+   ```
+### Step 8: run the following command
+   ```
+   ./twoway/assemble
    ```
    
   - This command will update all necessary files in WRF and CMAQ to create the twoway model. 
@@ -289,7 +292,7 @@ LIOAPI  = Linux2_x86_64gfort
  - I modified LIOAPI to Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0
 
 
-### Step 8: Compile the WRF-CMAQ twoway model
+### Step 9: Compile the WRF-CMAQ twoway model
 
 ```
 ./compile em_real >& mylog
@@ -297,7 +300,7 @@ LIOAPI  = Linux2_x86_64gfort
 
   - If compilation is done successfully, you can find main/wrf.exe file.
   
-### Step 9: Download the input data
+### Step 10: Download the input data
 
 [Link to CMAQv5.3.1_Benchmark_2Day_Input.tar.gz input data on Google Drive](https://drive.google.com/file/d/1fp--3dVvQHUyB_BodpU2aHBv5LjlC6E4/view?usp=sharing)
 
@@ -311,7 +314,7 @@ LIOAPI  = Linux2_x86_64gfort
   ```
   
     
-### Step 10: Run the WRF-CMAQ twoway model
+### Step 11: Run the WRF-CMAQ twoway model
 
   - Use the twoway_model_411_531_run_script_nf script and the CMAQv5.3.1 input benchmark dataset to run CMAQ-WRF with no feedback
   - It is configured to run on 16 processors and for 2 days of model simulation
@@ -341,7 +344,7 @@ set EMISSCTRL   = $WRF_DIR/cmaq                              # path of Emissions
     sbatch twoway_model_411_531_run_script_nf
     ```
 
-### Step 11: Verify that the run was successful
+### Step 12: Verify that the run was successful
    - look for the output directory
    
    ```
