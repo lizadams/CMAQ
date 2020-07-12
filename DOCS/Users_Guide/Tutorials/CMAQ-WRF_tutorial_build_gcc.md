@@ -37,19 +37,31 @@ module load openmpi_4.0.1/gcc_9.1.0
    
    - Follow these instructions to combine the libraries into a single combined directory
    
-   https://www2.mmm.ucar.edu/wrf/OnLineTutorial/compilation_tutorial.php
+   ```
+   cd /[your_path]/openmpi_4.0.1_gcc_9.1.0/LIBRARIES
+   mkdir netcdf_combined
+   cp -rp ./netcdf-fortran-4.4.5-gcc9.1.0/* ./netcdf_combined/
+   cp -rp ./netcdf-c-4.7.0-gcc9.1.0/* ./netcdf_combined/
+   ```
    
+   Now you should have a copy of both the netcdf C and netcdf Fortran libraries under 
+   netcdf_combined/lib
 
    - set the following environment variables including the path to your combined netcdf libraries, include files
    
    ```
-   setenv NETCDF /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/Build_WRF/LIBRARIES/netcdf_combined
+   setenv NETCDF [your_install_path]/openmpi_4.0.1_gcc_9.1.0/Build_WRF/LIBRARIES/netcdf_combined
    setenv CC gcc
    setenv CXX g++
    setenv FC gfortran
    setenv FCFLAGS -m64
    setenv F77 gfortran
    setenv FFLAGS -m64
+   ```
+   
+   For debug option, set 
+   ```
+   setenv FCFLAGS '-m64 -g3 -O0 -fno-inline'
    ```
     
  - check to see that the path to each compiler is defined using
