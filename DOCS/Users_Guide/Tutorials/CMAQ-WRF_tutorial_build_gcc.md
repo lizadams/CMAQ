@@ -193,13 +193,13 @@ https://cjcoats.github.io/ioapi/AVAIL.html
  ls -lrt /[your_path]/ioapi-3.2/Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0/libioapi.a
  ```
  
- ### Note: I am getting a shared object problem when I try running m3tools
+ ### Note: If you get a shared object problem when trying to run m3tools such as the following:
  ```
  [lizadams@dogwood-login1 Linux2_x86_64gfort_openmpi_4.0.1_gcc_9.1.0]$ ./juldate
 ./juldate: error while loading shared libraries: libimf.so: cannot open shared object file: No such file or directory
 ```
 
-### Need to edit your .cshrc to add the path to the library by setting the LD_LIBRARY_PATH environment variable
+### Edit your .cshrc to add the path to the library by setting the LD_LIBRARY_PATH environment variable
 
 ```
 #for gcc WRF-CMAQ build
@@ -214,7 +214,7 @@ setenv LD_LIBRARY_PATH ${NCF_COMBO}/lib:${LD_LIBRARY_PATH}
 #### Set the IOAPI environment variable to the path where it has been installed
 
 ```
-setenv IOAPI /proj/ie/proj/CMAS/WRF-CMAQ/openmpi_4.0.1_gcc_9.1.0/ioapi-3.2
+setenv IOAPI /[your install path]/openmpi_4.0.1_gcc_9.1.0/LIBRARIES/ioapi-3.2
 ```
     
 
