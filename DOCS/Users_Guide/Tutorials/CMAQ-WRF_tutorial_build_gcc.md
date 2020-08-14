@@ -218,7 +218,7 @@ setenv IOAPI /[your_install_path]/openmpi_4.0.1_gcc_9.1.0/LIBRARIES/ioapi-3.2
     
 
 ### Step 4: Install CMAQ
-     - follow these instructions to download the code, then use the modifications in Step 4
+     - follow these instructions to download the code, then use the modifications in Step 5
      
 https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/Tutorials/CMAQ_UG_tutorial_benchmark.md
 
