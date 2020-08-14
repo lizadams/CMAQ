@@ -109,14 +109,14 @@ https://cjcoats.github.io/ioapi/AVAIL.html
 
 #### Follow the instructions on how to install I/O API available
 
-#### Option 1) Download the tar.gz file from the github site.
+#### Method 1. Download the tar.gz file from the github site.
      ```
      wget http://github.com/cjcoats/ioapi-3.2/archive/2020220.tar.gz
      tar -xzvf 2020220.tar.gz
      cd ioapi-3.2-2020220
      ```
 
-#### Option 2) Use Git clone to obtain the code
+#### Method 2. Use Git clone to obtain the code
     
      ```
      git clone https://github.com/cjcoats/ioapi-3.2
