@@ -119,10 +119,10 @@ https://cjcoats.github.io/ioapi/AVAIL.html
      cd ioapi-3.2
      ```
      
-#### Change branches to 2020104 for the code updates 
+#### Change branches to 2020220 for the code updates 
 
      ```
-     git checkout -b 2020104
+     git checkout -b 2020220
      ```
 
 #### Change directories to the ioapi directory
