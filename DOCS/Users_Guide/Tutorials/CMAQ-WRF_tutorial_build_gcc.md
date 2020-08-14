@@ -126,15 +126,15 @@ https://cjcoats.github.io/ioapi/AVAIL.html
 
 #### Change directories to the ioapi directory
      
-     ```
+     
      cd ioapi
-     ```
+     
      
 #### Copy the Makefile.nocpl to Makefile 
      
-     ```
+     
      cp Makefile.nocpl Makefile
-     ```
+     
      
  #### Edit the Makefile to specify the BIN and INSTALL directories:
      
