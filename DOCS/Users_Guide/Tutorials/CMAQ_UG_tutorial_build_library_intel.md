@@ -243,6 +243,15 @@ setenv LD_LIBRARY_PATH ${NFDIR}/lib:${LD_LIBRARY_PATH}
 ```
 (may need to add the NCDIR and NFDIR to .cshrc)
 
+16. create a netcdf_combined directory, and copy the netcdf C and netcdf Fortran libraries to it
+
+```
+cd ../LIBRARIES
+mkdir netcdf_combined
+cp -rp ../netcdf-c-4.7.0/netcdf-c-4.7.0-intel18.2/* .
+cp -rp ../netcdf-fortran-4.4.5/netcdf-fortran-4.4.5-intel18.2/* .
+```
+
 ## Install I/O API
 
 Note The complete I/O API installation guide can be found at either of the following:
@@ -261,57 +270,55 @@ cd ioapi-3.2         ! change directory to ioapi-3.2
 git checkout -b 20200828   ! change branch to 20200828 for a tagged release version
 ```
 
-2. Change the BIN setting on line 133 of the Makefile to include the loaded module name
+2.  Set the following environment variables
 
 ```
-cd ioapi
-cp Makefile.nocpl Makefile
+setenv HOME /proj/ie/proj/CMAS/CMAQ/CMAQv5.3.2_rel2/openmpi_3.1.4_intel_18.2/LIBRARIES/
+setenv BIN      Linux2_x86_64ifort_openmpi_3.1.4_intel18.2
+setenv CPLMODE  nocpl
+```
+
+
+3. Change the NCFLIBS in the Makefile
+
+```
+cp Makefile.template Makefile
 gedit Makefile
+NCFLIBS    = /proj/ie/proj/CMAS/CMAQ/CMAQv5.3.2_rel2/openmpi_3.1.4_intel_18.2/LIBRARIES/netcdf_combined/lib -lnetcdff -lnetcdf 
 ```
 
-```
-BIN        = Linux2_x86_64ifort_openmpi_3.1.4_intel18.2
-```
-
-3. Change the NCFLIBS setting on line 141 of the Makefile to be
+4. Copy Makefile.nocpl to Makefile in m3tools directory
 
 ```
-NCFLIBS    = -lnetcdff -lnetcdf
+cd m3tools
+cp Makefile.nocpl Makefile
 ```
 
-4. Copy an existing Makeinclude file to have this BIN name at the end
+5. Copy an existing Makeinclude file to have this BIN name at the end
 
 ```
 cd ioapi
 cp Makeinclude.Linux2_x86_64ifort Makeinclude.Linux2_x86_64ifort_openmpi_3.1.4_intel18.2
 ```
 
-5. Edit the Makeinclude file, lines 27 and 28 to use -qopenmp instead of -openmp
+6. Edit the Makeinclude file, lines 27 and 28 to use -qopenmp instead of -openmp
 
 ```
 OMPFLAGS  = -qopenmp
 OMPLIBS   = -qopenmp
 ```
 
-6. Set the environment variable BIN
+7. Set the environment variable BIN
 
 ```
 setenv BIN Linux2_x86_64ifort_openmpi_3.1.4_intel18.2
 ```
 
-7. Create a BIN directory under the ioapi-3.2 directory
+8. Create a BIN directory under the ioapi-3.2 directory
 
 ```
 cd ..
 mkdir $BIN
-```
-
-8. Link the netcdf-C and netcdf-Fortran library in the $BIN directory
-
-```
-cd $BIN
-ln -s /home/netcdf-c-4.7.0-intel18.2/libnetcdff.a
-ln -s /home/netcdf-fortran-4.4.5-intel18.2/libnetcdf.a
 ```
 
 9. Run the make command to compile and link the ioapi library
