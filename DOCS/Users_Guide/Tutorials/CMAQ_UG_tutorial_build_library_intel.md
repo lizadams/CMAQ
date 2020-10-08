@@ -263,8 +263,11 @@ git checkout -b 20200828   ! change branch to 20200828 for a tagged release vers
 
 2. Change the BIN setting on line 133 of the Makefile to include the loaded module name
 
+```
 cd ioapi
+cp Makefile.nocpl Makefile
 gedit Makefile
+```
 
 ```
 BIN        = Linux2_x86_64ifort_openmpi_3.1.4_intel18.2
