@@ -56,7 +56,7 @@ set make_options = "-j"                #> additional options for make command if
                                        #>   comment out if no additional options are wanted.
 
 #> Integrated Source Apportionment Method (ISAM)
-set ISAM_CCTM                         #> uncomment to compile CCTM with ISAM activated
+#set ISAM_CCTM                         #> uncomment to compile CCTM with ISAM activated
                                        #>   comment out to use standard process
 
 #set DDM3D_CCTM                        #> uncomment to compile CCTM with DD3D activated
@@ -70,14 +70,15 @@ set ISAM_CCTM                         #> uncomment to compile CCTM with ISAM act
 
 #> Working directory and Version IDs
  if ( $?ISAM_CCTM ) then
-     set VRSN  = v532_ISAM                      #> model configuration ID
-    else if ( $?DDM3D_CCTM ) then
-     set VRSN = v532_DDM3D
-    else
-     set VRSN = v532               #> model configuration ID
+     set VRSN  = v532_ISAM             #> model configuration ID for CMAQ_ISAM
+ else if ( $?DDM3D_CCTM ) then
+     set VRSN = v532_DDM3D             #> model configuration ID for CMAQ_DDM
+ else
+     set VRSN = v532                   #> model configuration ID for CMAQ
  endif
-   set EXEC  = CCTM_${VRSN}.exe          #> executable name
-   set CFG   = CCTM_${VRSN}.cfg          #> configuration file name
+ 
+ set EXEC  = CCTM_${VRSN}.exe          #> executable name
+ set CFG   = CCTM_${VRSN}.cfg          #> configuration file name
 
 
 #========================================================================
@@ -660,6 +661,55 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
     mv $Bld/${CFG} $Bld/${CFG}.old
  endif
  mv ${CFG}.bld $Bld/${CFG}
+
+
+#> If Building WRF-CMAQ, download WRF, download auxillary files and build
+#> model
+ if ( $?build_twoway ) then
+
+#> Check if the user has git installed on their system
+  git --version >& /dev/null
+  
+  if ($? == 0) then
+   set git_check
+  endif
+ 
+  if ($?git_check) then
+
+    cd $CMAQ_HOME/CCTM/scripts
+  
+    # Downlad WRF repository from GitHub and configure it
+    set WRF_BLD = BLD_WRFv4.1.1_CCTM_${VRSN}_${compilerString}
+    git clone --branch v4.1.1 https://github.com/wrf-model/WRF.git ./$WRF_BLD >& /dev/null
+    cd $WRF_BLD
+    ./configure <<EOF
+    ${WRF_ARCH}
+    1
+EOF
+
+     # Transfer CMAQ Code to WRF Directory
+     mv $Bld ./cmaq
+
+     # Download twoway assembly code, unpackage it and run it
+     cp -r ${CMAQ_REPO}/UTIL/wrfcmaq_twoway_coupler .
+     ./wrfcmaq_twoway_coupler/assemble >& myassemble.log
+
+     # Compile WRF-CMAQ
+     ./compile em_real |& tee wrf-cmaq_buildlog.log
+
+     ls main/wrf.exe
+
+     if ( $? != 0) then
+       echo "Error, Unsuccesfull Build! Look at wrf-cmaq_buildlog.log"
+     else
+       echo "Successfull WRF-CMAQ Build!"
+     endif
+
+     cd ${CMAQ_HOME}/CCTM/scripts
+
+   endif
+
+ endif 
 
 
 

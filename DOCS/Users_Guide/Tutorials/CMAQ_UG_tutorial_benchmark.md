@@ -106,10 +106,8 @@ tar xzvf CMAQv5.3.2_Benchmark_2Day_Output_Debug.tar.gz
 ```
 
 The CMAQ benchmark test case is a two day simulation for July 1-2 2016 on a 100 column x 80 row x 35 layer 12-km resolution domain over the southeast U.S.  
-Metadata for the CMAQ benchmark test case is posted on the CMAS Center Dataverse site: https://doi.org/10.15139/S3/IQVABD 
-
-These input and output benchmark files have also been posted on the US EPA annoymous ftp server.  The benchmark data posted on the ftp server has been split into several .tar.gz files to allow for faster download times.  
-* [ftp://newftp.epa.gov/exposure/CMAQ/V5_3_2/Benchmark](ftp://newftp.epa.gov/exposure/CMAQ/V5_3_2/Benchmark)
+- The benchmark data is also available form the US EPA annoymous ftp server: ftp://newftp.epa.gov/exposure/CMAQ/V5_3_2/Benchmark/WRFv4.1.1-CMAQv5.3.2/
+- Metadata for the CMAQ benchmark test case is posted on the CMAS Center Dataverse site: https://doi.org/10.15139/S3/IQVABD 
 
 #### A note about differences in the v5.3+ and v5.3 benchmark data
 Starting with CMAQv5.3.2, the benchmark data contains a grid mask file for the United States  GRIDMASK_STATES_12SE1.nc, and new input tar file, but the only difference for the input tar file is the gridmask file.  
@@ -172,10 +170,13 @@ For an MPI configuration with 16 processors,
 cd $CMAQ_HOME/CCTM/scripts
 ```
 
-Edit the CCTM run script (run_cctm_Bench_2016_12SE1.csh) for the MPI configuration that you will use:
+Edit the CCTM run script (run_cctm_Bench_2016_12SE1.csh) for the MPI configuration and compiler that you will use:
 
 ```
-@ NPCOL 4 ; @ NPROW = 2
+setenv compiler gcc
+setenv compilerVrsn 9.1
+setenv INPDIR  ${CMAQ_DATA}/CMAQv5.3.2_Benchmark_2Day_Input
+@ NPCOL 4 ; @ NPROW = 4
 ```
 
 Most clustered multiprocessor systems require a command to start the MPI run-time environment. The default CCTM run script uses the *mpirun* command. Consult your system administrator to find out how to invoke MPI when running multiprocessor applications.
@@ -249,11 +250,9 @@ To determine if CMAQ is correctly installed on your Linux system compare the res
 - Debug mode turned on  (```set Debug_CCTM``` uncommented in $CMAQ_HOME/CCTM/scripts/bldit_cctm.csh)
 - CMAQv5.3.2
 
-CMAQv.5.3.2 output for a two day benchmark case is provided for both the debug mode turned off (Optimized) and the debug mode turned on (Debug) version to allow the user to compare their answers to either. To reduce the impact of compiler flags on the model output, it is preferrable to use the debug version. To compare model results obtained while achieving faster run times due to compiler optimization, the Optimized version output is also provided.
+CMAQv.5.3.2 output for a two day benchmark case is provided for both the debug mode turned off (Optimized) and the debug mode turned on (Debug) version to allow the user to compare their answers to either. To reduce the impact of compiler flags on the model output, it is preferable to use the debug version. To compare model results obtained while achieving faster run times due to compiler optimization, the Optimized version output is also provided.
 
-The CMAQv5.3.2 reference output data includes a set of CCTM_ACONC_\*.nc files with layer 1 average model species concentrations for each model hour for 226 variables and a set of CCTM_WETDEP1_\*.nc files with cumulative hourly wet deposition fluxes for an additional 136 variables. The CCTM_SA_ACONC_\*.nc, CCTM_SA_CGRID_\*.nc, CCTM_SA_CONC_\*.nc, CCTM_SA_WETDEP_\*.nc and CCTM_SA_DRYDEP_\*.nc are generated when you run the CMAQ-ISAM benchmark. see [CMAQ-ISAM Tutorial](../Tutorials/CMAQ_UG_tutorial_ISAM.md)
-
-
+The CMAQv5.3.2 reference output data includes a set of CCTM_ACONC_\*.nc files with layer 1 average model species concentrations for each model hour for 226 variables and a set of CCTM_WETDEP1_\*.nc files with cumulative hourly wet deposition fluxes for an additional 136 variables. The CCTM_SA_ACONC_\*.nc, CCTM_SA_CGRID_\*.nc, CCTM_SA_CONC_\*.nc, CCTM_SA_WETDEP_\*.nc and CCTM_SA_DRYDEP_\*.nc are generated when you run the CMAQ-ISAM benchmark. See the [CMAQ-ISAM Tutorial](../Tutorials/CMAQ_UG_tutorial_ISAM.md) for more information.
 
 Use your netCDF evaluation tool of choice to evaluate your benchmark results. For example, [VERDI](https://www.verdi-tool.org/) is a visualization tool to view CCTM results as tile plots. Statistical comparison of the results can be made with the I/O API Tools or R. 
 

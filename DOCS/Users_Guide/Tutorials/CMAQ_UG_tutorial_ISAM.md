@@ -3,15 +3,14 @@
 ### Procedure to build and run the CMAQ-ISAM model using gnu compiler: ###
 
 ### Step 1: Download and run the CMAQv5.3.2 benchmark case (without ISAM) to confirm that your model run is consistent with the provided benchmark output.
-
-https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/Tutorials/CMAQ_UG_tutorial_benchmark.md
+- [CMAQ Benchmark Tutorial](CMAQ_UG_tutorial_benchmark.md)
 
 If you encounter any errors, try running the model in debug mode and refer to the CMAS User Forum to determine if any issues have been reported.
 
 https://forum.cmascenter.org/
 
 ### Step 2: Read the User Guide Chapter on Integrated Source Apportionment Method.
-https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/CMAQ_UG_ch11_ISAM.md
+- [CMAQ User's Guide Chapter on ISAM](../CMAQ_UG_ch11_ISAM.md)
 
 Note: This benchmark is intended to demonstrate how to build and run CMAQ-ISAM with the provided input files:
 
@@ -53,7 +52,7 @@ https://www.cmascenter.org/ioapi/download/ioapi-3.2-large-20200828.tar.gz
 Otherwise, use the I/O API version available here:
 https://www.cmascenter.org/ioapi/download/ioapi-3.2-20200828.tar.gz
 
-### Step 5: Install CMAQ
+### Step 5: Install CMAQ with ISAM
 
 ```
 git clone -b master https://github.com/USEPA/CMAQ.git CMAQ_REPO
@@ -82,9 +81,9 @@ cd /work/your_username/CMAQ_v5.3.2
 ```
 
 
-### Step 5. Edit the config_cmaq.csh to specify the paths of the ioapi and netCDF libraries
+### Step 6. Edit the config_cmaq.csh to specify the paths of the ioapi and netCDF libraries
 
-### Step 6: Modify the bldit_cctm.csh 
+### Step 7: Modify the bldit_cctm.csh 
 
 Change directory to CCTM/scripts
 
@@ -97,35 +96,6 @@ Comment out the following option to compile CCTM with ISAM:
 ```
 #> Integrated Source Apportionment Method (ISAM)
 set ISAM_CCTM                         #> uncomment to compile CCTM with ISAM activated
-```
-
-### Step 7: Tag the executable with v532_ISAM
-
-Change the following section of the bldit_cctm.csh 
-
-```
-#> Working directory and Version IDs
- if ( $?ISAM_CCTM ) then
-     set VRSN  = v532                           #> model configuration ID
-    else if ( $?DDM3D_CCTM ) then
-     set VRSN = v532_DDM3D
-    else
-     set VRSN = v532                            #> model configuration ID
- endif
-```
-
-to
-
-
-```
-#> Working directory and Version IDs
- if ( $?ISAM_CCTM ) then
-     set VRSN  = v532_ISAM                      #> model configuration ID
-    else if ( $?DDM3D_CCTM ) then
-     set VRSN = v532_DDM3D
-    else
-     set VRSN = v532                            #> model configuration ID
- endif
 ```
 
 ### Step 8: Run the bldit_cctm.csh script
@@ -157,7 +127,7 @@ Uncomment the line that contains ISAM_REGIONS as the File Label
  !<Example>    'ALL'         ,'CMAQ_MASKS' ,'ALL',
                'ALL'         ,'ISAM_REGIONS','ALL',
 ```
-      
+  
 ### Step 10: Download the benchmark input data
 
 [Link to CMAQv5.3.2_Benchmark_2Day_Input.tar.gz input data on the following Google Drive Folder](https://drive.google.com/drive/u/1/folders/1jAKw1EeEzxLSsmalMplNwYtUv08pwUYk)
@@ -173,39 +143,37 @@ Uncomment the line that contains ISAM_REGIONS as the File Label
   ```
   
     
-### Step 11: Run the CMAQ-ISAM model
-    
-  - Verify the following settings
-
-    ```
-    set NPROCS =    16
-    set OMIfile    = OMI_1979_to_2019.dat
-    ```
-  - Change the code version to use the tag v532_ISAM
+### Step 11: Edit the CMAQ-ISAM runscript
 
 ```
 gedit run_cctm_Bench_2016_12SE1.csh
 ```
 
-#> Set General Parameters for Configuring the Simulation
+Set General Parameters for Configuring the Simulation
 
-  - Change
+```
+set VRSN = v532_ISAM
+```
 
-    ```       
-    set VRSN      = v532              #> Code Version
-    ```       
 
-  - to
+Turn on ISAM and uncomment ISAM regions file
 
-    ```
-    set VRSN      = v532_ISAM         #> Code Version
-    ```
-    
-  - Submit the job using the batch queueing system
+```
+setenv CTM_ISAM Y
+setenv ISAM_REGIONS $INPDIR/GRIDMASK_STATES_12SE1.nc
+```
+   
+Run or Submit the script to the batch queueing system
 
-    ```
-    sbatch run_cctm_Bench_2016_12SE1.csh
-    ```
+```
+./run_cctm_Bench_2016_12SE1.csh
+```
+
+OR (If using SLRUM)
+
+```
+sbatch run_cctm_Bench_2016_12SE1.csh
+```
 
 ### Step 12: Verify that the run was successful
    - look for the output directory
