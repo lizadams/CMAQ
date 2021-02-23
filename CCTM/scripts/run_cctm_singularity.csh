@@ -41,7 +41,7 @@ if ( ! $?END_DATE   )  setenv END_DATE      "2016-07-02"
 if ( ! $?START_TIME )  setenv START_TIME    000000
 if ( ! $?RUN_LENGTH )  setenv RUN_LENGTH    240000
 if ( ! $?TIME_STEP  )  setenv TIME_STEP     10000
-if ( ! $?NMLDIR     )  setenv NMLDIR        ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_gcc-mpich
+if ( ! $?NMLDIR     )  setenv NMLDIR        ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_gcc
 
 if ( ! $?APPL       )  setenv APPL           2016_12SE1
 if ( ! $?EMIS       )  setenv EMIS           2016ff
