@@ -12,8 +12,8 @@ set bar = '-=-=--=-=-=-=--=-=-=-=--=-=-=-=--=-=-=-=--=-=-=-=--=-=-=-=--=-=-'
 #>      Runtime Environment Options
 # ===================================================================
 
-setenv CMAQ_HOME        /opt/CMAQ_v532
-setenv CMAQ_DATA        /opt/CMAQ_v532/data
+setenv CMAQ_HOME        /usr/local/src/CMAQ_REPO
+setenv CMAQ_DATA        $CMAQ_HOME/data
 
 echo 'Start Model Run At ' `date`
 
@@ -41,7 +41,7 @@ if ( ! $?END_DATE   )  setenv END_DATE      "2016-07-02"
 if ( ! $?START_TIME )  setenv START_TIME    000000
 if ( ! $?RUN_LENGTH )  setenv RUN_LENGTH    240000
 if ( ! $?TIME_STEP  )  setenv TIME_STEP     10000
-if ( ! $?NMLDIR     )  setenv NMLDIR        ${CMAQ_HOME}/gcc_8.3.1_mpich-3.2.1/CCTM/scripts/BLD_CCTM_${VRSN}_gcc-mpich
+if ( ! $?NMLDIR     )  setenv NMLDIR        ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_gcc-mpich
 
 if ( ! $?APPL       )  setenv APPL           2016_12SE1
 if ( ! $?EMIS       )  setenv EMIS           2016ff
@@ -73,15 +73,15 @@ if ( ! $?MPIVERSION )   setenv $MPIVERSION  openmpi
 
 switch ( ${MPIVERSION} )
     case mvapich*:
-        set BLD = ${CMAQ_HOME}/gcc_8.3.1_mpich-3.2.1/CCTM/scripts/BLD_CCTM_${VRSN}_${compiler}-mvapich2
+        set BLD = ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_${compiler}-mvapich2
         alias mpirun /usr/lib64/mvapich2/bin/mpirun
         breaksw
     case mpich*:
-        set BLD = ${CMAQ_HOME}/gcc_8.3.1_mpich-3.2.1/CCTM/scripts/BLD_CCTM_${VRSN}_${compiler}-mpich
+        set BLD = ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_${compiler}-mpich
         alias mpirun /usr/lib64/mpich/bin/mpirun
         breaksw
     case openmpi*:
-        set BLD = ${CMAQ_HOME}/gcc_8.3.1_mpich-3.2.1/CCTM/scripts/BLD_CCTM_${VRSN}_${compiler}-openmpi
+        set BLD = ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_${compiler}
         alias mpirun /usr/lib64/openmpi3/bin/mpirun
         breaksw
     default:
@@ -96,7 +96,7 @@ if ( ! $?EXEC )  set EXEC = ${BLD}/CCTM_${VRSN}.exe
 
 
 #>      Set Working, Input, Log, and Output Directories; grid description file
- set WORKDIR = ${CMAQ_HOME}/gcc_8.3.1_mpich-3.2.1/CCTM/script
+ set WORKDIR = ${CMAQ_HOME}/CCTM/script
  set DATADIR = ${CMAQ_DATA}/${APPL}
  set LOGDIR  = ${DATADIR}/logs
  set OUTDIR  = $DATADIR/cctm
@@ -313,13 +313,13 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
     @ NDAYS = ${NDAYS} + 1
 
     #>      Retrieve Calendar day Information
-    set YYYYMMDD = `/opt/ioapi-3.2/Linux2_x86_64gfort_medium/jul2greg ${TODAYJ}`             #>      Convert YYYY-MM-DD to YYYYMMDD
+    set YYYYMMDD = `/usr/local/bin/jul2greg ${TODAYJ}`             #>      Convert YYYY-MM-DD to YYYYMMDD
     set YYMMDD   = `echo $YYYYMMDD | cut -c 3-8`    #>      Convert YYYYMMDD to YYMMDD
     set YYYYJJJ  = $TODAYJ
 
     #>      Calculate Yesterday's Date
-    set YESTERDAY = `/opt/ioapi-3.2/Linux2_x86_64gfort_medium/julshift $YYYYJJJ -1`
-    set YESTERDAYG = `/opt/ioapi-3.2/Linux2_x86_64gfort_medium/jul2greg ${YESTERDAY}`
+    set YESTERDAY = `/usr/local/bin/julshift $YYYYJJJ -1`
+    set YESTERDAYG = `/usr/local/bin/jul2greg ${YESTERDAY}`
 
     if ( $CTM_DIAG_LVL != 0 ) then
         echo ${bar}
