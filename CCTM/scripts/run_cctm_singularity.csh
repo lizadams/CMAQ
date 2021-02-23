@@ -786,7 +786,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
     #>      Increment both Gregorian and Julian Days
     set TODAYG = `date -ud "${TODAYG}+1days" +%Y-%m-%d` #>      Add a day for tomorrow
-    set TODAYJ = `/opt/ioapi-3.2/Linux2_x86_64gfort_medium/julshift $TODAYJ ${RUN_DAYS}`
+    set TODAYJ = `/usr/local/bin/julshift $TODAYJ ${RUN_DAYS}`
 
 end         #  Loop to the next Simulation Day
 
