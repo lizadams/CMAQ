@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ===================== CCTMv5.3.1 Run Script =========================
+# ===================== CCTMv5.3.2 Run Script =========================
 # Usage: run.cctm >&! cctm_v532.2016_12SE1.log &
 #
 # To report problems or request help with this script/program:
