@@ -82,7 +82,7 @@ switch ( ${MPIVERSION} )
         breaksw
     case openmpi*:
         set BLD = ${CMAQ_HOME}/CCTM/scripts/BLD_CCTM_${VRSN}_${compiler}
-        alias mpirun /usr/lib64/openmpi3/bin/mpirun
+        alias mpirun /usr/local/bin/mpirun
         breaksw
     default:
         echo ${bar}
