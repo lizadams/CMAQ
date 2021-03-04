@@ -251,7 +251,7 @@ if ( ! $?CTM_WVEL           ) setenv CTM_WVEL           Y      ##   save derived
  set EMISpath2 = $DATADIR/emis/gridded_area/rwc      ##   gridded surface residential wood combustion emissions directory
  set IN_PTpath = $DATADIR/emis/inln_point            ##   point source emissions input directory
  set IN_LTpath = $DATADIR/lightning                  ##   lightning NOx input directory
- set METpath   = $DATADIR/met/mcip                   ##   meteorology input directory
+ set METpath   = $DATADIR/met/mcipv5.0                   ##   meteorology input directory
  set OMIpath   = $BLD                                ##   ozone column data for the photolysis model
  set LUpath    = $DATADIR/land                       ##   BELD landuse data for windblown dust model
  set SZpath    = $DATADIR/land                       ##   surf zone file for in-line seaspray emissions
