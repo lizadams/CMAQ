@@ -402,7 +402,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      setenv CMAQ_MASKS $SZpath/12US1_surf.ncf
 
     #> Determine Representative Emission Days
-    set EMDATES = $INPDIR/emissions/smk_merge_dates_${YYYYMM}.txt
+    set EMDATES = $DATADIR/emissions/smk_merge_dates_${YYYYMM}.txt
     set intable = `grep "^${YYYYMMDD}" $EMDATES`
     set Date     = `echo $intable[1] | cut -d, -f1`
     set aveday_N = `echo $intable[2] | cut -d, -f1`
