@@ -758,7 +758,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
 
     else if ( $PROC == mpi ) then
 
-        ( time -p mpirun --oversubscribe -np $NPROCS ${EXEC} ) |& tee buff_${EXECUTION_ID}.txt
+        ( time mpirun --oversubscribe -np $NPROCS ${EXEC} ) |& tee buff_${EXECUTION_ID}.txt
         set err_status = ${status}      ##  save exit-status:  normal/success is 0, abnormal/failure non-zero
 
     else
