@@ -144,7 +144,7 @@ set make_options = "-j"                #> additional options for make command if
  set DBG        = "${myDBG}"
  setenv F_FLAGS   "${myFFLAGS}"            #> F77 flags
  set F90_FLAGS  = "${myFRFLAGS}"           #> F90 flags
- set CPP_FLAGS  = ""                       #> Fortran preprocessor flags
+ set CPP_FLAGS  = "-Dcluster"                       #> Fortran preprocessor flags
  set C_FLAGS    = "${myCFLAGS} -DFLDMN -I" #> C flags
  set LINK_FLAGS = "${myLINK_FLAG}"         # Link flags
 

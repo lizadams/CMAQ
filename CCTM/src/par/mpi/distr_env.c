@@ -117,11 +117,14 @@ extern void distr_env_ (int *myid_p, int *numprocs_p)
        curr_name = strtok (curr_str, "=");
        curr_val = strtok (NULL, "\0");
        
+       if (curr_val) /* dbg */
+       {
        if ( ret = setenv (curr_name, curr_val, 0) )
        {    
           printf ("error in setting environmental variable %s = %s. \n", curr_name, curr_val);
           exit (1);
        }
+       } /* dbg */
          
        DEBUG( printf ("check the environmetal variable %s = %s. \n", curr_name, getenv(curr_name)); )
       }
