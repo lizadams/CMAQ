@@ -210,11 +210,13 @@ Now execute the script.
 Change directories to the CMAQ_HOME directory
 
 ### Step 5. Edit and source the config_cmaq.csh to specify the paths of the ioapi and netCDF libraries 
+### Go to the case [compiler] entry
+### for example, if running using the gcc compiler, go to line 148, or search for 'case gcc'
    
 ```
 #> I/O API and netCDF for WRF-CMAQ 
 setenv NETCDF netcdf_root_gcc # Note please combine netCDF-C & Fortran Libraries (e.g. /usr/local/netcdf-4.7.0)
-setenv IOAPI  ioapi_root_gcc  (e.g. /usr/local/ioapi-3.2)
+setenv IOAPI  ioapi_root_gcc  (e.g. /usr/local/ioapi-3.2)  ##note, this doesn't indicate what the BIN directory name is.. We can't assume it. Where does this get used and what value of BIN is used?
 setenv WRF_ARCH 34              # [1-75]  64 Bit Linux_x86 Compiler/Architecture options
 ```
 
