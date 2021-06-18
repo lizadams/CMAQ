@@ -138,13 +138,13 @@
     case gcc:
   
         #> I/O API, netCDF, and MPI library locations
-        setenv IOAPI_INCL_DIR   iopai_inc_gcc   #> I/O API include header files
-        setenv IOAPI_LIB_DIR    ioapi_lib_gcc   #> I/O API libraries
-        setenv NETCDF_LIB_DIR   netcdf_lib_gcc  #> netCDF C directory path
-        setenv NETCDF_INCL_DIR  netcdf_inc_gcc  #> netCDF C directory path
-        setenv NETCDFF_LIB_DIR  netcdff_lib_gcc #> netCDF Fortran directory path
-        setenv NETCDFF_INCL_DIR netcdff_inc_gcc #> netCDF Fortran directory path
-        setenv MPI_LIB_DIR      mpi_lib_gcc     #> MPI directory path
+        setenv IOAPI_INCL_DIR   /shared/build/ioapi-3.2/ioapi/fixed_src   #> I/O API include header files
+        setenv IOAPI_LIB_DIR    /shared/build/ioapi-3.2/Linux2_x86_64gfort   #> I/O API libraries
+        setenv NETCDF_LIB_DIR   /shared/build/netcdf/lib  #> netCDF C directory path
+        setenv NETCDF_INCL_DIR  /shared/build/netcdf/include  #> netCDF C directory path
+        setenv NETCDFF_LIB_DIR  /shared/build/netcdf/lib #> netCDF Fortran directory path
+        setenv NETCDFF_INCL_DIR /shared/build/netcdf/include #> netCDF Fortran directory path
+        setenv MPI_LIB_DIR      /opt/amazon/openmpi     #> MPI directory path
     
         #> Compiler Aliases and Flags
         #> set the compiler flag -fopt-info-missed to generate a missed optimization report in the bldit logfile
@@ -155,7 +155,7 @@
         setenv myFFLAGS "-ffixed-form -ffixed-line-length-132 -funroll-loops -finit-character=32"
         setenv myFRFLAGS "-ffree-form -ffree-line-length-none -funroll-loops -finit-character=32"
         setenv myCFLAGS "-O2"
-        setenv myLINK_FLAG # "-fopenmp" openMP not supported w/ CMAQ
+        setenv myLINK_FLAG  "-fopenmp" # openMP not supported w/ CMAQ
         setenv extra_lib ""
         #setenv mpi_lib "-lmpi_mpifh"   #> -lmpich for mvapich or -lmpi for openmpi
         setenv mpi_lib ""   #> -lmpich for mvapich or -lmpi for openmpi
