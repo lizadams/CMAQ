@@ -2,8 +2,8 @@
 #SBATCH --nodes=2
 #SBATCH --ntasks-per-node=32
 #SBATCH -J CMAQ
-#SBATCH -o /shared/build/CMAQ_REPO/CCTM/scripts/run_cctmv5.3.2_Bench_2016_12US2.8x8pe.2day.log
-#SBATCH -e /shared/build/CMAQ_REPO/CCTM/scripts/run_cctmv5.3.2_Bench_2016_12US2.8x8pe.2day.log
+#SBATCH -o /shared/build/openmpi_4.1.0_gcc_8.3.1/CMAQ_v532/CCTM/scripts/run_cctmv5.3.2_Bench_2016_12US2.8x8pe.2day.log
+#SBATCH -e /shared/build/openmpi_4.1.0_gcc_8.3.1/CMAQ_v532/CCTM/scripts/run_cctmv5.3.2_Bench_2016_12US2.8x8pe.2day.log
 
 
 # ===================== CCTMv5.3.X Run Script ========================= 
@@ -19,8 +19,14 @@
 # ===================================================================
 
 echo 'Start Model Run At ' `date`
+echo 'information about processor including whether using hyperthreading'
 lscpu
-module load openmpi/4.1.0
+echo 'information about cluster'
+sinfo
+echo 'information about filesystem'
+df -h
+echo 'list the mounted volumes'
+showmount -e localhost
 
 #> Toggle Diagnostic Mode which will print verbose information to 
 #> standard output
@@ -45,7 +51,7 @@ module load openmpi/4.1.0
  set PROC      = mpi               #> serial or mpi
  set MECH      = cb6r3_ae7_aq      #> Mechanism ID
  set EMIS      = 2016ff            #> Emission Inventory Details
- set APPL      = 2016_CONUS_8x8        #> Application Name (e.g. Gridname)
+ set APPL      = 2016_CONUS_8x8pe        #> Application Name (e.g. Gridname)
 
 #> Define RUNID as any combination of parameters above or others. By default,
 #> this information will be collected into this one string, $RUNID, for easy
@@ -63,9 +69,9 @@ module load openmpi/4.1.0
 #> Set Working, Input, and Output Directories
  setenv WORKDIR ${CMAQ_HOME}/CCTM/scripts       #> Working Directory. Where the runscript is.
  #setenv CMAQ_DATA /21dayscratch/scr/l/i/lizadams/CMAQv5.3.2_CONUS/output
- setenv CMAQ_DATA /shared/build/CMAQ_REPO/data/output
- setenv OUTDIR  ${CMAQ_DATA}/output_CCTM_${RUNID}_2x32 #> Output Directory
- setenv INPDIR  /shared/build/CMAQ_REPO/data/CONUS/12US2  #Input Directory
+ setenv CMAQ_DATA /fsx/output
+ setenv OUTDIR  ${CMAQ_DATA}/output_CCTM_${RUNID} #> Output Directory
+ setenv INPDIR  /shared/build/openmpi_4.1.0_gcc_8.3.1/CMAQ_v532/data/CONUS/12US2  #Input Directory
  setenv LOGDIR  ${OUTDIR}/LOGS     #> Log Directory Location
  setenv NMLpath ${BLD}             #> Location of Namelists. Common places are: 
                                    #>   ${WORKDIR} | ${CCTM_SRC}/MECHS/${MECH} | ${BLD}
@@ -95,7 +101,7 @@ set TSTEP      = 010000            #> output time step interval (HHMMSS)
 if ( $PROC == serial ) then
    setenv NPCOL_NPROW "1 1"; set NPROCS   = 1 # single processor setting
 else
-   @ NPCOL  =  8; @ NPROW = 8 
+   @ NPCOL  =  8; @ NPROW = 8
    @ NPROCS = $NPCOL * $NPROW
    setenv NPCOL_NPROW "$NPCOL $NPROW"; 
 endif
@@ -120,7 +126,7 @@ setenv STDOUT T                    #> Override I/O-API trying to write informati
                                    #>   logs and STDOUT [ options: T | F ]
 
 setenv GRID_NAME 12US2     #> check GRIDDESC file for GRID_NAME options
-setenv GRIDDESC $INPDIR/MCIP/GRIDDESC_css   #> grid description file
+setenv GRIDDESC $INPDIR/GRIDDESC   #> grid description file
 
 #> Retrieve the number of columns, rows, and layers in this simulation
 set NZ = 35

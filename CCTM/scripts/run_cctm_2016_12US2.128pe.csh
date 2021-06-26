@@ -1,10 +1,9 @@
 #!/bin/csh -f
-#SBATCH --nodes=8
+#SBATCH --nodes=4
 #SBATCH --ntasks-per-node=32
-### using 32 out of 36 cpus per on core c5n.18xlarge 	72vcpu 	192Memory(GiB)
 #SBATCH -J CMAQ
-#SBATCH -o /shared/build/openmpi_4.1.0_gcc_8.3.1/CMAQ_v532/CCTM/scripts/run_cctmv5.3.2_Bench_2016_12US2.16x16pe.2day.log
-#SBATCH -e /shared/build/openmpi_4.1.0_gcc_8.3.1/CMAQ_v532/CCTM/scripts/run_cctmv5.3.2_Bench_2016_12US2.16x16pe.2day.log
+#SBATCH -o /shared/build/openmpi_4.1.0_gcc_8.3.1/CMAQ_v532/CCTM/scripts/run_cctmv5.3.2_Bench_2016_12US2.16x8pe.2day.log
+#SBATCH -e /shared/build/openmpi_4.1.0_gcc_8.3.1/CMAQ_v532/CCTM/scripts/run_cctmv5.3.2_Bench_2016_12US2.16x8pe.2day.log
 
 
 # ===================== CCTMv5.3.X Run Script ========================= 
@@ -27,7 +26,7 @@ sinfo
 echo 'information about filesystem'
 df -h
 echo 'list the mounted volumes'
-showmount -e localhost
+showmount -e localhost 
 
 
 #> Toggle Diagnostic Mode which will print verbose information to 
@@ -53,7 +52,7 @@ showmount -e localhost
  set PROC      = mpi               #> serial or mpi
  set MECH      = cb6r3_ae7_aq      #> Mechanism ID
  set EMIS      = 2016ff            #> Emission Inventory Details
- set APPL      = 2016_CONUS_16x16pe        #> Application Name (e.g. Gridname)
+ set APPL      = 2016_CONUS_16x8pe        #> Application Name (e.g. Gridname)
 
 #> Define RUNID as any combination of parameters above or others. By default,
 #> this information will be collected into this one string, $RUNID, for easy
@@ -103,7 +102,7 @@ set TSTEP      = 010000            #> output time step interval (HHMMSS)
 if ( $PROC == serial ) then
    setenv NPCOL_NPROW "1 1"; set NPROCS   = 1 # single processor setting
 else
-   @ NPCOL  =  16; @ NPROW = 16
+   @ NPCOL  =  16; @ NPROW = 8
    @ NPROCS = $NPCOL * $NPROW
    setenv NPCOL_NPROW "$NPCOL $NPROW"; 
 endif
@@ -710,7 +709,6 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   # set MPI = /usr/local/intel/impi/3.2.2.006/bin64
   # set MPIRUN = $MPI/mpirun
   ( /usr/bin/time -p mpirun -np $NPROCS $BLD/$EXEC ) |& tee buff_${EXECUTION_ID}.txt
-### to stop the model from crashing on the second day
 
   #> Harvest Timing Output so that it may be reported below
   set rtarray = "${rtarray} `tail -3 buff_${EXECUTION_ID}.txt | grep -Eo '[+-]?[0-9]+([.][0-9]+)?' | head -1` "
