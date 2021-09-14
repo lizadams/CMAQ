@@ -3,7 +3,7 @@
 
 The CMAQ User's Guide is designed to support the installation, configuration, and execution of the [Community Multiscale Air Quality (CMAQ)](http://www.epa.gov/cmaq) model on Linux systems. CMAQ users should be comfortable with Linux scripting conventions and have some familiarity with the Fortran programming language. Users should also have some familiarity with atmospheric structure, and the physical and chemical processes that occur in the atmosphere. 
 
-Note: While this User's Guide is packaged with the code when it is downloaded or cloned, users are encouraged to go [online](https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/README.md) for the latest version.
+Note: While this User's Guide is packaged with the code when it is downloaded or cloned, users are encouraged to go [online](https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/README.md) for the latest version.
 
 # Table of Contents
 
@@ -61,4 +61,4 @@ Note: While this User's Guide is packaged with the code when it is downloaded or
 
 ***
 
-CMAQ User's Guide (c) 2020<br>
+CMAQ User's Guide (c) 2021<br>

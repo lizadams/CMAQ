@@ -33,7 +33,7 @@ echo 'Start Model Run At ' `date`
  cd CCTM/scripts
 
 #> Set General Parameters and Labels for Configuring the Simulation
- set VRSN      = v532               #> Code Version
+ set VRSN      = v533               #> Code Version
  set PROC      = mpi                #> serial or mpi
  set MECH      = saprc07tic_ae7i_aq #> Mechanism ID
  set EMIS      = 2011eh_saprc_10g   #> Emission Inventory Details
@@ -156,6 +156,8 @@ setenv CTM_ABFLUX N          #> ammonia bi-directional flux for in-line depositi
 setenv CTM_HGBIDI N          #> mercury bi-directional flux for in-line deposition 
                              #>    velocities [ default: N ]
 setenv CTM_SFC_HONO Y        #> surface HONO interaction [ default: Y ]
+                             #> please see user guide (6.10.4 Nitrous Acid (HONO)) 
+                             #> for dependency on percent urban fraction dataset
 setenv CTM_GRAV_SETL Y       #> vdiff aerosol gravitational sedimentation [ default: Y ]
 setenv CTM_BIOGEMIS Y        #> calculate in-line biogenic emissions [ default: N ]
 
@@ -265,12 +267,10 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   if ($NEW_START == true || $NEW_START == TRUE ) then
      setenv ICFILE ICON_v52_4CALIF1_saprc07tb_ae6_aq_timeind
      setenv INIT_MEDC_1 notused
-     setenv INITIAL_RUN Y #related to restart soil information file
   else
      set ICpath = $OUTDIR
      setenv ICFILE CCTM_CGRID_${RUNID}_${YESTERDAY}.nc
      setenv INIT_MEDC_1 $ICpath/CCTM_MEDIA_CONC_${RUNID}_${YESTERDAY}.nc
-     setenv INITIAL_RUN N
   endif
 
   #> Boundary conditions
@@ -308,11 +308,11 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   #> made when creating the emission files defined below and the desired representation of organic aerosols.
   #> For further information, please see:
   #> + AERO7 Release Notes section on 'Required emission updates':
-  #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Release_Notes/aero7_overview.md
+  #>   https://github.com/USEPA/CMAQ/blob/main/DOCS/Release_Notes/CMAQv5.3_aero7_overview.md
   #> + CMAQ User's Guide section 6.9.3 on 'Emission Compatability': 
-  #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/CMAQ_UG_ch06_model_configuration_options.md#6.9.3_Emission_Compatability
+  #>   https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/CMAQ_UG_ch06_model_configuration_options.md#6.9.3_Emission_Compatability
   #> + Emission Control (DESID) Documentation in the CMAQ User's Guide: 
-  #>   https://github.com/USEPA/CMAQ/blob/master/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md 
+  #>   https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/Appendix/CMAQ_UG_appendixB_emissions_control.md 
   #>
   setenv EMISSCTRL_NML ${BLD}/EmissCtrl_${MECH}.nml
 
@@ -336,7 +336,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   set    EMISfile  = emis_mole_all_${YYYYMMDD}_4CALIF1_cmaq_saprc07TB_2011eh_saprc_10g.ncf
   setenv GR_EMIS_001 ${EMISpath}/${EMISfile}
   setenv GR_EMIS_LAB_001 GRIDDED_EMIS
-  setenv GR_EMIS_SYM_DATE_001 F # To change default behavior please see Users Guide for EMIS_SYM_DATE 
+  setenv GR_EM_SYM_DATE_001 F # To change default behavior please see Users Guide for EMIS_SYM_DATE 
   
   #> In-Line Point Emissions configuration
   setenv N_EMIS_PT 7          #> Number of elevated source groups
@@ -403,7 +403,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
      setenv SUMMER_YN  Y     #> Use summer normalized emissions? [ default: Y ]
      setenv PX_VERSION Y     #> MCIP is PX version? [ default: N ]
      setenv SOILINP    $OUTDIR/CCTM_SOILOUT_${RUNID}_${YESTERDAY}.nc
-                             #> Biogenic NO soil input file; ignore if INITIAL_RUN = Y
+                             #> Biogenic NO soil input file; ignore if NEW_START = TRUE
   endif
 
   #> Windblown dust emissions configuration

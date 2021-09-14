@@ -19,7 +19,7 @@ CMAQ source code can be installed either using git or from tarballs downloaded f
 
 In the directory where you would like to install CMAQ, issue the following command to clone the official EPA GitHub repository for CMAQv5.3:
 
-`git clone -b master https://github.com/USEPA/CMAQ CMAQ_REPO`
+`git clone -b main https://github.com/USEPA/CMAQ CMAQ_REPO`
 
 Using the git clone option, CMAQ will install into the following directories:
 
@@ -39,19 +39,19 @@ Reference input/output data for testing the installation of the software are ava
 
 In the directory where you would like to install CMAQ, unzip the model distribution file:
 
-`unzip CMAQ-master.zip`
+`unzip CMAQ-main.zip`
 
 The following directories will be created:
 
 ```
-CMAQ-master/CCTM
-CMAQ-master/PREP
-CMAQ-master/POST
-CMAQ-master/UTIL
-CMAQ-master/DOCS
+CMAQ-main/CCTM
+CMAQ-main/PREP
+CMAQ-main/POST
+CMAQ-main/UTIL
+CMAQ-main/DOCS
 ```
 
-The Git and Zip file installation options will produce slightly different subdirectories on your Linux system. The base installation directory using the git clone command will be `CMAQ_REPO`; the directory from the Zip file will be `CMAQ-master`. The subsequent instructions in this guide will be based on the git clone installation. For Zip file installations, replace `CMAQ_REPO` with `CMAQ-master` in the instructions that follow. The differences in the directory names highlights the difference in functionality between the two options. Cloning the repository gives the user access to the full repository and its history, while downloading the Zip file will only give access to version 5.3.
+The Git and Zip file installation options will produce slightly different subdirectories on your Linux system. The base installation directory using the git clone command will be `CMAQ_REPO`; the directory from the Zip file will be `CMAQ-main`. The subsequent instructions in this guide will be based on the git clone installation. For Zip file installations, replace `CMAQ_REPO` with `CMAQ-main` in the instructions that follow. The differences in the directory names highlights the difference in functionality between the two options. Cloning the repository gives the user access to the full repository and its history, while downloading the Zip file will only give access to version 5.3.
 
 ## 5.3 The CMAQ Repository Structure
 
@@ -169,12 +169,12 @@ run_cctm.csh |& tee run_cctm.log
 
 ### 5.7.1 CCTM Logfiles
 
-The CCTM simulation will write two types of logfile, a master logfile (e.g. run_cctm.log) and processor-specific logfiles that have the name convention:  
+The CCTM simulation will write two types of logfile, a main logfile (e.g. run_cctm.log) and processor-specific logfiles that have the name convention:  
 ```
 CTM_LOG_[ProcessorID].v53_[compiler]_[data_name]/_[RUNDATE].log
 ```
 
-The master logfile contains extensive metadata and useful information about the details of your simulation. The following examples describe some of this information:  
+The main logfile contains extensive metadata and useful information about the details of your simulation. The following examples describe some of this information:  
 ```
 Start Model Run At  Tue Apr 9 08:18:06 EDT 2019
 Compiler is set to intel
@@ -463,6 +463,6 @@ Check the last few lines of the CCTM output log for messages to help diagnose wh
 <!-- BEGIN COMMENT -->
 
 [<< Previous Chapter](CMAQ_UG_ch04_model_inputs.md) - [Home](README.md) - [Next Chapter >>](CMAQ_UG_ch06_model_configuration_options.md)<br>
-CMAQ User's Guide (c) 2020<br>
+CMAQ User's Guide (c) 2021<br>
 
 <!-- END COMMENT -->

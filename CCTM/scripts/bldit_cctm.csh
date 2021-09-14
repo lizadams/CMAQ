@@ -48,9 +48,11 @@ set CopySrc                            #> copy the source files into the build d
                                        #>   comment out to compile the model (default if not set)
 set ParOpt                             #> uncomment to build a multiple processor (MPI) executable; 
                                        #>   comment out for a single processor (serial) executable
+#set DistrEnv                          #> uncomment to distribute environmental variables to multiple machines
+                                       #>   comment out for a single processor (serial) executable (MPI only)
 #set build_parallel_io                 #> uncomment to build with parallel I/O (pnetcdf); 
                                        #>   comment out to use standard netCDF I/O
-#set Debug_CCTM                        #> uncomment to compile CCTM with debug option equal to TRUE
+#set Debug_CCTM                        #> uncomment to compile CCTM with debug option equal to TRUE, NOTE: to run using debug requires modify BLD and RUNID in run script 
                                        #>   comment out to use standard, optimized compile process
 set make_options = "-j"                #> additional options for make command if MakeFileOnly is not set
                                        #>   comment out if no additional options are wanted.
@@ -70,11 +72,11 @@ set make_options = "-j"                #> additional options for make command if
 
 #> Working directory and Version IDs
  if ( $?ISAM_CCTM ) then
-     set VRSN  = v532_ISAM             #> model configuration ID for CMAQ_ISAM
+     set VRSN  = v533_ISAM             #> model configuration ID for CMAQ_ISAM
  else if ( $?DDM3D_CCTM ) then
-     set VRSN = v532_DDM3D             #> model configuration ID for CMAQ_DDM
+     set VRSN = v533_DDM3D             #> model configuration ID for CMAQ_DDM
  else
-     set VRSN = v532                   #> model configuration ID for CMAQ
+     set VRSN = v533                   #> model configuration ID for CMAQ
  endif
  
  set EXEC  = CCTM_${VRSN}.exe          #> executable name
@@ -220,6 +222,10 @@ set make_options = "-j"                #> additional options for make command if
     set LIB3 = "${mpi_lib} ${extra_lib}"
     set Str1 = (// Parallel / Include message passing definitions)
     set Str2 = (include SUBST_MPI mpif.h;)
+    # Distribute Environment to different machines if not done automatically 
+    if ( $?DistrEnv ) then
+      set PAR = ($PAR -Dcluster) 
+    endif
  else
     #Serial system configuration
     echo "   Not Parallel; set Serial (no-op) flags"
@@ -264,7 +270,14 @@ set make_options = "-j"                #> additional options for make command if
 
 #> Set and create the "BLD" directory for checking out and compiling 
 #> source code. Move current directory to that build directory.
- set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}
+ if ( $?Debug_CCTM ) then
+    set MODE = debug
+    set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}_${MODE}
+ else
+    set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}
+ endif
+
+
  if ( ! -e "$Bld" ) then
     mkdir $Bld
  else
@@ -640,13 +653,19 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
     set bld_flags = "${bld_flags} -isam_cctm"
  endif
 
+ if ( $?build_twoway ) then
+   set bld_flags = "${bld_flags} -twoway"
+ endif
+
 #> Run BLDMAKE with source code in build directory
  $Blder $bld_flags $Cfile   
 
 #> Rename Makefile to specify compiler option and link back to Makefile
- mv Makefile Makefile.$compilerString
- if ( -e Makefile.$compilerString && -e Makefile ) rm Makefile
- ln -s Makefile.$compilerString Makefile
+ if ( ! $?build_twoway ) then
+    mv Makefile Makefile.$compilerString
+    if ( -e Makefile.$compilerString && -e Makefile ) rm Makefile
+    ln -s Makefile.$compilerString Makefile
+ endif
 
 #> Alert user of error in BLDMAKE if it ocurred
  if ( $status != 0 ) then
@@ -661,6 +680,64 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
     mv $Bld/${CFG} $Bld/${CFG}.old
  endif
  mv ${CFG}.bld $Bld/${CFG}
+
+
+#> If Building WRF-CMAQ, download WRF, download auxillary files and build
+#> model
+ if ( $?build_twoway ) then
+
+#> Check if the user has git installed on their system
+  git --version >& /dev/null
+  
+  if ($? == 0) then
+   set git_check
+  endif
+ 
+  if ($?git_check) then
+
+    cd $CMAQ_HOME/CCTM/scripts
+  
+    # Downlad WRF repository from GitHub and put CMAQv5.3.X into it
+    set WRF_BLD = BLD_WRFv4.3_CCTM_${VRSN}_${compilerString}
+    setenv wrf_path ${CMAQ_HOME}/CCTM/scripts/${WRF_BLD}
+    setenv WRF_CMAQ 1
+
+    if ( ! -d $WRF_BLD ) then 
+      git clone --branch v4.3 https://github.com/wrf-model/WRF.git ./$WRF_BLD >& /dev/null
+      cd $wrf_path
+      mv $Bld ./cmaq
+
+      # Link Coupler to WRF
+        cd ${CMAQ_REPO}/UTIL
+        ${CMAQ_REPO}/UTIL/wrfcmaq_twoway_coupler/assemble >& ${wrf_path}/wrf-cmaq_buildlog.log
+  
+        if ($? != 0) then
+          echo "Error running ${CMAQ_REPO}/UTIL/wrfcmaq_twoway_coupler/assemble look at wrf-cmaq_buildlog.log." 
+          exit 1
+        endif
+
+      cd $wrf_path
+  
+      # Configure WRF
+        ./configure <<EOF
+        ${WRF_ARCH}
+        1
+EOF
+
+    else
+      # Clean-up 
+      rm -r $Bld
+      cd $wrf_path
+    endif
+
+     # Compile WRF-CMAQ
+     ./compile em_real |& tee -a wrf-cmaq_buildlog.log
+
+     cd ${CMAQ_HOME}/CCTM/scripts
+
+   endif
+
+ endif 
 
 
 

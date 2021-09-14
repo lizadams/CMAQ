@@ -442,10 +442,10 @@ setenv BIOSEASON /home/user/path-to-file/bioseason.nc
 
 Additionally, when using the inline biogenic option, the user must point to the SOILOUT file from one day’s simulation as the SOILINP file for the next day. The user must also decide whether to write over SOILOUT files from previous days or create a uniquely named SOILOUT file for each day. The latter approach is recommended if the user wishes to retain the capability to restart simulations in the middle of a sequence of simulations.
 
-The INITIAL_RUN variable in the RunScript to Y if this is the first time that biogenic NO soil emissions will be calculated. If there is a previously created file, set to N.  When INITIAL_RUN is set to N, the directory path and file name of biogenic NO soil emissions file must be set in the RunScript:
+Set the NEW_START variable in the RunScript to TRUE if this is the first time that biogenic NO soil emissions will be calculated. If there is a previously created file, set to FALSE.  When NEW_START is set to FALSE, the directory path and file name of biogenic NO soil emissions file must be set in the RunScript:
 
 ```
-setenv INITIAL_RUN N
+setenv NEW_START FALSE
 ```
 
 ```
@@ -572,20 +572,12 @@ Alternatively, users can also edit the emission control file by commenting out t
 #### Lightning NO
 In retrospective applications over the continental U.S., National Lightning Detection Network (NLDN) lightning data can be used directly to generate NO produced by lightning in CMAQ. For real-time forecasts or other applications where lightning data are not available, lightning NO is produced based on statistical relationships with the simulated convective rainfall rate (Kang et al., 2019).
 
-There are three options for including NO from lighting.  All three options require setting the CTM_LTNG_NO flag to Y in the RunScript.
+There are two options for including NO from lighting. Both options require setting the CTM_LTNG_NO flag to Y in the RunScript.
 ```
 setenv CTM_LTNG_NO Y
 ```
 
-##### Option 1 - Offline NO -- user provides a gridded lightning NO emissions file calculated with a preprocessor external to the CMAQ repository
-
-For this option set the LTNGNO environment variable in the RunScript to the location of the gridded netCDF file of NO emissions:
-
-```
-setenv LTNGNO /home/user/path-to-file/ltngno_emiss_from_user.nc
-```
-
-##### Option 2 - Inline NO with NLDN Data -- user uses hourly NLDN lightning strike netCDF file.
+##### Option 1 - Inline NO with NLDN Data -- user uses hourly NLDN lightning strike netCDF file.
 
 Hourly NLDN lightning strike data can be purchased.
 In addition to the hourly lightning strike netCDF file, this option requires a lightning parameters netCDF file.  This file contains  the intercloud to cloud-to-ground flash ratios, which are the scaling factors for calculating flashes using the convective precipitation rate, land-ocean masks, and the moles of NO per flash (cloud-to-ground and intercloud).  The lightning parameters file for a domain over the continental US at 12km horizontal resolution (12US1) can be downloaded from the [CMAS Data Warehouse](https://drive.google.com/drive/folders/1R8ENVSpQiv4Bt4S0LFuUZWFzr3-jPEeY).  This file can be regridded to support other domains within the continental US. 
@@ -606,7 +598,7 @@ setenv NLDN_STRIKES /home/user/path-to-file/nldn_hourly_ltng_strikes.nc
 setenv LTNGPARMS_FILE /home/user/path-to-file/LTNG_AllParms_12US1.nc
 ```
 
-##### Option 3 - Inline NO without NLDN Data --  lightning NO is calculated within CCTM based on statistical relationships with the simulated convective rainfall rate.
+##### Option 2 - Inline NO without NLDN Data --  lightning NO is calculated within CCTM based on statistical relationships with the simulated convective rainfall rate.
 
 This option also requires a lightning parameters netCDF file which contains the linear regression parameters for generating lightning NO.  The lightning parameters file for the continental US at 12km horizontal resolution can be downloaded from the [CMAS Data Warehouse](https://drive.google.com/drive/folders/1R8ENVSpQiv4Bt4S0LFuUZWFzr3-jPEeY). This file can be regridded to support other domains within the continental US. 
 
@@ -642,7 +634,7 @@ Potential Combustion SOA (PCSOA) was added to CMAQv5.2 to account for missing PM
 
 <a id=a-pinene></a>
 #### &#945;-Pinene separated from other monoterpenes
-If using chemical mechanism CB6r3 and aerosol module AERO7 (cb6r3_ae7) with offline biogenic emissions, &#945;-pinene should be separated from all other monoterpenes. This will prevent overestimation in PM2.5 SOA as &#945;-pinene should not make SOA through nitrate radical reaction.  Users can use biogenic emission files created for older model versions by updating the emission control file to separate &#945;-pinene. No action is required for aerosol module AERO6 (any mechanism), in-line biogenics (any mechanism, any aerosol module), or aero7 with SAPRC mechanisms. See the [AERO7 overview release notes](../Release_Notes/aero7_overview.md) for further details. 
+If using chemical mechanism CB6r3 and aerosol module AERO7 (cb6r3_ae7) with offline biogenic emissions, &#945;-pinene should be separated from all other monoterpenes. This will prevent overestimation in PM2.5 SOA as &#945;-pinene should not make SOA through nitrate radical reaction.  Users can use biogenic emission files created for older model versions by updating the emission control file to separate &#945;-pinene. No action is required for aerosol module AERO6 (any mechanism), in-line biogenics (any mechanism, any aerosol module), or aero7 with SAPRC mechanisms. See the [AERO7 overview release notes](../Release_Notes/CMAQv5.3_aero7_overview.md) for further details. 
 
 <a id=6.10_Gas_Phase_Chem></a>
 
@@ -763,7 +755,9 @@ In CMAQ, HONO is produced from emissions, gas-phase chemical reactions, and a he
 setenv CTM_SFC_HONO Y 
 ```
 
-CMAQ uses a default setting of Y to include the production of HONO from the heterogeneous reaction on ground surface. The user can set it to N to exclude the heterogeneous production from the reaction. Note that the default setting for the inline deposition calculation (CTM_ILDEPV) flag is Y. If the flag is changed to N, then the production of HONO from the heterogeneous reaction on ground surface will not work properly. Additional description of the HONO chemistry in CMAQ can be found in Sarwar et al. (2008).
+CMAQ uses a default setting of Y to include the production of HONO from the heterogeneous reaction on ground surface. Ground surface areas for buildings and other structures for urban environments is assumed to be proportional to the percent urban area in any grid cell. This data is usually available via MCIP represented by the variable PURB, however, in some instances this data may not be available. If the data is not available, the model assumes the percent urban area to be 0.0 which will inhibit the heterogeneous reaction on buildings and other structures for urban environments causing lower predicted HONO.
+
+The user can set it to N to exclude the heterogeneous production from the reaction. Note that the default setting for the inline deposition calculation (CTM_ILDEPV) flag is Y. If the flag is changed to N, then the production of HONO from the heterogeneous reaction on ground surface will not work properly. Additional description of the HONO chemistry in CMAQ can be found in Sarwar et al. (2008).
 
 
 <a id=6.11_Aerosol_Dynamics></a>
@@ -994,6 +988,6 @@ Yi, C. (2008). Momentum transfer within canopies. J. App. Meteor. Clim., 47, 262
 
 [<< Previous Chapter](CMAQ_UG_ch05_running_a_simulation.md) - [Home](README.md) - [Next Chapter >>](CMAQ_UG_ch07_model_outputs.md)
 <br>
-CMAQ User's Guide (c) 2020<br>
+CMAQ User's Guide (c) 2021<br>
 
 <!-- END COMMENT -->

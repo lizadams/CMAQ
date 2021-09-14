@@ -142,6 +142,11 @@ MODULE mcipparm
 !                        scheme with radiative feedbacks.  (T. Spero)
 !           15 Jul 2019  Updated release stamp.  (T. Spero)
 !           21 Nov 2019  Updated release stamp.  (T. Spero)
+!           06 Mar 2020  Updated the version stamp.  (T. Spero)
+!           30 Jun 2021  Updated the version stamp. Beginning with this
+!                        release, version for MCIP will become consistent
+!                        with CMAQ. Therefore, the versioning skips from 
+!                        MCIPv5.1 to MCIPv5.3.3. (T. Spero)
 !-------------------------------------------------------------------------------
 
   USE m3utilio, ONLY: mxdesc3
@@ -310,7 +315,7 @@ MODULE mcipparm
 
   CHARACTER(LEN=80)                 :: fdesc      ( mxdesc3 )
   CHARACTER(LEN=16),  PARAMETER     :: progname   = 'MCIP'
-  CHARACTER(LEN=10),  PARAMETER     :: vdate      = '11/21/2019'
-  CHARACTER(LEN=8),   PARAMETER     :: ver        = 'V5.1'
+  CHARACTER(LEN=10),  PARAMETER     :: vdate      = '06/30/2021'
+  CHARACTER(LEN=8),   PARAMETER     :: ver        = 'V5.3.3'
 
 END MODULE mcipparm

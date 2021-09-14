@@ -17,8 +17,7 @@
 #> directory.
 
 
- #set CMAQ_HOME = [your_install_path]/openmpi_4.0.1_gcc_9.1.0_debug 
- set CMAQ_HOME = /home/username/CMAQ_Project
+ set CMAQ_HOME =  /[your_install_path]/
 
 #> This section allows users to choose explicitly which tools
 #> to make available from the repo. For each selected tool,
@@ -108,6 +107,7 @@
     cp CCTM/scripts/isam_control.txt $CMAQ_HOME/CCTM/scripts/isam_control.txt
     cp CCTM/scripts/sensinput.dat $CMAQ_HOME/CCTM/scripts/sensinput.dat
     cp CCTM/scripts/run_cctm_Bench_2016_12SE1.csh $CMAQ_HOME/CCTM/scripts/run_cctm_Bench_2016_12SE1.csh
+    cp CCTM/scripts/run_cctm_Bench_2016_12SE1.WRFCMAQ.csh $CMAQ_HOME/CCTM/scripts/run_cctm_Bench_2016_12SE1.WRFCMAQ.csh
  endif
 
 #===============================================================================
