@@ -91,8 +91,8 @@ set make_options = "-j"                #> additional options for make command if
 
  set ModGrid   = grid/cartesian             #> grid configuration module 
  
- set DepMod    = m3dry                      #> m3dry or stage
-#set DepMod    = stage
+ # set DepMod    = m3dry                      #> m3dry or stage
+set DepMod    = stage
  set ModAdv    = wrf_cons                   #> 3-D Advection Scheme [Options: wrf_cons (default), local_cons]
  set ModHdiff  = hdiff/multiscale           #> horizontal diffusion module
  set ModVdiff  = vdiff/acm2_${DepMod}       #> vertical diffusion module (see $CMAQ_MODEL/CCTM/src/vdiff)
@@ -264,7 +264,7 @@ set make_options = "-j"                #> additional options for make command if
 
 #> Set and create the "BLD" directory for checking out and compiling 
 #> source code. Move current directory to that build directory.
- set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}
+ set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}_STAGE
  if ( ! -e "$Bld" ) then
     mkdir $Bld
  else
