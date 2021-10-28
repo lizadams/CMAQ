@@ -3,8 +3,6 @@ CMAQv5.3.2.1
 
 Community Multiscale Air Quality Model US EPA CMAQ Website: (https://www.epa.gov/cmaq).
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.4081737.svg)](https://doi.org/10.5281/zenodo.4081737)
-
 CMAQ is an active open-source development project of the U.S. EPA's Office of Research and Development that consists of a suite of programs for conducting air quality model simulations.
 CMAQ is supported by the CMAS Center: (http://www.cmascenter.org).
 
@@ -15,6 +13,8 @@ particulates, toxics, and acid deposition.
 ## CMAQ version 5.3.2.1 Overview:
 CMAQv5.3.2.1 was used for the EQUATES model runs.
 CMAQv5.3.2.1 is based on CMAQv5.3.2 and also includes bugfixes numbered 2, 9, 11, 13, and 14 in the v5.3.3 bugfix page https://github.com/USEPA/CMAQ/blob/main/DOCS/Release_Notes/CMAQv5.3.3_bugfixes.md
+
+**EQUATES DOI**:  https://doi.org/10.15139/S3/F2KJSK 
 
 ## CMAQ version 5.3.2 Overview:
 CMAQv5.3.2 includes significant updates to the CMAQ Integrated Source Apportionment Method (ISAM) and multiple minor fixes to address issues identified in CMAQv5.3.1. The new CMAQ-ISAM version includes substantial updates to the gas-phase chemistry apportionment algorithms that improves both physical and numerical aspects of the method. Users of ISAM are strongly encouraged to update to CMAQv5.3.2.
