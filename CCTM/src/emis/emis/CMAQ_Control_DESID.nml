@@ -127,7 +127,7 @@
                'EVERYWHERE'  ,'N/A'        ,'N/A',
  !<Example>    'WATER'       ,'CMAQ_MASKS' ,'OPEN',
  !<Example>    'ALL'         ,'CMAQ_MASKS' ,'ALL',
- !<Example>    'ALL'         ,'ISAM_REGIONS','ALL',
+    'ALL'         ,'ISAM_REGIONS','ALL',
 /
 
 &Desid_RegionFam
