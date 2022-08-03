@@ -38,7 +38,6 @@ git clone -b main https://github.com/USEPA/CMAQ.git CMAQ_REPO
 
 ```
 
-
 ## CMAQ Repository Guide
 Source code and scripts are organized as follows:
 * **CCTM (CMAQ Chemical Transport Model):** code and scripts for running the 3D-CTM at the heart of CMAQ.
@@ -66,6 +65,9 @@ Benchmark/tutorial data for each CMAQ release version are available from the CMA
 |v5.3, v5.3.1|Output| Southeast US| July 1 - 14, 2016|https://doi.org/10.15139/S3/PDE4SS |
 |v5.3.2|Output| Southeast US| July 1 - 2, 2016|https://doi.org/10.15139/S3/PDE4SS |
 |v5.3.3|Output| Southeast US| July 1 - 2, 2016|https://doi.org/10.15139/S3/PDE4SS |
+
+## Code updates to CMAQv5.3.3
+Several code updates were made available between CMAQv5.3.3 and CMAQv5.4.  Although these are not official CMAQ releases, users may wish to utilize these code updates and bugfixes to improve the performance of their CMAQv5.3.3 simulations.  The list of tagged updates for CMAQv5.3.3 are available on the [CMAQ Wiki](https://github.com/USEPA/CMAQ/wiki/CMAQ-Bugfix-Branch#record-of-changes-to-cmaqv533).
 
 ## Previous CMAQ Versions
 The following release versions of CMAQ are currently available on GitHub.  DOI values from Zenodo can be used when referencing a specific version.
