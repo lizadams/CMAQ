@@ -97,7 +97,10 @@ C Try to open existing file for update
             IF ( IO_PE_INCLUSIVE ) THEN
 
 C Get default file header attibutes from CONC file (assumes file already open)
-
+               IF ( .NOT. OPEN3( CTM_CONC_1, FSREAD3, PNAME ) ) THEN
+                 XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update'
+                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+               END IF
                IF ( .NOT. DESC3( CTM_CONC_1 ) ) THEN
                   XMSG = 'Could not get '
      &                 // TRIM( CTM_CONC_1 )
@@ -189,6 +192,10 @@ C pick up transported RHOJ
      &                 // TRIM( S_CGRID ) // ' file'
                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                END IF
+               IF ( .NOT. CLOSE3( CTM_CONC_1 ) ) THEN
+                   XMSG = 'Could not close ' // CTM_CONC_1
+                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+               END IF
 
             END IF   ! IO_PE_INCLUSIVE
 
@@ -198,6 +205,10 @@ C File exists. Check header data with CONC file as reference. Currently only
 C proc 0 has CTM_CONC_1 open
 
             IF ( IO_PE_INCLUSIVE ) THEN
+               IF ( .NOT. OPEN3( CTM_CONC_1, FSREAD3, PNAME ) ) THEN
+                 XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update'
+                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+               END IF
 
                IF ( .NOT. DESC3( CTM_CONC_1 ) ) THEN
                   XMSG = 'Could not get '
@@ -267,6 +278,10 @@ C proc 0 has CTM_CONC_1 open
                     XMSG = 'Header inconsistent on existing S_CGRID'
                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
                END IF
+               IF ( .NOT. CLOSE3( CTM_CONC_1 ) ) THEN
+                    XMSG = 'Could not close ' // CTM_CONC_1
+                    CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+               ENDIF
 
             END IF   ! IO_PE_INCLUSIVE
 

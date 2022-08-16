@@ -225,6 +225,10 @@
      &              // TRIM( A_CONC_1 ) // ' file'
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
+            IF ( .NOT. CLOSE3( CTM_CONC_1 ) ) THEN
+                XMSG = 'Could not close ' // CTM_CONC_1
+                CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+            END IF
 
          END IF   ! MYPE = 0
 

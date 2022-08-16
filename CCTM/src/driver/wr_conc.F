@@ -92,6 +92,13 @@ C open conc file for update
             END IF
          END IF
 
+         IF ( IO_PE_INCLUSIVE ) THEN
+             IF ( .NOT. OPEN3( CTM_CONC_1, FSREAD3, PNAME ) ) THEN
+                XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update'
+                CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+             END IF
+         END IF
+
          IF ( .NOT. DESC3( CTM_CONC_1 ) ) THEN
             XMSG = 'Could not get file description from ' // CTM_CONC_1
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -101,8 +108,22 @@ C open conc file for update
          NVARS = NVARS3D
          ALLOCATE ( VNAME( NVARS ), STAT=ALLOCSTAT )
          VNAME = VNAME3D( 1:NVARS )
-
+          IF ( .NOT. CLOSE3( CTM_CONC_1 ) ) THEN
+             XMSG = 'Could not close ' // CTM_CONC_1
+             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+          END IF
       END IF   ! firstime
+       IF ( IO_PE_INCLUSIVE ) THEN
+          IF ( .NOT. OPEN3( CTM_CONC_1, FSRDWR3, PNAME ) ) THEN
+             XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update'
+             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+          END IF
+       ELSE
+          IF ( .NOT. OPEN3( CTM_CONC_1, FSREAD3, PNAME ) ) THEN
+             XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update'
+             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+          END IF
+       END IF
 
       VAR = 0
 
@@ -194,6 +215,13 @@ C open conc file for update
       WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &      'Timestep written to', CTM_CONC_1,
      &      'for date and time', JDATE, JTIME
+
+! if the third step and onward has the same issue, uncomment the following block of code
+
+      IF ( .NOT. CLOSE3( CTM_CONC_1 ) ) THEN
+          XMSG = 'Could not close ' // CTM_CONC_1
+          CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+      END IF
 
       RETURN 
       END
