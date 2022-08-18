@@ -53,11 +53,6 @@ C-----------------------------------------------------------------------
       USE UTILIO_DEFN
       USE ASX_DATA_MOD, ONLY : MET_DATA
       USE CENTRALIZED_IO_MODULE
-#ifdef parallel
-      USE SE_MODULES            ! stenex (using SE_UTIL_MODULE)
-#else
-      USE NOOP_MODULES          ! stenex (using NOOP_UTIL_MODULE)
-#endif
 
       IMPLICIT NONE
 
@@ -81,7 +76,6 @@ C Local variables:
 
       CHARACTER( 16 ), ALLOCATABLE, SAVE :: VNAME( : )
       INTEGER, SAVE :: NVARS
-!      LOGICAL, EXTERNAL :: SYNC3
 
 C-----------------------------------------------------------------------
 
@@ -90,34 +84,15 @@ C-----------------------------------------------------------------------
          FIRSTIME = .FALSE.
 
 C open conc file for update
-C Liz Adams adding flush for PE 0 to do prior to the other PEs trying to
-C open CTM_CONC_1 for reading file 
-C flush didn't work - try close.
-         CALL SUBST_BARRIER
-         IF ( IO_PE_INCLUSIVE ) THEN
-            IF ( .NOT. CLOSE3( CTM_CONC_1 ) ) THEN
-             XMSG = 'PE0 Could not close ' // CTM_CONC_1
-             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-         ENDIF 
-C         IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-C            IF ( .NOT. CLOSE3( CTM_CONC_1 ) ) THEN
-C             XMSG = 'all other but PE0 Could not close ' // CTM_CONC_1
-C             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-C            END IF
-C         ENDIF
-         CALL SUBST_BARRIER
-         IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-            call sleep(10)
-            IF ( .NOT. OPEN3( CTM_CONC_1, FSREAD3, PNAME ) ) THEN
-               XMSG = 'all other than PE0 Could not open ' // CTM_CONC_1 // ' file for update'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-         END IF
 
          IF ( IO_PE_INCLUSIVE ) THEN
-           IF ( .NOT. OPEN3( CTM_CONC_1, FSREAD3, PNAME ) ) THEN
-               XMSG = 'PE0 Could not open ' // CTM_CONC_1 // ' file for update'
+            IF ( .NOT. OPEN3( CTM_CONC_1, FSRDWR3, PNAME ) ) THEN
+               XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update'
+               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+            END IF
+         ELSE
+            IF ( .NOT. OPEN3( CTM_CONC_1, FSREAD3, PNAME ) ) THEN
+               XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update'
                CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
          END IF
@@ -131,22 +106,8 @@ C         ENDIF
          NVARS = NVARS3D
          ALLOCATE ( VNAME( NVARS ), STAT=ALLOCSTAT )
          VNAME = VNAME3D( 1:NVARS )
-          IF ( .NOT. SYNC3( CTM_CONC_1 ) ) THEN
-             XMSG = 'Could not synch ' // CTM_CONC_1
-             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-          END IF
+
       END IF   ! firstime
-C      #IF ( IO_PE_INCLUSIVE ) THEN
-C      #    IF ( .NOT. OPEN3( CTM_CONC_1, FSRDWR3, PNAME ) ) THEN
-C      #       XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update'
-C      #       CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-C      #    END IF
-C      # ELSE
-C      #    IF ( .NOT. OPEN3( CTM_CONC_1, FSREAD3, PNAME ) ) THEN
-C      #       XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update'
-C      #       CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-C      #    END IF
-C      # END IF
 
       VAR = 0
 
@@ -238,13 +199,6 @@ C      # END IF
       WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
      &      'Timestep written to', CTM_CONC_1,
      &      'for date and time', JDATE, JTIME
-
-! if the third step and onward has the same issue, uncomment the following block of code
-
-C     # IF ( .NOT. CLOSE3( CTM_CONC_1 ) ) THEN
-C     #     XMSG = 'Could not close ' // CTM_CONC_1
-C     #     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-C     # END IF
 
       RETURN 
       END
