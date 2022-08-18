@@ -67,6 +67,7 @@
       REAL( 8 ) :: XCELL_RF, YCELL_RF
       INTEGER VGTYP_RF
       REAL VGTOP_RF
+!      LOGICAL, EXTERNAL :: SYNC3
 !-----------------------------------------------------------------------
 
 ! Change output date/time to starting date/time - e.g. timestamp 1995196:090000
@@ -225,8 +226,8 @@
      &              // TRIM( A_CONC_1 ) // ' file'
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
             END IF
-            IF ( .NOT. CLOSE3( CTM_CONC_1 ) ) THEN
-                XMSG = 'Could not close ' // CTM_CONC_1
+            IF ( .NOT. SYNC3( CTM_CONC_1 ) ) THEN
+                XMSG = 'Could not synch ' // CTM_CONC_1
                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
 
