@@ -74,7 +74,7 @@ C Local variables:
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
       LOGICAL OK
 
-!      LOGICAL, EXTERNAL :: SYNC3
+      LOGICAL, EXTERNAL :: FLUSH3
 
 C-----------------------------------------------------------------------
 
@@ -97,11 +97,7 @@ C Try to open existing file for update
             IF ( IO_PE_INCLUSIVE ) THEN
 
 C Get default file header attibutes from CONC file (assumes file already open)
-C - taking out OPEN3, trying FLUSH3 instead of CLOSE3
-C               IF ( .NOT. OPEN3( CTM_CONC_1, FSREAD3, PNAME ) ) THEN
-C                XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update'
-C                CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-C              END IF
+
                IF ( .NOT. DESC3( CTM_CONC_1 ) ) THEN
                   XMSG = 'Could not get '
      &                 // TRIM( CTM_CONC_1 )
@@ -193,10 +189,6 @@ C pick up transported RHOJ
      &                 // TRIM( S_CGRID ) // ' file'
                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                END IF
-               IF ( .NOT. SYNC3( CTM_CONC_1 ) ) THEN
-                   XMSG = 'Could not synch ' // CTM_CONC_1
-                   CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               END IF
 
             END IF   ! IO_PE_INCLUSIVE
 
@@ -206,10 +198,6 @@ C File exists. Check header data with CONC file as reference. Currently only
 C proc 0 has CTM_CONC_1 open
 
             IF ( IO_PE_INCLUSIVE ) THEN
-C               IF ( .NOT. OPEN3( CTM_CONC_1, FSREAD3, PNAME ) ) THEN
-C                 XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update'
-C                 CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-C               END IF
 
                IF ( .NOT. DESC3( CTM_CONC_1 ) ) THEN
                   XMSG = 'Could not get '
@@ -279,10 +267,6 @@ C               END IF
                     XMSG = 'Header inconsistent on existing S_CGRID'
                     CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
                END IF
-               IF ( .NOT. SYNC3( CTM_CONC_1 ) ) THEN
-                    XMSG = 'Could not synch' // CTM_CONC_1
-                    CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-               ENDIF
 
             END IF   ! IO_PE_INCLUSIVE
 
@@ -292,7 +276,7 @@ C               END IF
 
 #ifdef parallel_io
       IF ( IO_PE_INCLUSIVE ) THEN
-         IF ( .NOT. SYNC3 ( S_CGRID ) ) THEN
+         IF ( .NOT. FLUSH3 ( S_CGRID ) ) THEN
             XMSG = 'Could not sync to disk ' // TRIM( S_CGRID )
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF

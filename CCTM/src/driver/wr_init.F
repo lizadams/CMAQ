@@ -79,16 +79,15 @@ C  environment variable description
 
 C-----------------------------------------------------------------------
 
-C#ifdef parallel_io
+#ifdef parallel_io
       CALL SUBST_BARRIER
-C      IF ( .NOT. IO_PE_INCLUSIVE ) THEN
-      IF (  IO_PE_INCLUSIVE ) THEN
+      IF ( .NOT. IO_PE_INCLUSIVE ) THEN
          IF ( .NOT. OPEN3( CTM_CONC_1, FSREAD3, PNAME ) ) THEN
             XMSG = 'Could not open ' // CTM_CONC_1
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
       END IF
-C#endif
+#endif
 
 C write the initial concentrations as step 0 on the conc file
 C (inital data assumed to be in correct output units)
