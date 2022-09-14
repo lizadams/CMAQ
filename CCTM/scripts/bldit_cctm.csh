@@ -215,7 +215,7 @@ set make_options = "-j"                #> additional options for make command if
     set STENEX = ${CMAQ_MODEL}/STENEX
     # MPI_INC is set in config.cmaq
     # set PIO_INC = "${IOAPI_DIR}/src/fixed_src"
-    set PAR = ( -Dparallel -Dcluster)
+    set PAR = ( -Dparallel )
     set Popt = SE
     set seL = se_snl
     set LIB2 = "${ioapi_lib}"

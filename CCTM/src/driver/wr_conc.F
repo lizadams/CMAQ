@@ -84,24 +84,29 @@ C-----------------------------------------------------------------------
          FIRSTIME = .FALSE.
 
 C open conc file for update
+C Test opening existing conc file for update
+      CALL LOG_HEADING( LOGDEV, "CLOSE Concentration File on PE0" )
+               IF (  IO_PE_INCLUSIVE ) THEN
+                IF ( .NOT. CLOSE3( CTM_CONC_1 ) ) THEN
+                  XMSG = 'Could not close ' // CTM_CONC_1 // ' file on PE0'
+                  CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT1 )
+                  END IF
+               ENDIF
 
+           CALL LOG_HEADING( LOGDEV, "OPEN Concentration File on PE0" )
          IF ( IO_PE_INCLUSIVE ) THEN
             IF ( .NOT. OPEN3( CTM_CONC_1, FSRDWR3, PNAME ) ) THEN
-               XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update'
+               XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update on PE0'
                CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
-         ELSE
-            IF ( .NOT. OPEN3( CTM_CONC_1, FSREAD3, PNAME ) ) THEN
-               XMSG = 'Could not open ' // CTM_CONC_1 // ' file for update'
-               CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-            END IF
-         END IF
 
          IF ( .NOT. DESC3( CTM_CONC_1 ) ) THEN
             XMSG = 'Could not get file description from ' // CTM_CONC_1
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
          
+         ENDIF
+
          ! Retrieve number and values of variable names
          NVARS = NVARS3D
          ALLOCATE ( VNAME( NVARS ), STAT=ALLOCSTAT )
