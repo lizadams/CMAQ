@@ -48,7 +48,7 @@ set CopySrc                            #> copy the source files into the build d
                                        #>   comment out to compile the model (default if not set)
 set ParOpt                             #> uncomment to build a multiple processor (MPI) executable; 
                                        #>   comment out for a single processor (serial) executable
-#set DistrEnv                          #> uncomment to distribute environmental variables to multiple machines
+set DistrEnv                          #> uncomment to distribute environmental variables to multiple machines
                                        #>   comment out for a single processor (serial) executable (MPI only)
 #set build_parallel_io                 #> uncomment to build with parallel I/O (pnetcdf); 
                                        #>   comment out to use standard netCDF I/O
