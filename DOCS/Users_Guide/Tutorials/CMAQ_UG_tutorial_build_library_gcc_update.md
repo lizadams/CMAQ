@@ -332,8 +332,8 @@ MFLAGS    = -ffast-math -funroll-loops -m64 -DIOAPI_NCF4=1 #  -Wall -Wsurprising
 settings.  This will remove the need to link the shared memory OPENMP libraries when compiling CMAQ and WRF-CMAQ.
 
 ```
-#OMPFLAGS  = -fopenmp
-#OMPLIBS   =  -fopenmp
+OMPFLAGS  = # -fopenmp
+OMPLIBS   = # -fopenmp
 ```
 
 8. Create a BIN directory where the library and m3tools executables will be installed
