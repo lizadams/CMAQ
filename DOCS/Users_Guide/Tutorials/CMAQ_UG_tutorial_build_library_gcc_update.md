@@ -1,68 +1,81 @@
 ## Install netCDF-C
 
-### This tutorial assumes that you are using the C-shell, GCC version 9.1.0, and OpenMPI 4.0.1
+### This tutorial assumes that you are using the C-shell, (csh or tcsh), GCC version 9.1.0, and OpenMPI 4.0.1
 
-1. If your compute server uses modules use the following command to see what packages are available
+1. To enter the csh shell you can type the following at the command line:
+
+```
+csh
+```
+
+2. To verify what shell you are in
+
+```
+echo $SHELL
+```
+
+3. If your compute server uses modules use the following command to see what packages are available
 
 ```
 module avail
 ```
-2. Load module environment for a compiler (Intel|GCC|PGI) and mpi package corresponding to that compiler (e.g. openmpi).
+
+4. Load module environment for a compiler (Intel|GCC|PGI) and mpi package corresponding to that compiler (e.g. openmpi).
 
 ```
 module load gcc9.1.0
 module load openmpi_4.0.1/gcc_9.1.0
 ```
 
-3. Create a LIBRARY directory where you would like to install the libraries required for CMAQ
+5. Create a LIBRARY directory where you would like to install the libraries required for CMAQ
 
 ```
 /[your_install_path]/LIBRARIES
 
 ```
 
-4. Change directories to the new LIBRARIES Directory
+6. Change directories to the new LIBRARIES Directory
 
 ```
 cd /[your_install_path]/LIBRARIES
 ```
 
-5. Download netCDF-C from the following website https://www.unidata.ucar.edu/downloads/netcdf/index.jsp
+7. Download netCDF-C from the following website https://www.unidata.ucar.edu/downloads/netcdf/index.jsp
 
 ```
 wget https://github.com/Unidata/netcdf-c/archive/refs/tags/v4.8.1.tar.gz
 ```
 
-6. Untar the netCDF-C tar.gz file
+8. Untar the netCDF-C tar.gz file
 
 ```
 tar -xzvf v4.8.1.tar.gz
 ```
 
-7. Change directories into the extracted directory
+9. Change directories into the extracted directory
 ```
 cd netcdf-c-4.8.1
 ```
 
-8. Review the installation instructions for netcdf-c-4.7.0 for building Classic netCDF
+10. Review the installation instructions for netcdf-c-4.7.0 for building Classic netCDF
 
 ```
 more INSTALL.md
 ```
 
-9. Create a target installation directory that includes the loaded module environment name
+11. Create a target installation directory that includes the loaded module environment name
 
 ```
 mkdir ../netcdf
 ```
 
 
-10. Run the configure --help command to see what settings can be used for the build.
+12. Run the configure --help command to see what settings can be used for the build.
 ```
 ./configure --help
 ```
 
-11. Set the Compiler environment variables
+13. Set the Compiler environment variables
 
 Make sure these compilers can be found.
 ```
@@ -80,25 +93,25 @@ setenv CC gcc
 setenv CXX g++
 ```
 
-12. Run the configure command
+14. Run the configure command
 
 ```
 ./configure --prefix=$cwd/../netcdf --disable-netcdf-4 --disable-dap
 ```
 
-13. Check that the configure command worked correctly, then run the install command
+15. Check that the configure command worked correctly, then run the install command
 
 ```
 make check install
 ```
 
-14. Verify that the following message is obtained
+16. Verify that the following message is obtained
 
 ```
 | Congratulations! You have successfully installed netCDF!    |
 ```
 
-15. Change directories to one level up from your current directory
+17. Change directories to one level up from your current directory
 ```
 cd ..
 ```
