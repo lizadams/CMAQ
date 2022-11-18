@@ -136,21 +136,10 @@ tar -xzvf v4.5.4.tar.gz
 cd netcdf-fortran-4.5.4
 ```
 
-4. Make an install directory that matches the name of your loaded module environment
+4. Review the installation document http://www.unidata.ucar.edu/software/netcdf/docs/building_netcdf_fortran.html
 
-```
-mkdir ../netcdf-fortran-4.4.5-gcc9.1.0
-```
 
-5. Review the installation document http://www.unidata.ucar.edu/software/netcdf/docs/building_netcdf_fortran.html
-
-6. Set the environment variable NCDIR to specify the install directory
-
-```
-setenv NCDIR $cwd/../netcdf
-```
-
-7. Set the CC environment variable to use the gcc and gfortran compilers
+5. Set the CC environment variable to use the gcc and gfortran compilers
 
 ```
 which gfortran
@@ -162,36 +151,36 @@ setenv CC gcc
 setenv CXX g++
 ```
 
-8. Set your LD_LIBRARY_PATH to include the netcdf-C library path for netCDF build
+6. Set your LD_LIBRARY_PATH to include the netcdf-C library path for netCDF build
 
 ```
 setenv NCDIR $cwd/../netcdf
 setenv LD_LIBRARY_PATH ${NCDIR}/lib:${LD_LIBRARY_PATH}
 ```
 
-9. Check your LD_LIBRARY_PATH
+7. Check your LD_LIBRARY_PATH
 
 ```
 echo $LD_LIBRARY_PATH
 ```
 
-10. Set the install directory for netCDF fortran
+8. Set the install directory for netCDF fortran (note it will be the same location as the install directory for netCDF C libraries)
 
 ```
-setenv NFDIR $cwd/../netcdf-fortran-4.4.5-gcc9.1.0
+setenv NFDIR $cwd/../netcdf
 
 setenv CPPFLAGS -I${NCDIR}/include
 setenv LDFLAGS -L${NCDIR}/lib
 setenv LIBS "-lnetcdf"
 ```
 
-11. Run the configure command
+9. Run the configure command
 
 ```
 ./configure --disable-shared --prefix=${NFDIR}
 ```
 
-12. Run the make check command
+10. Run the make check command
 
 ```
 make check
@@ -208,7 +197,7 @@ Testsuite summary for netCDF-Fortran 4.4.5
 
 Note, this often fails, even if the library is ok.
 
-13. Run the make install command
+11. Run the make install command
 
 ```
 make install
@@ -232,14 +221,14 @@ flag during linking and do at least one of the following:
    - have your system administrator add LIBDIR to '/etc/ld.so.conf'
 
 
-14. set your LD_LIBRARY_PATH to include the netcdf-Fortran library path for netCDF build
+12. set your LD_LIBRARY_PATH to include the netcdf-Fortran library path for netCDF build
 
 ```
 setenv NFDIR $cwd/../netcdf
 setenv LD_LIBRARY_PATH ${NFDIR}/lib:${LD_LIBRARY_PATH}
 ```
 
-15. Update the library bin directory path and LD_LIBRARY_PATH to use  $NCDIR and $NFDIR to in your .cshrc.
+13. Update the library bin directory path and LD_LIBRARY_PATH to use  $NCDIR and $NFDIR to in your .cshrc.
 
 Verify the paths for $NCDIR and $NFDIR
 
@@ -248,7 +237,7 @@ echo $NCDIR
 echo $NFDIR
 ```
 
-Edit the .cshrc file in your home directory to add the paths to the libraries.
+14. Edit the .cshrc file in your home directory to add the paths to the libraries.
 Note, in this case we installed both NetCDF C and NetCDF Fortran into the same location.
 
 vi ~/.cshrc
@@ -259,6 +248,12 @@ set $NCDIR /your_path/netcdf
 set $NFDIR /your_path/netcdf
 set path = ($path $NCDIR\bin $NFDIR\bin )
 setenv LD_LIBRARY_PATH ${NCDIR}/lib:${NFDIR}/lib:${LD_LIBRARY_PATH}
+```
+
+15. Source your updated .cshrc file by restarting the c-shell
+
+```
+csh
 ```
 
 
@@ -320,7 +315,7 @@ setenv BIN Linux2_x86_64gfort_gcc_9.1.0
 cp Makeinclude.Linux2_x86_64gfort Makeinclude.Linux2_x86_64gfort_gcc_9.1.0
 ```
 
-7. Edit Makeinclude file to include ‘-DIOAPI_NCF4=1’ to the MFLAGS make-variable to avoid multiple definition of `nf_get_vara_int64_’
+:. Edit Makeinclude file to include ‘-DIOAPI_NCF4=1’ to the MFLAGS make-variable to avoid multiple definition of `nf_get_vara_int64_’
 
 ```
 vi  Makeinclude.Linux2_x86_64gfort_gcc_9.1.0
