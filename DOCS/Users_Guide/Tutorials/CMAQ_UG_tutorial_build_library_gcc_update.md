@@ -1,6 +1,6 @@
 ## Install netCDF-C
 
-###This tutorial assumes that you are using the C-shell, (csh or tcsh), GCC version 9.1.0, and OpenMPI 4.0.1
+### This tutorial assumes that you are using the C-shell, (csh or tcsh), GCC version 9.1.0, and OpenMPI 4.0.1
 
 1. To enter the csh shell you can type the following at the command line:
 
