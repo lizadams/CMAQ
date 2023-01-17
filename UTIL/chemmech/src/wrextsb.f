@@ -40,10 +40,9 @@ C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
       USE MECHANISM_DATA
       USE GET_ENV_VARS
-      USE BASIC_WRITE_ROUTINES
-
       
       IMPLICIT NONE
+!      INCLUDE 'PARMS.e'
 
 C Argument variables
 

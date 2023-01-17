@@ -188,7 +188,6 @@ C LOCAL VARIABLES:
       INTEGER LOGDEV             ! FORTRAN unit number for log file
       CHARACTER( 80 ) :: MSG     ! For message issued from M3WARN
       CHARACTER( 16 ), SAVE :: PNAME = 'PIO_INIT'
-      LOGICAL, SAVE   :: FIRST_TIME = .TRUE.
 
 C   Equivalence of the conversion table:
 C
@@ -332,10 +331,8 @@ C Calculate processor-to-subdomain maps
 C Write out processor-to-subdomain map
 
       IF ( MY_PE .EQ. IO_PE ) THEN
-         IF ( PRESENT( WFLG ) .AND. FIRST_TIME ) THEN
-            FIRST_TIME = .FALSE.
-            CALL WRSUBDMAP ( NUMPROCS, NCOLS_PE, NROWS_PE, COLSX_PE, ROWSX_PE )
-         END IF
+         IF ( PRESENT( WFLG ) )
+     &      CALL WRSUBDMAP ( NUMPROCS, NCOLS_PE, NROWS_PE, COLSX_PE, ROWSX_PE )
       END IF
 
 C Set number of rows and columns for (this) local processor

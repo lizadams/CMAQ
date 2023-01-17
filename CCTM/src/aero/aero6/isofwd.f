@@ -94,15 +94,6 @@ C
             CALL CALCB4              ! Only liquid          ; case B4
          ENDIF
       ENDIF
-
-c modified by Wenxian Zhang for DDM sensitivity calculation
-      DO I = 1,NIONS
-         MOLALD(I) = MOLAL(I)
-      ENDDO
-      GNH3D  = GNH3
-      GHNO3D = GHNO3
-      GHCLD  = GHCL
-
       CALL CALCNH3
 C
 C *** SULFATE RICH (FREE ACID)
@@ -124,15 +115,6 @@ C
 C
          ENDIF
       ENDIF
-
-c modified by Wenxian Zhang for DDM sensitivity calculation
-      DO I = 1,NIONS
-         MOLALD(I) = MOLAL(I)
-      ENDDO
-      GNH3D  = GNH3
-      GHNO3D = GHNO3
-      GHCLD  = GHCL
-
       CALL CALCNH3
       ENDIF
 C
@@ -233,16 +215,6 @@ C
          ENDIF
       ENDIF
 C
-C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION ****************
-C By Wenxian Zhang
-C
-      DO I = 1,NIONS
-         MOLALD(I) = MOLAL(I)
-      ENDDO
-      GHNO3D = GHNO3
-      GNH3D  = GNH3
-      GHCLD  = GHCL
-C
       CALL CALCNA                 ! HNO3(g) DISSOLUTION
 C
 C *** SULFATE RICH (FREE ACID)
@@ -270,15 +242,6 @@ C
             SCASE = 'F2'
          ENDIF
       ENDIF
-C
-C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION ****************
-C
-      DO I = 1,NIONS
-         MOLALD(I) = MOLAL(I)
-      ENDDO
-      GHNO3D = GHNO3
-      GNH3D  = GNH3
-      GHCLD  = GHCL
 C
       CALL CALCNA                 ! HNO3(g) DISSOLUTION
       ENDIF
@@ -443,15 +406,6 @@ C
          ENDIF
       ENDIF
 C                                    
-C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION ****************
-C
-      DO I = 1,NIONS
-         MOLALD(I) = MOLAL(I)
-      ENDDO
-      GHNO3D = GHNO3
-      GNH3D  = GNH3
-      GHCLD  = GHCL
-C
       CALL CALCNHA                ! MINOR SPECIES: HNO3, HCl       
       CALL CALCNH3                !                NH3 
 C
@@ -478,13 +432,6 @@ C
          ENDIF
       ENDIF
 C                                    
-      DO I = 1,NIONS
-         MOLALD(I) = MOLAL(I)
-      ENDDO
-      GHNO3D = GHNO3
-      GNH3D  = GNH3
-      GHCLD  = GHCL
-C
       CALL CALCNHA                ! MINOR SPECIES: HNO3, HCl       
       CALL CALCNH3                !                NH3 
       ENDIF
@@ -521,15 +468,15 @@ C
 C
 C *** ADJUST FOR TOO LITTLE AMMONIUM AND CHLORIDE ***********************
 C
-       WI(3) = MAX (WI(3), 1.D-10)  ! NH4+ : 1e-4 umoles/m3
-       WI(5) = MAX (WI(5), 1.D-10)  ! Cl-  : 1e-4 umoles/m3
+C      WI(3) = MAX (WI(3), 1.D-10)  ! NH4+ : 1e-4 umoles/m3
+C      WI(5) = MAX (WI(5), 1.D-10)  ! Cl-  : 1e-4 umoles/m3
 C
 C *** ADJUST FOR TOO LITTLE SODIUM, SULFATE AND NITRATE COMBINED ********
 C
-       IF (WI(1)+WI(2)+WI(4) .LE. 1d-10) THEN
-          WI(1) = 1.D-10  ! Na+  : 1e-4 umoles/m3
-          WI(2) = 1.D-10  ! SO4- : 1e-4 umoles/m3
-       ENDIF
+C      IF (WI(1)+WI(2)+WI(4) .LE. 1d-10) THEN
+C         WI(1) = 1.D-10  ! Na+  : 1e-4 umoles/m3
+C         WI(2) = 1.D-10  ! SO4- : 1e-4 umoles/m3
+C      ENDIF
 C
 C *** INITIALIZE ALL VARIABLES IN COMMON BLOCK **************************
 C
@@ -805,15 +752,6 @@ C
          ENDIF
        ENDIF
 C
-C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION ****************
-C
-      DO I = 1,NIONS
-         MOLALD(I) = MOLAL(I)
-      ENDDO
-      GHNO3D = GHNO3
-      GNH3D  = GNH3
-      GHCLD  = GHCL
-C
       CALL CALCNHA                ! MINOR SPECIES: HNO3, HCl
       CALL CALCNH3                !                NH3
 C
@@ -843,15 +781,6 @@ C
             CALL CALCK4           ! CASO4
          ENDIF
        ENDIF
-C
-C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION ****************
-C
-      DO I = 1,NIONS
-         MOLALD(I) = MOLAL(I)
-      ENDDO
-      GHNO3D = GHNO3
-      GNH3D  = GNH3
-      GHCLD  = GHCL
 C
       CALL CALCNHA                  ! MINOR SPECIES: HNO3, HCl
       CALL CALCNH3                  !                NH3
@@ -2238,15 +2167,6 @@ C
 C *** CALCULATE HSO4 SPECIATION AND RETURN *******************************
 C
 50    CONTINUE
-C
-C modified by Wenxian Zhang for DDM sensitivity calculation
-      DO I = 1,NIONS
-         MOLALD(I) = MOLAL(I)
-      ENDDO
-      GNH3D  = GNH3
-      GHNO3D = GHNO3
-      GHCLD  = GHCL
-C
       IF (MOLAL(1).GT.TINY) THEN
          CALL CALCHS4 (MOLAL(1), MOLAL(5), ZERO, DELTA)
          MOLAL(1) = MOLAL(1) - DELTA                     ! H+   EFFECT
@@ -2789,15 +2709,6 @@ C
 C *** CALCULATE HSO4 SPECIATION AND RETURN *******************************
 C
 50    CONTINUE
-C
-C modified by Wenxian Zhang for DDM sensitivity calculation
-      DO I = 1,NIONS
-         MOLALD(I) = MOLAL(I)
-      ENDDO
-      GNH3D  = GNH3
-      GHNO3D = GHNO3
-      GHCLD  = GHCL
-C
       IF (MOLAL(1).GT.TINY .AND. MOLAL(5).GT.TINY) THEN  ! If quadrat.called
          CALL CALCHS4 (MOLAL(1), MOLAL(5), ZERO, DELTA)
          MOLAL(1) = MOLAL(1) - DELTA                    ! H+   EFFECT
@@ -4084,16 +3995,6 @@ C
 C *** CALCULATE HSO4 SPECIATION AND RETURN *******************************
 C
 50    CONTINUE
-C
-C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION
-C
-      DO I = 1,NIONS
-         MOLALD(I) = MOLAL(I)
-      ENDDO
-      GNH3D  = GNH3
-      GHNO3D = GHNO3
-      GHCLD  = GHCL
-C
       IF (MOLAL(1).GT.TINY .AND. MOLAL(5).GT.TINY) THEN
          CALL CALCHS4 (MOLAL(1), MOLAL(5), ZERO, DELTA)
          MOLAL(1) = MOLAL(1) - DELTA                     ! H+   EFFECT
@@ -7379,15 +7280,6 @@ C
 C *** CALCULATE HSO4 SPECIATION AND RETURN *******************************
 C
 50    CONTINUE
-C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION
-C
-      DO I = 1,NIONS
-         MOLALD(I) = MOLAL(I)
-      ENDDO
-      GNH3D  = GNH3
-      GHNO3D = GHNO3
-      GHCLD  = GHCL
-C
       IF (MOLAL(1).GT.TINY .AND. MOLAL(5).GT.TINY) THEN  ! If quadrat.called
          CALL CALCHS4 (MOLAL(1), MOLAL(5), ZERO, DELTA)
          MOLAL(1) = MOLAL(1) - DELTA                    ! H+   EFFECT
@@ -9349,16 +9241,6 @@ C
 C *** CALCULATE HSO4 SPECIATION AND RETURN *******************************
 C
 50    CONTINUE
-C
-C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION
-C
-      DO I = 1,NIONS
-         MOLALD(I) = MOLAL(I)
-      ENDDO
-      GNH3D  = GNH3
-      GHNO3D = GHNO3
-      GHCLD  = GHCL
-C
       IF (MOLAL(1).GT.TINY .AND. MOLAL(5).GT.TINY) THEN
          CALL CALCHS4 (MOLAL(1), MOLAL(5), ZERO, DELTA)
          MOLAL(1) = MOLAL(1) - DELTA                     ! H+   EFFECT
@@ -11677,16 +11559,6 @@ C
 C *** CALCULATE HSO4 SPECIATION AND RETURN *******************************
 C
 50    CONTINUE
-C
-C *** SAVE MOLAL BEFORE ADJUSTMENT FOR DDM CALCULATION
-C
-      DO I = 1,NIONS
-         MOLALD(I) = MOLAL(I)
-      ENDDO
-      GNH3D  = GNH3
-      GHNO3D = GHNO3
-      GHCLD  = GHCL
-C
       IF (MOLAL(1).GT.TINY .AND. MOLAL(5).GT.TINY) THEN
          CALL CALCHS4 (MOLAL(1), MOLAL(5), ZERO, DELTA)
          MOLAL(1) = MOLAL(1) - DELTA                     ! H+   EFFECT

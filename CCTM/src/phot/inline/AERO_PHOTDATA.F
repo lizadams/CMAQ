@@ -350,7 +350,7 @@ C ***    Create map for refactive index for each species
       END SUBROUTINE INIT_AERO_DATA
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-      SUBROUTINE GET_AERO_DATA ( COL, ROW, NLAYS, DENS, CGRID )
+      SUBROUTINE GET_AERO_DATA ( COL, ROW, NLAYS, CGRID )
 
 C-----------------------------------------------------------------------
 C  FUNCTION:  This subroutine calculates the volume, the natural logs of 
@@ -415,7 +415,6 @@ C Arguments:
       INTEGER, INTENT( IN ) :: COL               ! specified column index
       INTEGER, INTENT( IN ) :: ROW               ! specified row index
       INTEGER, INTENT( IN ) :: NLAYS             ! # of vertical layers
-      REAL,    INTENT( IN ) :: DENS( :,:,: )
       REAL,    POINTER      :: CGRID( :,:,:,: )
 
 C Parameters:
@@ -476,8 +475,7 @@ C***  variables for calculating modal averaged properties per layer and lambda
       LOGICAL SUCCESS
       LOGICAL TROUBLE
       LOGICAL, SAVE    :: FIRSTCALL  = .TRUE.
-
-
+ 
 #ifdef verbose_phot
       character( 26 ), allocatable :: lambda_list( : )
 #endif
@@ -500,6 +498,7 @@ C *** initialize internal and external dimensions of aerosols
       AE_DGN_CORE   = 0.0
       SUCCESS       = .TRUE.
 
+
       LAY_LOOP1: DO L = 1, NLAYS
 
 C *** extract grid cell concentrations of aero species from CGRID into aerospc_conc 
@@ -512,12 +511,7 @@ C     Also converts dry surface area to wet second moment
 #endif
 
 C *** extract soa concentrations from CGRID
-         AIRDENS  = DENS ( COL,ROW,L )
-#ifdef sens
-         CALL EXTRACT_SOA ( CGRID( COL,ROW,L,: ), CGRID( COL,ROW,:,: ), .FALSE. )
-#else
          CALL EXTRACT_SOA ( CGRID( COL,ROW,L,: ) )
-#endif
 
 C *** Calculate geometric mean diameters and standard deviations of "wet" size distribution
          CALL GETPAR ( .FALSE. )
@@ -1063,11 +1057,7 @@ C     Also converts surface area to wet second moment
 #endif
 
 C *** extract soa concentrations from CGRID
-#ifdef sens
-         CALL EXTRACT_SOA ( CGRID( COL,ROW,L,: ), CGRID( COL,ROW,:,: ), .FALSE. )
-#else
          CALL EXTRACT_SOA ( CGRID( COL,ROW,L,: ) )
-#endif
 
 C *** Calculate geometric mean diameters and standard deviations of "wet" size distribution
          CALL GETPAR ( .FALSE. )

@@ -71,6 +71,9 @@ C column and row range for each processor
 C Conc difference for a science process
       REAL, ALLOCATABLE, SAVE :: DELC( :,:,:,: )
 
+C previous Conc in a science process
+      REAL, ALLOCATABLE, SAVE :: CSAV( :,:,:,: )
+
 C Array for outputting IRR results
       REAL, ALLOCATABLE, SAVE :: IRROUT( :,:,:,: )
 
@@ -168,6 +171,14 @@ C Construct the processor-to-subdomain map for IPR domain
      &                       STAT = ALST )
                   IF ( ALST .NE. 0 ) THEN
                      XMSG = '*** DELC Memory allocation failed'
+                     CALL M3WARN ( PNAME, 0, 0, XMSG )
+                     SUCCESS = .FALSE.; RETURN
+                  END IF
+
+                  ALLOCATE ( CSAV( MY_PACOLS,MY_PAROWS,PALEVS,NCSAVE ),
+     &                       STAT = ALST )
+                  IF ( ALST .NE. 0 ) THEN
+                     XMSG = '*** CSAV Memory allocation failed'
                      CALL M3WARN ( PNAME, 0, 0, XMSG )
                      SUCCESS = .FALSE.; RETURN
                   END IF

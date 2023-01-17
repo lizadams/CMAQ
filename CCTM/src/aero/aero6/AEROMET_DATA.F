@@ -48,18 +48,13 @@ C Concentration lower limit used for gas species
       Real,      Parameter :: min_gasconc = 1.0E-30        ! [ ug/m^3 ]
       Real,      Parameter :: inv_mwair   = 1.0E3 / mwair  ! [ 1/g ]
 
-C Meteorological variables 
-      Real :: airtemp      ! air temp [ K ] :from MET_CRO_3D File
-      Real :: srftemp      ! 2-meter temp [ K ] :from MET_CRO_2D File
+C Meteorological variables (data from MET_CRO_3D file)
+      Real :: airtemp      ! air temp [ K ]
       Real :: airpres      ! air pressure [ Pa]
       Real :: airdens      ! air density [ kg/m^3]
       Real :: airRH        ! fractional relative humidity
       Real :: airQV        ! water vapor mass mixing ratio [ kg_H2O/kg_air ]
       Real :: H2OsatVP     ! saturation water vapor pressure [ Pa ]
       Real :: H2OVP        ! ambient water vapor pressure [ Pa ]
-      Real :: cfrac        ! cloud fraction
-      Real :: dz           ! grid cell height between layer faces
-      Real :: zh           ! grid cell midpoint height (mass-weighted)
-      Real :: pv           ! potential vorticity in grid cell
 
       End Module aeromet_data

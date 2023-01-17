@@ -47,7 +47,6 @@ C                   15 Jul 14 B.Hutzell: 1) replaced mechanism include files wit
 C                   RXNS_DATA module, 2) inserted call to function MAP_CHEMISTRY_SPECIES 
 C                   RXNS_FUNCTION module, and 3) inserted do loop that calculates species
 C                   unit conversion factors based on species type
-C                   21 Mar 22 G . Sarwar: changed BLKLAND to BLKSEAWATER
 C                      
 C***********************************************************************
       USE RXNS_DATA
@@ -213,10 +212,10 @@ c..cell & solver data
      &          BLKCH2O( BLKSIZE ),
      &          BLKDENS( BLKSIZE ),
      &          BLKSVOL( BLKSIZE ), 
-     &          BLKSEAWATER( BLKSIZE ), STAT = STATUS )
+     &          BLKLAND( BLKSIZE ), STAT = STATUS )
       IF ( STATUS .NE. 0 ) THEN
          XMSG = 'ERROR allocating BLKTEMP, BLKPRES, BLKCH2O, BLKDENS, '
-     &       // 'BLKSVOL, BLKSEAWATER '
+     &       // 'BLKSVOL, BLKLAND '
          CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
       END IF
 
@@ -238,13 +237,6 @@ c..cell & solver data
          CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
       END IF
 
-#ifdef sens
-      ALLOCATE( YAVE( BLKSIZE,NUMB_MECH_SPC ), STAT = STATUS )
-      IF ( STATUS .NE. 0 ) THEN
-         XMSG = 'ERROR allocating YAVE'
-         CALL M3EXIT( PNAME, 0, 0, XMSG, XSTAT2 )
-      END IF
-#endif
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Set convergence tolerances for each species; currently uses
 c  one set of tolerances for all species

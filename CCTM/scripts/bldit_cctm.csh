@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ======================= CCTMv5.4.X Build Script ========================= 
+# ======================= CCTMv5.3.X Build Script ========================= 
 # Usage: bldit.cctm >&! bldit.cctm.log                                   
 # Requirements: I/O API & netCDF libraries, a Fortran compiler,               
 #               and MPI for multiprocessor computing                     
@@ -46,30 +46,13 @@ set CopySrc                            #> copy the source files into the build d
 #set CopySrcTree                       #> copy the source files and directory tree into the build directory
 #set MakeFileOnly                      #> uncomment to build a Makefile, but do not compile; 
                                        #>   comment out to compile the model (default if not set)
-#set build_mech                        #> uncomment to build mechanism source code files using the 
-                                       #>   chemmech utility.
-
-#> Below are chemmech options for revising the mechanism definitions file. The option needs information on the
-#> composition of each chemistry. See UTIL/chemmech/README.md for more information.
-#> Uncomment to use.
-#>    Rewrite reactions by appending them with changes in tracked atoms or elements from reactants to products
-      #setenv COMPUTE_DELTA_ATOMS F
-#>    The species namelist contains the composition information as comments at the end of lines defining species.
-#>    Note that if a defining line does not have an ending comment, the species is taken to have none of the tacked atoms.
-#>    If NAMELISTS_LIST_ATOMS equals F, an additional ASCII file contains the information.
-      #setenv NAMELISTS_LIST_ATOMS T
-
-#set clobber_mech                      #> when commented, the bldit_mech.csh script will halt if 
-                                       #>   newly created mechanism files are attempting replace
-                                       #>   existing ones. When uncommented, the existing files
-                                       #>   will be overwritten.
 set ParOpt                             #> uncomment to build a multiple processor (MPI) executable; 
                                        #>   comment out for a single processor (serial) executable
 #set DistrEnv                          #> uncomment to distribute environmental variables to multiple machines
                                        #>   comment out for a single processor (serial) executable (MPI only)
 #set build_parallel_io                 #> uncomment to build with parallel I/O (pnetcdf); 
                                        #>   comment out to use standard netCDF I/O
-#set Debug_CCTM                        #> uncomment to compile CCTM with debug option equal to TRUE
+#set Debug_CCTM                        #> uncomment to compile CCTM with debug option equal to TRUE, NOTE: to run using debug requires modify BLD and RUNID in run script 
                                        #>   comment out to use standard, optimized compile process
 set make_options = "-j"                #> additional options for make command if MakeFileOnly is not set
                                        #>   comment out if no additional options are wanted.
@@ -89,19 +72,16 @@ set make_options = "-j"                #> additional options for make command if
 
 #> Working directory and Version IDs
  if ( $?ISAM_CCTM ) then
-     set VRSN  = v54_ISAM             #> model configuration ID for CMAQ_ISAM
+     set VRSN  = v533_ISAM             #> model configuration ID for CMAQ_ISAM
  else if ( $?DDM3D_CCTM ) then
-     set VRSN = v54_DDM3D             #> model configuration ID for CMAQ_DDM
+     set VRSN = v533_DDM3D             #> model configuration ID for CMAQ_DDM
  else
-     set VRSN = v54                   #> model configuration ID for CMAQ
+     set VRSN = v533                   #> model configuration ID for CMAQ
  endif
  
  set EXEC  = CCTM_${VRSN}.exe          #> executable name
  set CFG   = CCTM_${VRSN}.cfg          #> configuration file name
 
- if ( $?build_twoway ) then            # WRF Version used for WRF-CMAQ Model (must be v4.4+)
-    set WRF_VRSN = v4.4
- endif   
 
 #========================================================================
 #> CCTM Science Modules
@@ -121,51 +101,19 @@ set make_options = "-j"                #> additional options for make command if
  set ModDepv   = depv/${DepMod}             #> deposition velocity calculation module 
                                             #>     (see $CMAQ_MODEL/CCTM/src/depv)
  set ModEmis   = emis/emis                  #> in-line emissions module
- set ModBiog   = biog/beis4                 #> BEIS4 in-line emissions module 
-
- set ModMegBiog   = biog/megan3                #> MEGAN3 in-line emissions module
-
+ set ModBiog   = biog/beis3                 #> BEIS3 in-line emissions module 
  set ModPlmrs  = plrise/smoke               #> in-line emissions plume rise
  set ModCgrds  = spcs/cgrid_spcs_nml        #> chemistry species configuration module 
                                             #>     (see $CMAQ_MODEL/CCTM/src/spcs)
  set ModPhot   = phot/inline                #> photolysis calculation module 
                                             #>     (see $CMAQ_MODEL/CCTM/src/phot)
-
- setenv Mechanism cb6r5_ae7_aq              #> chemical mechanism (see $CMAQ_MODEL/CCTM/src/MECHS) 
- set ModMech   = MECHS/${Mechanism}
-
- if ( ${Mechanism} =~ *ae7* ) then          #> ae7 family of aero and cloud chem
-     set ModAero   = aero/aero7             # > aerosol chemistry module (see $CMAQ_MODEL/CCTM/src/aero)
-     set ModCloud  = cloud/acm_ae7          # > cloud chemistry module (see $CMAQ_MODEL/CCTM/src/cloud)
- else if ( ${Mechanism} =~ *ae6* ) then     #> ae6 family of aero and cloud chem
-     set ModAero   = aero/aero6             # > aerosol chemistry module (see $CMAQ_MODEL/CCTM/src/aero)
-     set ModCloud  = cloud/acm_ae6          # > cloud chemistry module (see $CMAQ_MODEL/CCTM/src/cloud)
- else if ( ${Mechanism} =~ *cracmm* ) then  #> CRACMM family of aero and cloud chem
-     set ModAero    = aero/cracmm           # > aerosol chemistry module (see $CMAQ_MODEL/CCTM/src/aero)
-     set ModCloud   = cloud/acm_cracmm      # > cloud chemistry module (see $CMAQ_MODEL/CCTM/src/cloud)
- endif
-
- # Special cloud modules for kmt versions
- if( ${Mechanism} == cb6r5_ae7_aqkmt2 ) then
-     set ModCloud = cloud/acm_ae7_kmt2
- else if( ${Mechanism} == saprc07tic_ae7i_aqkmt2 ) then
-     set ModCloud = cloud/acm_ae7_kmt2
- endif
-
- # Gas chem solver
- if ( ${Mechanism} == cb6r5m_ae7_aq ) then  #> Gas-phase chemistry solver options ($CMAQ_MODEL/CCTM/src/gas)
-     setenv ChemSolver ros3                  #> ros3 (or smvgear) are system independent
- else                                      
-     setenv ChemSolver ebi                   #> [ default for most mechanisms: ebi ]
- endif
-                                         
- if ( $ChemSolver == ebi ) then             
-    set ModGas    = gas/${ChemSolver}_${Mechanism}
-                                            
- else
-    set ModGas    = gas/${ChemSolver}
- endif
-    
+ set Mechanism = cb6r3_ae7_aq               #> chemical mechanism (see $CMAQ_MODEL/CCTM/src/MECHS)
+ set ModGas    = gas/ebi_${Mechanism}       #> gas-phase chemistry solver (see $CMAQ_MODEL/CCTM/src/gas)
+                                            #> use gas/ros3 or gas/smvgear for a solver independent 
+                                            #  of the photochemical mechanism
+ set ModAero   = aero/aero7                 #> aerosol chemistry module (see $CMAQ_MODEL/CCTM/src/aero)
+ set ModCloud  = cloud/acm_ae7              #> cloud chemistry module (see $CMAQ_MODEL/CCTM/src/cloud)
+                                            #>   overwritten below if using cb6r3m_ae7_kmtbr mechanism
  set ModUtil   = util/util                  #> CCTM utility modules
  set ModDiag   = diag                       #> CCTM diagnostic modules
  set Tracer    = trac0                      #> tracer configuration directory under 
@@ -174,7 +122,6 @@ set make_options = "-j"                #> additional options for make command if
  set ModPvO3   = pv_o3                      #> potential vorticity from the free troposphere
  set ModISAM   = isam                       #> CCTM Integrated Source Apportionment Method
  set ModDDM3D  = ddm3d                      #> Decoupled Direct Method in 3D
- set ModDegrade = reactive_tracers          #> Linear Chemical Loss for a fixed set of species treated as reactive tracers
 
 #============================================================================================
 #> Computing System Configuration:
@@ -303,40 +250,12 @@ set make_options = "-j"                #> additional options for make command if
     set SENS = ""
  endif
  
-#> Build Mechanism Files and instruct build-make to look
-#> in the CHEMMECH output folder for the files
- if ( $?build_mech ) then
+#> Mechanism location
+ set ModMech = MECHS/$Mechanism        #> chemical mechanism module
 
-    # Note: modifying existing or creating new chemical mechanisms
-    # can lead to unstable or highly inaccurate representations of 
-    # atmospheric chemical predictions when applying the EBI solvers.
-    # EBI solvers are highly characterized and tested before 
-    # application. The CMAQ development team recommends using the 
-    # generalized solvers, Rosenbrock or Gear, with user-defined
-    # mechanisms.
-
-    # Because the bldit_cctm script is executing the bldit_mech
-    # processor, we will assume that the source location for the new 
-    # mechanism files is in the CMAQ repo. There will also be an 
-    # error check for overwriting an existing mechanism that can be
-    # disabled using the mech_clobber variable above.
-    setenv MECH_SRC ${CMAQ_REPO}/CCTM/src/${ModMech}
-    setenv TRAC_NML ${CMAQ_REPO}/CCTM/src/MECHS/trac0/Species_Table_TR_0.nml
-    setenv MECH_OUT ${CMAQ_REPO}/CCTM/src/${ModMech}
-    setenv EBI_SOLVER_OUT ${CMAQ_REPO}/CCTM/src/${ModGas}
-    if ( $?clobber_mech ) then
-      setenv CLOBBER_MECH TRUE
-    else
-      setenv CLOBBER_MECH FALSE
-    endif
-
-    cd ${CMAQ_HOME}/CCTM/scripts
-    ./bldit_mech.csh ${compiler} ${compilerVrsn}
-    if ( $? != 0 ) then
-      echo ""
-      echo "bldit_mech did not finish correctly --> Build Process Halted"
-      exit 1
-    endif
+#> Cloud chemistry options
+ if ( $Mechanism == cb6r3m_ae7_kmtbr ) then
+    set ModCloud = cloud/acm_ae7_kmtbr
  endif
 
 #> Tracer configuration files
@@ -352,7 +271,8 @@ set make_options = "-j"                #> additional options for make command if
 #> Set and create the "BLD" directory for checking out and compiling 
 #> source code. Move current directory to that build directory.
  if ( $?Debug_CCTM ) then
-    set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}_debug
+    set MODE = debug
+    set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}_${MODE}
  else
     set Bld = $CMAQ_HOME/CCTM/scripts/BLD_CCTM_${VRSN}_${compilerString}
  endif
@@ -412,8 +332,6 @@ set make_options = "-j"                #> additional options for make command if
               -DSUBST_GLOBAL_TO_LOCAL_COORD=${Popt}_GLOBAL_TO_LOCAL_COORD\
               -DSUBST_GLOBAL_SUM=${Popt}_GLOBAL_SUM\
               -DSUBST_GLOBAL_LOGICAL=${Popt}_GLOBAL_LOGICAL\
-              -DSUBST_GLOBAL_GATHER=${Popt}_GLOBAL_GATHER\
-              -DSUBST_GLOBAL_BCAST=${Popt}_GLOBAL_BCAST\
               -DSUBST_LOOP_INDEX=${Popt}_LOOP_INDEX\
               -DSUBST_SUBGRID_INDEX=${Popt}_SUBGRID_INDEX )
  set STX2 = ( -DSUBST_HI_LO_BND_PE=${Popt}_HI_LO_BND_PE\
@@ -441,11 +359,6 @@ set make_options = "-j"                #> additional options for make command if
     set ModVadv = vadv/local_cons              #> Vertical advection module
  endif
 
- # Retrieve git repository sha ID for this source code version
- set shaID   = `git --git-dir=${CMAQ_REPO}/.git rev-parse --short=10 HEAD`
- if ( $? != 0 ) then
-    set shaID   = "not_a_repo"
- endif
 
 # ============================================================================
 #> Create Config File 
@@ -462,8 +375,6 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "model        $EXEC;"                                        >> $Cfile
  echo                                                              >> $Cfile
  echo "repo        $CCTM_SRC;"                                     >> $Cfile
- echo                                                              >> $Cfile
- echo "sha_ID      $shaID;"                                        >> $Cfile
  echo                                                              >> $Cfile
  echo "mechanism   $Mechanism;"                                    >> $Cfile
  echo                                                              >> $Cfile
@@ -597,15 +508,10 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "Module ${ModEmis};"                                         >> $Cfile
  echo                                                              >> $Cfile
 
- set text = "beis4"
+ set text = "beis3"
  echo "// options are" $text                                       >> $Cfile
  echo "Module ${ModBiog};"                                         >> $Cfile
  echo                                                              >> $Cfile
-
- set text = "megan3"
- echo "// options are" $text                                       >> $Cfile
- echo "Module ${ModMegBiog};"                                      >> $Cfile
- echo  
 
  set text = "smoke"
  echo "// options are" $text                                       >> $Cfile
@@ -622,20 +528,14 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  echo "Module ${ModPhot};"                                         >> $Cfile
  echo                                                              >> $Cfile
 
- set text = "degrade"
- echo "// reactive_tracer options are" $text                       >> $Cfile
- echo "Module ${ModDegrade};"                                      >> $Cfile
- echo                                                              >> $Cfile
-
  set text = "gas chemistry solvers"
  echo "// " $text                                                  >> $Cfile
- set text = "smvgear, ros3, and ebi; see 'gas chemistry mechanisms' for <mech>"
+ set text = "smvgear, ros3, and ebi_<mech>; see 'gas chemistry mechanisms' for <mech>"
  echo "// options are" $text                                       >> $Cfile
  echo "Module ${ModGas};"                                          >> $Cfile
  echo                                                              >> $Cfile
 
- set MechList = "cb6r5hap_ae7_aq, cb6r3_ae7_aq, cb6r5_ae7_aq, cb6r5_ae7_aqkmt2, cb6r5m_ae7_aq, racm2_ae6_aq, saprc07tc_ae6_aq, saprc07tic_ae7i_aq, saprc07tic_ae7i_aqkmt2"
-
+ set MechList = " cb6mp_ae6_aq, cb6r3_ae6_aq, cb6r3_ae7_aq, cb6r3_ae7_aqkmt2, cb6r3m_ae7_kmtbr, racm2_ae6_aq, saprc07tc_ae6_aq, saprc07tic_ae6i_aq, saprc07tic_ae6i_aqkmti, saprc07tic_ae7i_aq, saprc07tic_ae7i_aqkmt2"
  set text = "gas chemistry mechanisms"
  echo "// " $text                                                  >> $Cfile
  set text = "$MechList"
@@ -781,6 +681,7 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
  endif
  mv ${CFG}.bld $Bld/${CFG}
 
+
 #> If Building WRF-CMAQ, download WRF, download auxillary files and build
 #> model
  if ( $?build_twoway ) then
@@ -796,15 +697,26 @@ set Cfile = ${Bld}/${CFG}.bld      # Config Filename
 
     cd $CMAQ_HOME/CCTM/scripts
   
-    # Downlad WRF repository from GitHub and put CMAQv5.4 into it
-    set WRF_BLD = BLD_WRF${WRF_VRSN}_CCTM_${VRSN}_${compilerString}
+    # Downlad WRF repository from GitHub and put CMAQv5.3.X into it
+    set WRF_BLD = BLD_WRFv4.3_CCTM_${VRSN}_${compilerString}
     setenv wrf_path ${CMAQ_HOME}/CCTM/scripts/${WRF_BLD}
     setenv WRF_CMAQ 1
 
     if ( ! -d $WRF_BLD ) then 
-      git clone --branch ${WRF_VRSN} https://github.com/wrf-model/WRF.git ./$WRF_BLD >& /dev/null
+      git clone --branch v4.3 https://github.com/wrf-model/WRF.git ./$WRF_BLD >& /dev/null
       cd $wrf_path
       mv $Bld ./cmaq
+
+      # Link Coupler to WRF
+        cd ${CMAQ_REPO}/UTIL
+        ${CMAQ_REPO}/UTIL/wrfcmaq_twoway_coupler/assemble >& ${wrf_path}/wrf-cmaq_buildlog.log
+  
+        if ($? != 0) then
+          echo "Error running ${CMAQ_REPO}/UTIL/wrfcmaq_twoway_coupler/assemble look at wrf-cmaq_buildlog.log." 
+          exit 1
+        endif
+
+      cd $wrf_path
   
       # Configure WRF
         ./configure <<EOF
@@ -826,5 +738,7 @@ EOF
    endif
 
  endif 
+
+
 
 exit

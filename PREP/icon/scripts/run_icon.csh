@@ -1,6 +1,6 @@
 #!/bin/csh -f
 
-# ======================= ICONv5.4.X Run Script ========================
+# ======================= ICONv5.3.X Run Script ========================
 # Usage: run.icon.csh >&! icon.log &                                   
 #
 # To report problems or request help with this script/program:         
@@ -28,7 +28,7 @@
  echo " "; echo " Input data path, CMAQ_DATA set to $CMAQ_DATA"; echo " "
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN     = v54                     #> Code Version
+ set VRSN     = v532                    #> Code Version
  set APPL     = 2016_12SE1              #> Application Name
  set ICTYPE   = regrid                  #> Initial conditions type [profile|regrid]
 
@@ -115,11 +115,5 @@
 
 #> Executable call:
  time $BLD/$EXEC
-
- set progstat = ${status}
- if ( ${progstat} ) then
-   echo "ERROR ${progstat} in $BLD/$EXEC"
-   exit( ${progstat} )
- endif
 
  exit() 

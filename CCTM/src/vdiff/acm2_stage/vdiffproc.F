@@ -83,19 +83,18 @@ C-----------------------------------------------------------------------
 
       USE CGRID_SPCS          ! CGRID mechanism species
       USE GRID_CONF
-      USE DESID_VARS, ONLY : VDEMIS_DIFF, DESID_LAYS
-      USE DESID_MODULE, ONLY : DESID_INIT, DESID_DRIVER
+      USE EMIS_VARS, ONLY : VDEMIS_DIFF, EMLAYS
+      USE EMIS_DEFN, ONLY : EMIS_INIT, GET_EMIS
       USE DEPV_DEFN
       USE ASX_DATA_MOD
       USE VDIFF_MAP
       USE UTILIO_DEFN
       USE BIDI_MOD
       USE HGSIM
-      Use MOSAIC_MOD, Only: Tile_Data
+      USE LSM_MOD, Only: n_lufrac
       USE SEDIMENTATION
       USE VDIFF_DIAG
-      USE PA_UPDATE
-      USE PA_DEFN, ONLY : LIPR, BUDGET_DIAG
+      USE PA_DEFN, Only: LIPR ! Process Analysis control and data variables
 
 #ifdef isam
       USE SA_DEFN, Only: ITAG, N_SPCTAG, VNAM_SPCTAG, SA_DDEP
@@ -136,12 +135,13 @@ C Local Variables:
 
       REAL, ALLOCATABLE, SAVE :: CNGRD      ( :,:,:,: )    ! cgrid aero in mixing ratio
       REAL, ALLOCATABLE, SAVE :: DDEP       ( :,:,: )   ! ddep accumulator
-      REAL, ALLOCATABLE, SAVE :: DDEP0    ( :,:,: )   ! ddep initial before call to vdiffacmx
       REAL, ALLOCATABLE, SAVE :: TOT_BD_EMIS( :,:,: )   ! bidi emissions accumlator 
       REAL, ALLOCATABLE, SAVE :: DDEPJ      ( :,:,:,: ) ! ddep for mosaic
+      REAL, ALLOCATABLE, SAVE :: DDEPJ_FST  ( :,:,:,: ) ! ddep for stomtal/cuticular pathway
 
       REAL     :: WRDD( NCOLS,NROWS )                 ! ddep write buffer
-      REAL     :: WRDDJ( NCOLS,NROWS,Tile_Data%N_LUFRAC+1 )     ! mosaic ddep write buffer
+      REAL     :: WRDDJ( NCOLS,NROWS,N_LUFRAC+1 )     ! mosaic ddep write buffer
+      REAL     :: WRDDJ_FST( NCOLS,NROWS,N_LUFRAC+1 ) ! mosaic stomatal flux write buffer
 
       REAL, ALLOCATABLE, SAVE :: DDEP_PA  ( :,:,: )   ! ddep for process analysis
       REAL, ALLOCATABLE, SAVE :: EMIS_PA( :,:,:,: )   ! emis for process analysis
@@ -162,6 +162,18 @@ C Local Variables
       INTEGER     MDATE, MTIME, MSTEP           ! internal simulation date&time
 
       INTERFACE
+         SUBROUTINE PA_UPDATE_EMIS ( PNAME, VDEMIS_DIFF, JDATE, JTIME, TSTEP )
+            CHARACTER( * ), INTENT( IN )  :: PNAME
+            REAL,           INTENT( IN )  :: VDEMIS_DIFF( :,:,:,: )
+            INTEGER,        INTENT( IN )  :: JDATE, JTIME
+            INTEGER,        INTENT( IN )  :: TSTEP( 3 )
+         END SUBROUTINE PA_UPDATE_EMIS
+         SUBROUTINE PA_UPDATE_DDEP ( PNAME, DDEP, JDATE, JTIME, TSTEP )
+            CHARACTER( * ), INTENT( IN )  :: PNAME
+            REAL,           INTENT( IN )  :: DDEP( :,:,: )
+            INTEGER,        INTENT( IN )  :: JDATE, JTIME
+            INTEGER,        INTENT( IN )  :: TSTEP( 3 )
+         END SUBROUTINE PA_UPDATE_DDEP
          SUBROUTINE CONV_CGRID ( CGRID, JDATE, JTIME, CNGRD )
             REAL, POINTER :: CGRID( :,:,:,: )
             INTEGER,        INTENT( IN )  :: JDATE, JTIME
@@ -175,12 +187,13 @@ C Local Variables
          SUBROUTINE EDDYX ( EDDYV )
             REAL,           INTENT( OUT ) :: EDDYV( :,:,: )
          END SUBROUTINE EDDYX
-         SUBROUTINE VDIFFACMX( dtsec, seddy, ddep, TOT_BD_EMIS, ddepj, cngrd )
+         SUBROUTINE VDIFFACMX( dtsec, seddy, ddep, TOT_BD_EMIS, ddepj, ddepj_fst, cngrd )
             REAL, INTENT( IN )    :: dtsec
             REAL, INTENT( INOUT ) :: seddy( :,:,: )
             REAL, INTENT( INOUT ) :: ddep ( :,:,: )
             REAL, INTENT( INOUT ) :: TOT_BD_EMIS ( :,:,: )
             REAL, INTENT( INOUT ), OPTIONAL :: ddepj    ( :,:,:,: )
+            REAL, INTENT( INOUT ), OPTIONAL :: ddepj_fst( :,:,:,: )
             REAL, INTENT( INOUT ) :: cngrd( :,:,:,: )
          END SUBROUTINE VDIFFACMX
 #ifdef isam
@@ -245,13 +258,6 @@ C Allocate and initialize dry deposition array
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
          DDEP = 0.0   ! array assignment
-
-         ALLOCATE ( DDEP0( N_SPC_DEPV,NCOLS,NROWS ), STAT = ASTAT )
-         IF ( ASTAT .NE. 0 ) THEN
-            XMSG = 'Failure allocating DDEP0'
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-         DDEP0 = 0.0   ! array assignment
   
          ALLOCATE ( TOT_BD_EMIS( N_BD_EMIS,NCOLS,NROWS ), STAT = ASTAT )
          IF ( ASTAT .NE. 0 ) THEN
@@ -262,7 +268,7 @@ C Allocate and initialize dry deposition array
 
          CALL LOG_HEADING( LOGDEV, "Initialize Emissions Module" )
 
-         IF ( .NOT. DESID_INIT ( JDATE, JTIME, TSTEP( 1 ) ) ) THEN
+         IF ( .NOT. EMIS_INIT ( JDATE, JTIME, TSTEP( 1 ) ) ) THEN
             XMSG = 'Failure initializing emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
@@ -277,15 +283,15 @@ C Allocate and initialize dry deposition array
 #endif
 
 C Set up for process analysis
-         CALL LOG_HEADING( LOGDEV, "Initialize Surface Exchange for Process Analysis" )
+         IF ( LIPR ) THEN
+            CALL LOG_HEADING( LOGDEV, "Initialize Surface Exchange for Process Analysis" )
 
-         IF ( BUDGET_DIAG .OR. LIPR ) THEN
-            ALLOCATE ( EMIS_PA( NCOLS,NROWS,NLAYS,N_CGRID_SPC ), STAT = ASTAT )
+            ALLOCATE ( EMIS_PA( NCOLS,NROWS,EMLAYS,N_SPC_DIFF ), STAT = ASTAT )
             IF ( ASTAT .NE. 0 ) THEN
                XMSG = 'EMIS_PA memory allocation failed'
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
-            ALLOCATE ( DDEP_PA( NCOLS,NROWS,N_CGRID_SPC ), STAT = ASTAT )
+            ALLOCATE ( DDEP_PA( NCOLS,NROWS,N_SPC_DEPV ), STAT = ASTAT )
             IF ( ASTAT .NE. 0 ) THEN
                XMSG = 'DDEP_PA memory allocation failed'
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
@@ -317,7 +323,7 @@ C Set up for grav. settling
 !----------------------------------------------------------------------------------------
 
          IF ( MOSAIC ) THEN 
-            ALLOCATE ( DDEPJ( Tile_Data%N_LUFRAC,N_SPC_DEPV,NCOLS,NROWS ), STAT = ASTAT )
+            ALLOCATE ( DDEPJ( N_LUFRAC,N_SPC_DEPV,NCOLS,NROWS ), STAT = ASTAT )
             IF ( ASTAT .NE. 0 ) THEN
                XMSG = 'Failure allocating DDEPJ'
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
@@ -325,6 +331,16 @@ C Set up for grav. settling
             DDEPJ = 0.0   ! array assignment
             IF ( IO_PE_INCLUSIVE )
      &         CALL OPDDEP_MOS ( JDATE, JTIME, TSTEP( 1 ), N_SPC_DDEP )
+            IF ( FST ) THEN
+               ALLOCATE ( DDEPJ_FST( N_LUFRAC,N_SPC_DEPV,NCOLS,NROWS ), STAT = ASTAT )
+               IF ( ASTAT .NE. 0 ) THEN
+                  XMSG = 'Failure allocating DDEPJ_FST'
+                  CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+               END IF
+               DDEPJ_FST = 0.0   ! array assignment
+               IF ( IO_PE_INCLUSIVE )
+     &            CALL OPDDEP_FST ( JDATE, JTIME, TSTEP( 1 ), N_SPC_DDEP )
+            END IF   ! if Fst
          END IF   ! if Mosaic
 !--------------------------------------------------------------------------------------------------
          DO V = 1, N_SPC_DEPV
@@ -358,18 +374,17 @@ C Calculate the changes in the layer J-,K-mode aerosol concentrations
       END IF
 
 C read & interpolate emissions data => VDEMIS_DIFF from EMIS_DEFN module
-      CALL DESID_DRIVER ( MDATE, MTIME, TSTEP, CGRID )
+      CALL GET_EMIS ( MDATE, MTIME, TSTEP, CGRID )
 
-      IF ( BUDGET_DIAG .OR. LIPR ) THEN
-         EMIS_PA = 0.0
+      IF ( LIPR ) THEN
          DO S = 1, N_SPC_DIFF
-            DO L = 1, DESID_LAYS
-               EMIS_PA( :,:,L,DIFF_MAP(S) ) = VDEMIS_DIFF( S,L,:,: )
+            DO L = 1, EMLAYS
+               EMIS_PA( :,:,L,S ) = VDEMIS_DIFF( S,L,:,: )
             END DO
          END DO
-         CALL PA_UPDATE_EMIS ( EMIS_PA, JDATE, JTIME, TSTEP )
+         CALL PA_UPDATE_EMIS ( 'VDIF', EMIS_PA, JDATE, JTIME, TSTEP )
       END IF
-      
+
       CALL EDDYX ( EDDYV )
 
 C EDDYV returned = Kz, where Kz is in m**2/sec
@@ -381,13 +396,12 @@ C EDDYV returned = Kz, where Kz is in m**2/sec
       IF ( WSTEP .EQ. 0 ) THEN
          DDEP = 0.0                      ! array assignment
          TOT_BD_EMIS = 0.0                      ! array assignment
+         IF( ABFLUX ) STAGE_Diag_Data%NH3_Diag_Out = 0.0
          IF ( MOSAIC ) THEN
             DDEPJ = 0.0                  ! array assignment
+            IF ( FST ) DDEPJ_FST = 0.0   ! array assignment
          END IF
       END IF
-
-C Store Deposition Change in Budget and Process Analysis Arrays
-      IF ( BUDGET_DIAG .OR. LIPR ) DDEP0 = DDEP
 
 C Calculate the change in concentration and dry dep from vertical diffusion and vsed
 C Note: cngrd is the argument keyword (from the INTERFACE); CNGRD is the actual argument
@@ -395,8 +409,13 @@ C Note: cngrd is the argument keyword (from the INTERFACE); CNGRD is the actual 
          CALL VDIFFACMX( DTSEC, SEDDY, DDEP, TOT_BD_EMIS,
      &                   cngrd = CNGRD )
       ELSE
-         CALL VDIFFACMX( DTSEC, SEDDY, DDEP, TOT_BD_EMIS,
-     &                   ddepj = DDEPJ, cngrd = CNGRD )
+         IF ( .NOT. FST ) THEN
+            CALL VDIFFACMX( DTSEC, SEDDY, DDEP, TOT_BD_EMIS,
+     &                      ddepj = DDEPJ, cngrd = CNGRD )
+         ELSE
+            CALL VDIFFACMX( DTSEC, SEDDY, DDEP, TOT_BD_EMIS,
+     &                      ddepj = DDEPJ, ddepj_fst = DDEPJ_FST, cngrd = CNGRD )
+         END IF 
       END IF 
 
       IF ( VDIFFDIAG ) THEN
@@ -418,20 +437,7 @@ C Note: cngrd is the argument keyword (from the INTERFACE); CNGRD is the actual 
             END DO
          END IF
       END IF
- 
-C Store Deposition Change in Budget and Process Analysis Arrays
-      IF ( BUDGET_DIAG .OR. LIPR ) THEN
-         DDEP_PA = 0.0
-         DO V = 1, N_SPC_DEPV
-            DO R = 1, NROWS
-               DO C = 1, NCOLS
-                  DDEP_PA( C,R,MAP_DEPVtoCGRID(V)) = DDEP( V,C,R ) - DDEP0( V,C,R )
-               END DO
-            END DO
-         END DO
-         CALL PA_UPDATE_DDEP ( DDEP_PA, JDATE, JTIME, TSTEP )
-      END IF
- 
+
 C Revert non-molar mixing ratio species and re-order CGRID
       CALL REV_CGRID ( CNGRD, MDATE, MTIME, CGRID )
 
@@ -458,6 +464,12 @@ C If last call this hour:  write accumulated depositions:
                      XMSG = 'Could not open ' // TRIM(CTM_DRY_DEP_MOS)
                      CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
                   END IF
+                  IF ( FST ) THEN
+                     IF ( .NOT. OPEN3( CTM_DRY_DEP_FST, FSREAD3, PNAME ) ) THEN
+                        XMSG = 'Could not open ' // TRIM(CTM_DRY_DEP_FST)
+                        CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+                     END IF
+                  END IF
                END IF
             END IF   ! .NOT. IO_PE_INCLUSIVE
          END IF
@@ -483,13 +495,20 @@ C If last call this hour:  write accumulated depositions:
      &           MDATE, MTIME, TOT_BD_EMIS( NH3_E,:,: ) ) ) THEN
                XMSG = 'Could not write ' // CTM_DRY_DEP_1 // ' file'
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF     
+            END IF
             WRDD( :,: ) = DDEP(NH3_HIT,:,:) - TOT_BD_EMIS( NH3_E,:,: )
             IF ( .NOT. WRITE3( CTM_DRY_DEP_1, 'NH3_Flux',
      &           MDATE, MTIME, WRDD ) ) THEN
                XMSG = 'Could not write ' // CTM_DRY_DEP_1 // ' file'
                CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-            END IF          
+            END IF     
+            DO S = 1, STAGE_Diag_Data%n_spc
+               IF ( .NOT. WRITE3( CTM_DRY_DEP_1, STAGE_Diag_Data%dep_name( S ),
+     &              MDATE, MTIME, STAGE_Diag_Data%NH3_Diag_Out( :,:,S ) ) ) THEN
+                  XMSG = 'Could not write ' // CTM_DRY_DEP_1 // ' file'
+                  CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+               END IF     
+            END DO
          ENDIF
          IF ( HGBIDI ) THEN
             IF ( .NOT. WRITE3( CTM_DRY_DEP_1, BD_EMIS_SPC( HG_E ),
@@ -612,11 +631,11 @@ C Write other diagnostics
                WRDD = 0.0 ! reuse array since it has already been written for hour
                DO R = 1, NROWS
                   DO C = 1, NCOLS
-                     DO J = 1, Tile_Data%N_LUFRAC
-                        WRDD( C,R ) = WRDD( C,R ) + DDEPJ( J,S,C,R ) * Tile_Data%LUFRAC( C,R,J )
+                     DO J = 1, N_LUFRAC
+                        WRDD( C,R ) = WRDD( C,R ) + DDEPJ( J,S,C,R ) * Grid_Data%LUFRAC( C,R,J )
                         WRDDJ( C,R,J ) = DDEPJ( J,S,C,R )
                      END DO
-                     WRDDJ( C,R,Tile_Data%N_LUFRAC+1 ) = WRDD( C,R )  ! last array element is total across all land use categories
+                     WRDDJ( C,R,N_LUFRAC+1 ) = WRDD( C,R )  ! last array element is total across all land use categories
                   END DO
                END DO
 
@@ -632,18 +651,65 @@ C Write other diagnostics
      &             'Timestep written to', CTM_DRY_DEP_MOS,
      &             'for date and time', MDATE, MTIME
 
+            IF ( FST ) THEN
+
+               DO V = 1, N_SPC_DDEP
+                  S = DD2DV( V )
+                  WRDD = 0.0 ! reuse array since it has already been written for hour
+                  DO R = 1, NROWS
+                     DO C = 1, NCOLS
+                        DO J = 1, N_LUFRAC
+                           WRDD( C,R ) = WRDD( C,R ) + DDEPJ_FST( J,S,C,R ) * Grid_Data%LUFRAC( C,R,J )
+                           WRDDJ_FST( C,R,J ) = DDEPJ_FST( J,S,C,R )
+                           IF ( DDEPJ_FST( J,S,C,R ) .GT. DDEPJ( J,S,C,R ) ) THEN
+                              WRITE( LOGDEV,* ) 'FST too big !!!'
+                              WRITE( LOGDEV,* ) 'J,S,C,R = ', J, S, C, R
+                              WRITE( LOGDEV,* ) 'DDEPJ,DDEPJ_FST: ', DDEPJ( J,S,C,R ), DDEPJ_FST( J,S,C,R )
+                              WRITE( LOGDEV,* ) 'DDEP Species: ', DDEP_SPC( V )
+                              WRITE( LOGDEV,* ) 'Time and date: ', MTIME, MDATE
+                           END IF
+                        END DO
+                        WRDDJ_FST( C,R,N_LUFRAC+1 ) = WRDD( C,R )  ! last array element is total across all land use categories
+                    END DO
+                  END DO
+             
+                  IF ( .NOT. WRITE3( CTM_DRY_DEP_FST, DDEP_SPC( V ),
+     &                       MDATE, MTIME, WRDDJ_FST ) ) THEN
+                     XMSG = 'Could not write ' // CTM_DRY_DEP_FST // ' file'
+                     CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
+                  END IF
+             
+               END DO
+
+               WRITE( LOGDEV, '( /5X, 3( A, :, 1X ), I8, ":", I6.6 )' )
+     &               'Timestep written to', CTM_DRY_DEP_FST,
+     &               'for date and time', MDATE, MTIME
+
+            END IF   ! FST
+
          END IF   ! MOSAIC
 
          IF ( ABFLUX .OR. HGBIDI ) THEN    
             CALL WRASX_MEDIA( MDATE, MTIME )
          END IF 
  
+         IF ( LIPR ) THEN
+            DO V = 1, N_SPC_DEPV
+               DO R = 1, NROWS
+                  DO C = 1, NCOLS
+                     DDEP_PA( C,R,V ) = DDEP( V,C,R )
+                  END DO
+               END DO
+            END DO
+            CALL PA_UPDATE_DDEP ( 'VDIF', DDEP_PA, JDATE, JTIME, TSTEP )
+         END IF
 C re-set dry deposition array to zero
 
          DDEP = 0.0
          TOT_BD_EMIS = 0.0
          IF ( MOSAIC ) THEN
             DDEPJ = 0.0   ! array assignment
+            IF ( FST ) DDEPJ_FST = 0.0   ! array assignment
          END IF
 
 #ifdef isam

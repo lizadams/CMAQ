@@ -62,9 +62,6 @@ C --------------------------------------------------------------------------
           use se_global_min_module
           use se_global_sum_module
 
-          use se_global_gather_module
-          use se_global_bcast_module
-
           use se_twoway_comm_module
 
         end module se_modules

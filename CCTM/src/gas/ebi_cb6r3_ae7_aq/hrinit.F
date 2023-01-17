@@ -29,7 +29,7 @@ C  RETURN VALUES: None
 C
 C  KEY SUBROUTINES/FUNCTIONS CALLED: None
 C
-C  REVISION HISTORY: Created by EBI solver program, Jun  8, 2022
+C  REVISION HISTORY: Created by EBI solver program, May 24, 2019
 C   21 Jun 10 J.Young:   convert for Namelist redesign
 C   18 Jul 14 B.Hutzell: revised to use the RXNS_DATA and RXNS_FUNCTION
 C                        modules instead of include files
@@ -91,11 +91,11 @@ C***********************************************************************
      &           DENSITY( MAX_CELLS_EBI ),
      &           HET    ( MAX_CELLS_EBI, NHETERO ),
      &           RJIN   ( MAX_CELLS_EBI, NPHOTAB ),
-     &           SEAWATER  ( MAX_CELLS_EBI ) ,
+     &           LAND   ( MAX_CELLS_EBI ) ,
      &           STAT = IOS )
 
        IF ( IOS .NE. 0 ) THEN
-          MSG = 'Error allocating ATMPRES, H2O, TEMP, HET, RJIN, SEAWATER '
+          MSG = 'Error allocating ATMPRES, H2O, TEMP, HET, RJIN, LAND '
           CALL M3EXIT( PNAME, 0, 0, MSG, XSTAT1 )
        END IF
 

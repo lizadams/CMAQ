@@ -32,16 +32,12 @@ C     01 Feb 2019 D. Wong: Implemented centralized I/O approach, and
 C                          created a new module biog_emis_param_module 
 C                          (model_data_module.F) to hold some of information
 C                          originally stored here to avoid cyclic dependence
-C     10 Mar 2021 G. Sarwar: Changed CB6R3M_AE7_KMTBR to CB6R3M_AE7_AQ
-C     10 June 2021 G. Sarwar: Replacd CB6R3M_AE7_AQ with CB6R5M_AE7_AQ
-C      Xiaoyang Chen at Northeastern University notified that CMAQ is not generating any monoterpene
+C      Xiaoyang Chen at Northeastern University notified that CMAQ is not generating any monoterpene 
 C             emissions when in-line option is enabled with RACM2
 C     07 June 2021 G. Sarwar: replaced "B10RD" with "B3V10" for RACM2
-C     30 Sept 2021 G. Sarwar: added CB6R5_AE7_AQ
-C     04 Oct  2021 G. Sarwar: added CB6R5HAP_AE7_AQ
 C-----------------------------------------------------------------------
       USE RUNTIME_VARS
-      USE DESID_VARS
+      USE EMIS_VARS
       USE biog_emis_param_module
 
       IMPLICIT NONE
@@ -75,7 +71,7 @@ C (A line from the profile file is a record.)
          INTEGER,        PARAMETER :: NSEGS = 6  ! # of potential line segments (fields)
          INTEGER,        PARAMETER :: MXLINES = 100 ! max lines for requested sppro name
          INTEGER,        PARAMETER :: MXSPPOL = 10  ! max no. spc per pollutant
-         INTEGER,        PARAMETER :: NMECHS  = 20  ! dimension for number of mechanisms considered
+         INTEGER,        PARAMETER :: NMECHS = 14   ! dimension for number of mechanisms considered
          CHARACTER,      PARAMETER :: CINVHDR = '#' ! Indicator for inventory hdr fields
 !        REAL,           PARAMETER :: GM2TON  = 1.0 / 907184.74  ! grams to tons
 
@@ -139,20 +135,14 @@ C Local variables
      &         BIOG_MECH_TYPE( 'CB05TUCL51_AE6_AQ      ','B10C5   '),
      &         BIOG_MECH_TYPE( 'CB6R3_AE6_AQ           ','B10C6   '),
      &         BIOG_MECH_TYPE( 'CB6MP_AE6_AQ           ','B10C6   '),
-     &         BIOG_MECH_TYPE( 'CB6R5HAP_AE7_AQ        ','B10C6AE7'),
      &         BIOG_MECH_TYPE( 'CB6R3_AE7_AQ           ','B10C6AE7'),     
-     &         BIOG_MECH_TYPE( 'CB6R5_AE7_AQ           ','B10C6AE7'),     
-     &         BIOG_MECH_TYPE( 'CB6R3_AE7_AQKMT2       ','B10C6AE7'),     
-     &         BIOG_MECH_TYPE( 'CB6R5M_AE7_AQ          ','B10C6AE7'),
+     &         BIOG_MECH_TYPE( 'CB6R3M_AE7_KMTBR       ','B10C6AE7'),
      &         BIOG_MECH_TYPE( 'RACM2_AE6_AQ           ','B3V10   '),
      &         BIOG_MECH_TYPE( 'SAPRC07TB_AE6_AQ       ','B10SP   '),
      &         BIOG_MECH_TYPE( 'SAPRC07TC_AE6_AQ       ','B10SP   '),
      &         BIOG_MECH_TYPE( 'SAPRC07TIC_AE6I_AQ     ','B10SP   '),
-     &         BIOG_MECH_TYPE( 'SAPRC07TIC_AE6I_AQKMTI ','B10SP   '),
      &         BIOG_MECH_TYPE( 'SAPRC07TIC_AE7I_AQ     ','B10SP   '),
-     &         BIOG_MECH_TYPE( 'SAPRC07TIC_AE7I_AQKMT2 ','B10SP   '),
-     &         BIOG_MECH_TYPE( 'CRACMM1_AQ             ','CRACMM1 '),
-     &         BIOG_MECH_TYPE( 'CRACMM1AMORE_AQ        ','CRACMM1 ') /)
+     &         BIOG_MECH_TYPE( 'SAPRC07TIC_AE6I_AQKMTI ','B10SP   ') /)
  
          CHARACTER( 16 ) :: PNAME = 'BIOG_INIT'
 
@@ -429,37 +419,33 @@ C Find emitted CMAQ species names
          END DO
 
 C Save Species names in global array for mapping emissions
-         DESID_EMVAR( IBIOSRM )%LEN = MSPCS
-         ALLOCATE( DESID_EMVAR( IBIOSRM )%ARRY ( MSPCS ) )
-         ALLOCATE( DESID_EMVAR( IBIOSRM )%UNITS( MSPCS ) )
-         ALLOCATE( DESID_EMVAR( IBIOSRM )%MW   ( MSPCS ) )
-         ALLOCATE( DESID_EMVAR( IBIOSRM )%USED ( MSPCS ) )
-         ALLOCATE( DESID_EMVAR( IBIOSRM )%CONV ( MSPCS ) )
-         ALLOCATE( DESID_EMVAR( IBIOSRM )%BASIS( MSPCS ) )
-         ALLOCATE( DESID_EMVAR( IBIOSRM )%LAREA( MSPCS ) )
-         ALLOCATE( DESID_EMVAR( IBIOSRM )%LAREAADJ( MSPCS ) )
+         EM_FILE_SURR( IBIOSRM )%LEN = MSPCS
+         ALLOCATE( EM_FILE_SURR( IBIOSRM )%ARRY ( MSPCS ) )
+         ALLOCATE( EM_FILE_SURR( IBIOSRM )%UNITS( MSPCS ) )
+         ALLOCATE( EM_FILE_SURR( IBIOSRM )%MW   ( MSPCS ) )
+         ALLOCATE( EM_FILE_SURR( IBIOSRM )%USED ( MSPCS ) )
+         ALLOCATE( EM_FILE_SURR( IBIOSRM )%CONV ( MSPCS ) )
+         ALLOCATE( EM_FILE_SURR( IBIOSRM )%BASIS( MSPCS ) )
 
-         DESID_EMVAR( IBIOSRM )%ARRY  = EMSPC
-         DESID_EMVAR( IBIOSRM )%UNITS = 'MOLES/S'
-         DESID_EMVAR( IBIOSRM )%MW    = 1.0
-         DESID_EMVAR( IBIOSRM )%USED  = .FALSE.
-         DESID_EMVAR( IBIOSRM )%CONV  = 1.0
-         DESID_EMVAR( IBIOSRM )%BASIS = 'MOLE'
-         DESID_EMVAR( IBIOSRM )%LAREA = .FALSE.
-         DESID_EMVAR( IBIOSRM )%LAREAADJ = .FALSE.
+         EM_FILE_SURR( IBIOSRM )%ARRY  = EMSPC
+         EM_FILE_SURR( IBIOSRM )%UNITS = 'MOLES/S'
+         EM_FILE_SURR( IBIOSRM )%MW    = 1.0
+         EM_FILE_SURR( IBIOSRM )%USED  = .FALSE.
+         EM_FILE_SURR( IBIOSRM )%CONV  = 1.0
+         EM_FILE_SURR( IBIOSRM )%BASIS = 'MOLE'
 
          ! Populate the Molecular Weight Field by Matching Gas Species
          ! to the CMAQ mechanism species
          DO ISP = 1,MSPCS
              INDX = INDEX1( EMSPC( ISP ), N_CGRID_SPC, CGRID_NAME )
              IF ( INDX .NE. 0 ) THEN
-                 DESID_EMVAR( IBIOSRM )%MW( ISP ) = CGRID_MW( INDX )
+                 EM_FILE_SURR( IBIOSRM )%MW( ISP ) = CGRID_MW( INDX )
              ELSE
                  WRITE( MESG, '(A,A,A,A)' ) 'WARNING: BEIS emission species ',
      &               EMSPC( ISP ),' is not found in the Gas-Phase Mechanism. ',
-     &               'The emission variable molecular weight will be set to 1.0'
+     &               'The surrogate molecular weight will be set to 1.0'
                  CALL LOG_MESSAGE( LOGDEV, MESG )
-                 DESID_EMVAR( IBIOSRM )%MW( ISP ) = 1.0
+                 EM_FILE_SURR( IBIOSRM )%MW( ISP ) = 1.0
              END IF
 
          END DO

@@ -47,11 +47,6 @@ C H. Pye 09/2014: added alkane and PAH SOA precursor
 C D.Wong  02/01/19 added one more variable in the USE clause
 C-----------------------------------------------------------------------
 
-#ifdef sens
-      USE DDM3D_DEFN, ONLY : NP, NPMAX
-      Use aero_ddm3d, ONLY : init_aero_ddm3d, s_precursor_conc, ae_ddm3d_ready
-#endif 
-
       Implicit None
 
       Integer, Parameter :: n_precursor = 24   ! # of precursors
@@ -64,7 +59,7 @@ C-----------------------------------------------------------------------
          Logical         :: required           ! required for model run
       End Type precursor_type
 
-      Type ( precursor_type ) :: precursor( n_precursor ) = (/
+      Type ( precursor_type ), Private :: precursor( n_precursor ) = (/
 C                       Name    RxnCounter  Update  Required
 C                    ---------   ---------- ------  ------
      & precursor_type( 'NO2    ', .False. , .True., .True.  ),
@@ -241,10 +236,6 @@ C Find indices of required species
 
       mapped = .True.
 
-#ifdef sens
-      Allocate ( s_precursor_conc( n_precursor,npmax ) )
-#endif
-
 99901 Format( 'FATAL error(s) found in the GC and/or NR namelists used. Check that '
      &     /  'these namelists contain the above required data as the respective files '
      &     /  'in the repository version of the mechanism: ' , a )
@@ -255,11 +246,7 @@ C Find indices of required species
       End Subroutine map_precursor
 
 C-----------------------------------------------------------------------
-#ifdef sens
-      Subroutine extract_precursor( conc,s_conc )
-#else
       Subroutine extract_precursor( conc )
-#endif
 
 C  Extracts the required precursor data from CGRID into conc.
 
@@ -277,21 +264,12 @@ C-----------------------------------------------------------------------
 
 C Arguments:
       Real, Intent( In ) :: conc( : )
-#ifdef sens
-      Real, Intent( In ) :: s_conc( :,: )
-#endif
 
 C Local Variables:
       Real( 8 )       :: gasconv       ! converts from [ppm] to [ug/m^3]
       Real( 8 )       :: vtmp
       Integer         :: n
       Integer         :: spc
-
-#ifdef sens
-      If ( .Not. ae_ddm3d_ready ) Then
-         Call init_aero_ddm3d()
-      End If
-#endif
 
       Call map_precursor()
 
@@ -300,24 +278,12 @@ C Compute gas conversion constant
 
 C Copy grid cell concentrations of precursor species
       precursor_conc = 0.0d0
-#ifdef sens
-      s_precursor_conc = 0.0D0
-#endif
 
       Do spc = 1, n_precursor
          n = precursor_map( spc )
          If ( n .Ne. 0 ) Then
             vtmp = gasconv * precursor_mw( spc )
             precursor_conc( spc ) = Max( Real( conc( n ), 8) * vtmp, Real( min_gasconc, 8) )
-#ifdef sens 
-            Do np = 1, npmax
-               If ( precursor_conc( spc ) .Eq. min_gasconc ) Then
-                  s_precursor_conc( spc,np ) = 0.0D0
-               Else
-                  s_precursor_conc( spc,np ) = vtmp * Real( s_conc( np,n ), 8 )
-               End If
-            End Do
-#endif
          End If
       End Do
 
@@ -325,11 +291,7 @@ C Copy grid cell concentrations of precursor species
       End Subroutine extract_precursor
 
 C------------------------------------------------------------------------
-#ifdef sens
-      Subroutine update_precursor( conc, s_conc )
-#else
       Subroutine update_precursor( conc )
-#endif
 
 C  Updates CGRID aerosol precursor values from the conc array.
 
@@ -351,9 +313,6 @@ C-----------------------------------------------------------------------
 
 C arguments:
       Real, Intent( Out ) :: conc( : )
-#ifdef sens
-      Real, Intent( Out ) :: s_conc( :,: )
-#endif
 
 C local variables:
       Character( 80 ) :: xmsg
@@ -376,15 +335,7 @@ C copy precursor_conc back to grid cell concentrations
          If ( n .Ne. 0 ) Then
             If ( precursor( spc )%update ) Then
                If ( precursor( spc )%rxncounter ) Then
-                  vtmp = precursor_mw( spc ) * gasconv
-                  conc( n ) = Max( real( precursor_conc( spc ) / vtmp, 4 ), min_gasconc  )
-                  COND_BUDGET( n )   = -1.0 *  conc( n ) 
                   conc( n ) = 0.0
-#ifdef sens
-                  do np = 1, npmax
-                     s_conc( np,n ) = 0.0
-                  end do
-#endif
                Else
                   vtmp = precursor_mw( spc ) * gasconv
                   conc( n ) = Max( real( precursor_conc( spc ) / vtmp, 4 ), min_gasconc  )
@@ -392,16 +343,9 @@ C copy precursor_conc back to grid cell concentrations
                   ! Convert Budget Process Numbers from ug m-3 to ppmv
                   ! for application to process analysis and ISAM
                   COND_BUDGET( n )   = COND_BUDGET( n )   / vtmp
+                  COAG_BUDGET( n,: ) = COAG_BUDGET( n,: ) / vtmp
                   NPF_BUDGET( n )    = NPF_BUDGET( n )    / vtmp
-#ifdef sens
-                  do np = 1, npmax
-                     If ( conc( n ) .Eq. min_gasconc ) Then
-                        s_conc( np,n ) = 0.0
-                     Else
-                        s_conc( np,n ) = Real( (s_precursor_conc( spc,np )/vtmp), 4 )
-                     End If
-                  end do
-#endif                  
+                  GROWTH_BUDGET( n ) = GROWTH_BUDGET( n ) / vtmp
                End If
             End If
          End If

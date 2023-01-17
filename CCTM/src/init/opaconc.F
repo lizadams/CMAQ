@@ -186,7 +186,7 @@
             IF ( W_VEL ) THEN
                VAR = VAR + 1 
                VTYPE3D( VAR ) = M3REAL
-               VNAME3D( VAR ) = 'W_VEL'
+               VNAME3D( VAR ) = 'WVEL'
                UNITS3D( VAR ) = 'm s-1'
                VDESC3D( VAR ) = 'Vertical Wind Velocity'
             END IF

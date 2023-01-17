@@ -36,7 +36,7 @@ C-----------------------------------------------------------------------
       USE RUNTIME_VARS
       USE HGRD_DEFN
       USE AERO_DATA, ONLY: N_MODE
-      USE DESID_VARS
+      USE EMIS_VARS
 
       IMPLICIT NONE
 
@@ -304,32 +304,28 @@ C Map aerospc data
 C Populate Master Emissions Map Vector So That Diagnostics 
 C can be printed in EMIS_MAP
             NSSSPC = NSEA_SPC
-            DESID_EMVAR( iseasrm )%len = nssspc*2
-            Allocate( DESID_EMVAR( iseasrm )%arry ( nssspc*2 ) )
-            Allocate( DESID_EMVAR( iseasrm )%units( nssspc*2 ) )
-            Allocate( DESID_EMVAR( iseasrm )%mw   ( nssspc*2 ) )
-            Allocate( DESID_EMVAR( iseasrm )%used ( nssspc*2 ) )
-            Allocate( DESID_EMVAR( iseasrm )%conv ( nssspc*2 ) )
-            Allocate( DESID_EMVAR( iseasrm )%basis( nssspc*2 ) )
-            Allocate( DESID_EMVAR( iseasrm )%larea( nssspc*2 ) )
-            Allocate( DESID_EMVAR( iseasrm )%lareaadj( nssspc*2 ) )
-            DESID_EMVAR( iseasrm )%arry( : ) = 'NOT_AVAILABLE'
+            Em_File_Surr( iseasrm )%len = nssspc*2
+            Allocate( Em_File_Surr( iseasrm )%arry ( nssspc*2 ) )
+            Allocate( Em_File_Surr( iseasrm )%units( nssspc*2 ) )
+            Allocate( Em_File_Surr( iseasrm )%mw   ( nssspc*2 ) )
+            Allocate( Em_File_Surr( iseasrm )%used ( nssspc*2 ) )
+            Allocate( Em_File_Surr( iseasrm )%conv ( nssspc*2 ) )
+            Allocate( Em_File_Surr( iseasrm )%basis( nssspc*2 ) )
+            Em_File_Surr( iseasrm )%arry( : ) = 'NOT_AVAILABLE'
             do i = 1,nssspc
               IF ( sea_spc( i )%spcfac(1) .NE. 0.0 .or. i .EQ. nssspc ) 
-     &           DESID_EMVAR( iseasrm )%arry( i )  =
+     &           Em_File_Surr( iseasrm )%arry( i )  =
      &                         "PMFINE_" // sea_spc(i)%name
               IF ( sea_spc( i )%spcfac(2) .NE. 0.0 .or. i .EQ. nssspc ) 
-     &           DESID_EMVAR( iseasrm )%arry( i+nssspc )  =
+     &           Em_File_Surr( iseasrm )%arry( i+nssspc )  =
      &                         "PMCOARSE_" // sea_spc(i)%name
-               DESID_EMVAR( iseasrm )%mw   ( i ) = sea_spc(i)%mw
-               DESID_EMVAR( iseasrm )%mw   ( i+nssspc ) = sea_spc(i)%mw
+               Em_File_Surr( iseasrm )%mw   ( i ) = sea_spc(i)%mw
+               Em_File_Surr( iseasrm )%mw   ( i+nssspc ) = sea_spc(i)%mw
             end do
-            DESID_EMVAR( iseasrm )%units( : ) = 'G/S'
-            DESID_EMVAR( iseasrm )%used ( : ) = .FALSE.
-            DESID_EMVAR( iseasrm )%conv ( : ) = 1.0
-            DESID_EMVAR( iseasrm )%basis( : ) = 'MASS'
-            DESID_EMVAR( iseasrm )%larea( : ) = .FALSE.
-            DESID_EMVAR( iseasrm )%lareaadj( : ) = .FALSE.
+            Em_File_Surr( iseasrm )%units( : ) = 'G/S'
+            Em_File_Surr( iseasrm )%used ( : ) = .FALSE.
+            Em_File_Surr( iseasrm )%conv ( : ) = 1.0
+            Em_File_Surr( iseasrm )%basis( : ) = 'MASS'
  
 C Allocate SS arrays using NSSSPC value
             ALLOCATE ( SSOUTM( NSSSPC*2,NCOLS,NROWS ),
@@ -513,8 +509,7 @@ C Open sea-salt emissions diagnostic file
          END SUBROUTINE OPSSEMIS
 
 C:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-         SUBROUTINE GET_SSEMIS ( JDATE, JTIME, TSTEP, CELLVOL, CELLHGT,
-     &                           L_DESID_DIAG )
+         SUBROUTINE GET_SSEMIS ( JDATE, JTIME, TSTEP, CELLVOL, CELLHGT )
 
 C GET_SSEMIS calculates the sea-salt emission rates in a grid cell
 C given the fractional grid-cell area covered by open ocean and surf zone
@@ -580,10 +575,9 @@ C-----------------------------------------------------------------------
 
 C Arguments
             INTEGER, INTENT( IN ) :: JDATE, JTIME, TSTEP( 3 )
-            REAL,    INTENT( IN ) :: CELLVOL(:,:)          ! grid-cell volume [m2*sigma]
-            REAL,    INTENT( IN ) :: CELLHGT      ! grid-cell height [sigma] 
-            LOGICAL, INTENT( IN ) :: L_DESID_DIAG ! flag for whether or not DESID 
-                                                  !     is in diagnostic mode
+            REAL,    INTENT( IN ) :: CELLVOL               ! grid-cell volume [m2*sigma]
+            REAL,    INTENT( IN ) :: CELLHGT               ! grid-cell height [sigma]
+
 C Includes:
             INCLUDE SUBST_FILES_ID  ! file name parameters
 
@@ -696,7 +690,7 @@ C Mathematical constants; statement function for ERF approximation
 C----------------------------- Begin calc ------------------------------
 
 C Initialize sea-salt output buffer
-            IF ( SSEMDIAG .AND. WSTEP .EQ. 0 .AND. .NOT. L_DESID_DIAG ) SSBF = 0.0
+            IF ( SSEMDIAG .AND. WSTEP .EQ. 0 ) SSBF = 0.0
             SEA_FACTNUM = 0.0
             SEA_FACTSRF = 0.0
 
@@ -900,7 +894,7 @@ C Multiply dry 2nd moment by PI to obtain dry surface area emission rate.
                   SEA_FACTSRF( 3,C,R ) = SSOUTS( 2,C,R ) / M3K
 
 C Update the SSBF array, for writing the diagnostic sea-salt-emission file.
-                  IF ( SSEMDIAG .AND. .NOT. L_DESID_DIAG ) THEN
+                  IF ( SSEMDIAG ) THEN
                      V = 0
                      DO N = 1, 2
                         DO S = 1, NSSSPC
@@ -921,7 +915,7 @@ C Update the SSBF array, for writing the diagnostic sea-salt-emission file.
                         SSOUTD( V ) = SSOUTS( N,C,R )
                      END DO
 
-                     AIRVOL = CELLVOL(C,R) / Met_Data%RJACM( C,R,1 )
+                     AIRVOL = CELLVOL / Met_Data%RJACM( C,R,1 )
 
                      DO S = 1, NSSDIAG
                         SSBF( S,C,R ) = SSBF( S,C,R ) + SSOUTD( S ) * AIRVOL
@@ -934,7 +928,7 @@ C Update the SSBF array, for writing the diagnostic sea-salt-emission file.
 
 C If last call this hour, write out the total sea-salt emissions [g/s].
 C Then reset the sea-salt emissions array and local write counter.
-            IF ( SSEMDIAG .AND. .NOT. L_DESID_DIAG ) THEN
+            IF ( SSEMDIAG ) THEN
 
 #ifdef parallel_io
                IF ( FIRSTIME ) THEN

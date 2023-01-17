@@ -104,10 +104,6 @@ C   21 Nov 19 S.L.Napelenok: Include DDM3D for versions 5.3.1
 C-----------------------------------------------------------------------
 
       USE RXNS_DATA             ! chemical mechanism data
-      USE BUDGET_DEFN
-      USE AERO_DATA
-      USE ELMO_DATA, ONLY : L_ELMO
-      USE ELMO_PROC, ONLY : ELMO_DRIVER, WRITE_ELMO, MAP_ELMO
 #ifdef mpas
       USE CGRID_SPCS            ! CGRID mechanism species
       USE HGRD_DEFN, ONLY: MYPE
@@ -118,6 +114,8 @@ C-----------------------------------------------------------------------
       use mydata_module
       use get_env_module
       use lus_defn
+      USE AERO_DATA
+
       use mio_module
 #else
       USE PCGRID_DEFN           ! inherits GRID_CONF
@@ -149,7 +147,7 @@ c     USE PMFRC_DEFN            ! MAPFRAC array definition ( adapted )
 #ifdef parallel
       USE VERTEXT_MODULE
 #endif
-      USE UTIL_FAMILY_MODULE
+
       USE CENTRALIZED_IO_MODULE
       USE lus_data_module
 
@@ -383,13 +381,6 @@ C Set CGRID mechanism
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, 1 )
          END IF
 
-#ifdef sens
-C Initialize ddm3d calculations
-         CALL INIT_DDM3D
-#endif
-
-         CALL MAP_AERO()
-
 #ifdef verbose_driver
          write( logdev,* ) ' MYPE -> NSPCS:    ', mype, nspcsd
 #endif
@@ -429,8 +420,15 @@ C Initialize stencil exchange
 C Generate the process analysis data: load PA_DEFN module
          CALL PA_DATAGEN( )
 
-C Abort if the number of output variables exceeds the maximum allowed
-C by I/O-API
+C Set up horizontal domain and calculate processor-to-subdomain maps for
+C process analysis, if required
+         IF ( LIPR .OR. LIRR ) THEN
+            IF ( .NOT. PAGRD_INIT( MYPE ) ) THEN
+               XMSG = '*** Failure defining PA domain configuration'
+               CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
+            END IF
+         END IF
+
          IF ( NSPCSD .GT. MXVARS3 ) THEN
             WRITE( XMSG,'(5X, A, I5, A)' ) 'The number of variables,', NSPCSD,
      &      ' to be written to the State CGRID File'
@@ -464,6 +462,10 @@ C Miscellaneous Configuration Operations
 c        CALL GET_SA_LAYS ()
          CALL SA_DIM()
 
+         N_SPCTAG = NSPC_SA * NTAG_SA
+
+         CALL GET_SPC_INDEX ()
+
 C Initialize PISAM
          IF ( .NOT. PISAM_INIT ( NSPC_SA, NTAG_SA ) ) THEN
             XMSG = 'Failure in defining SA horizontal domain'
@@ -471,6 +473,17 @@ C Initialize PISAM
          END IF
          ISAM => PISAM( 1:NCOLS,1:NROWS,:,:,: )
 
+C Allocate arrays of species indices, tagging indices, and
+C variable names for the combined species-tags
+C i.e. set s_spctag, t_spctag, and vnam_spctag
+         ALLOCATE ( S_SPCTAG( N_SPCTAG ) )
+         ALLOCATE ( T_SPCTAG( N_SPCTAG ) )
+         ALLOCATE ( VNAM_SPCTAG( N_SPCTAG ) )
+         ALLOCATE ( BCON_SPC( N_SPCTAG ) )
+
+C Assign BCON tag indicies used in advection
+         BCON_SPC = .FALSE.
+         BCON_SPC( ((BCONTAG - 1)*NSPC_SA+1) : (NSPC_SA*BCONTAG) ) = .TRUE.
 #endif
 
 C Initialize optional derived vertical velocity writes to conc file
@@ -481,6 +494,8 @@ C Initialize optional derived vertical velocity writes to conc file
 
 #ifdef sens
 C Initialize ddm3d calculations
+         CALL INIT_DDM3D
+
          IF ( .NOT. S_PCGRID_IN( NPMAX ) ) THEN
             XMSG = 'Failure defining horizontal sens domain'
             CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT2  )
@@ -501,15 +516,7 @@ C Initialize ddm3d calculations
 
 #endif
 
-C Initialize Global Arrays for Storing Chemical, Regional, Process,
-C and Emission Stream Families
-         call read_families
-
-C Initiliaze IO Arrays and Open Files
          call centralized_io_init
-
-C Initialize ELMO Arrays and Maps
-         call map_elmo
 
 C Initialize conc field: Copy IC's to CONC file as step 0
 C Convention: the input file concentration units are always ppmV.
@@ -526,7 +533,7 @@ C Convention: the input file concentration units are always ppmV.
          IF ( LIPR .OR. LIRR ) CALL PA_INIT ( CGRID, JDATE, JTIME, TSTEP )
 
 C Verify input file header consistency and run duration
-!         CALL FLCHECK ( JDATE, JTIME, TSTEP( 1 ) )
+         CALL FLCHECK ( JDATE, JTIME, TSTEP( 1 ) )
 
          ALLOCATE ( AGRID( NCOLS,NROWS,A_NLYS,N_ASPCS ), STAT = ALLOCSTAT )
          IF ( ALLOCSTAT .NE. 0 ) THEN
@@ -574,8 +581,8 @@ C Verify input file header consistency and run duration
 
         call setfile (EMIS_1)
 
-        if (ELMO) then
-           call fcreate (CTM_ELMO_1, io_mode)
+        if (pmdiag) then
+           call fcreate (CTM_PMDIAG_1, io_mode)
         end if
 
         call fcreate (CTM_DRY_DEP_1, io_mode)
@@ -701,34 +708,13 @@ C Get synchronization and advection time steps, TSTEP(2), ASTEP(L) and NREPS
       END IF
 #endif
 
-C Compute ELMO Values at Beginning of Main Time Step
-      IF ( L_ELMO ) THEN
-        IF ( JDATE .EQ. STDATE .AND. JTIME .EQ. STTIME ) THEN
-             
-             ! Calculate all ELMO variables for both Instantaneous and
-             ! Average parameters
-             CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP,
-     &                         INIT_TIME=.TRUE., INIT_STEP=.TRUE. )
-             ! Print Instantaneous Values at first time step
-             CALL WRITE_ELMO( JDATE, JTIME, TSTEP, INIT_TIME=.TRUE. )
-
-        ELSE
-             ! Calculate all ELMO Variables for averaging but do not output them
-             CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP,
-     &                         INIT_TIME=.FALSE., INIT_STEP=.TRUE. )
-        END IF
-      END IF
-
-C Initialize Budget Output File and Concentration Array
-      IF ( BUDGET_DIAG ) CALL BUDGET_INIT( CGRID, JDATE, JTIME, TSTEP )
-
 C science process sequence:
          
       myNREPS = myNREPS + NREPS
 
       DO IREP = 1, NREPS
 
-         CALL SCIPROC ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
+            CALL SCIPROC ( CGRID, JDATE, JTIME, TSTEP, ASTEP )
 
 #ifndef mpas
 C Use trapezoidal rule to time-average data
@@ -754,27 +740,24 @@ C Use trapezoidal rule to time-average data
      &      AVG_PRES( :,:,: ) = AVG_PRES + 2.0 * MET_DATA%PRES( :,:,ACONC_BLEV:ACONC_ELEV )
 
 #ifdef isam
-         ! average isam
-         DO ITAG = 1, NTAG_SA
-            DO V = 1, NSPC_SA
-               L = 0
-               DO K = AISAM_BLEV, AISAM_ELEV
-                  L = L + 1
-                  DO R = 1, NROWS
-                     DO C = 1, NCOLS
-                        AISAM( C,R,L,V,ITAG ) = AISAM( C,R,L,V,ITAG )
-     &                                        + 2.0 * ISAM( C,R,K,V,ITAG )
+            ! average isam
+            DO ITAG = 1, NTAG_SA
+               DO V = 1, NSPC_SA
+                  L = 0
+                  DO K = AISAM_BLEV, AISAM_ELEV
+                     L = L + 1
+                     DO R = 1, NROWS
+                        DO C = 1, NCOLS
+                           AISAM( C,R,L,V,ITAG ) = AISAM( C,R,L,V,ITAG )
+     &                                           + 2.0 * ISAM( C,R,K,V,ITAG )
+                        END DO
                      END DO
                   END DO
                END DO
             END DO
-         END DO
 #endif
 
 #endif
-         ! OUTPUT DIAGNOSTIC INFORMATION
-         IF ( L_ELMO ) CALL ELMO_DRIVER( CGRID, JDATE, JTIME, TSTEP, 
-     &                      INIT_TIME=.FALSE., INIT_STEP=.FALSE. )
 
       END DO
 
@@ -849,12 +832,8 @@ C write conc fields
 #ifdef sens
          CALL WR_ASENS ( JDATE, JTIME, TSTEP( 1 ) )
 #endif
-         IF ( L_ELMO ) CALL WRITE_ELMO( JDATE, JTIME, TSTEP, INIT_TIME=.FALSE. )
-
          IF ( LIPR .OR. LIRR ) CALL PA_OUTPUT ( CGRID, JDATE, JTIME )
-         IF ( BUDGET_DIAG ) CALL WRITE_BUDGET ( CGRID, JDATE, JTIME, TSTEP )
          IF ( PRINT_PROC_TIME ) CALL TIMING_SPLIT ( CPU_TIME_START, 3 )
-         
       END IF
 
 #ifdef twoway

@@ -82,18 +82,11 @@ C**********************************************************************
       USE UTILIO_DEFN
       USE GRVARS              ! inherits GRID_CONF
       USE AEROSOL_CHEMISTRY
-      USE DEGRADE_ROUTINES, ONLY : NCELLS, N_REACT, RXTANT_MAP,
-     &                              ICELL_WRITE, WRITE_CELL, WRITE_BLOCK,
-     &                              FIND_DEGRADED, INIT_DEGRADE_BLK, FINAL_DEGRADE_BLK
-
+      USE DEGRADE_SETUP_TOX, ONLY : N_REACT, RXTANT_MAP
       USE PHOT_MOD, Only: INIT_PHOT_SHARED, RJ     ! photolysis rate, in-line module
       USE PA_DEFN,  Only: LIRR                     ! Process Anaylsis control and data variable
       USE PA_IRR_CLT
       USE CENTRALIZED_IO_MODULE, ONLY : INTERPOLATE_VAR, OCEAN, SZONE
-#ifdef sens
-      USE DDM3D_CHEM, DDM_RK => RK
-      Use DDM3D_DEFN, Only: DATENUM, STARTDATE, IPT, IDATE, HIGH, NP, NPMAX, CKTIME
-#endif
 
       IMPLICIT NONE 
 
@@ -195,7 +188,7 @@ C..SCRATCH LOCAL VARIABLES:
       REAL, ALLOCATABLE, SAVE :: QV     ( :, :, : )      ! Cell water vapor (Kg/Kg air)
       REAL, ALLOCATABLE, SAVE :: TA     ( :, :, : )      ! Cell temperature (K)
 
-      REAL, ALLOCATABLE, SAVE :: SEAWATER_ZONE   ( :,: ) ! fractional area of OPEN+SURF       
+      LOGICAL, ALLOCATABLE, SAVE :: LAND_ZONE   ( :,: )       ! Is the surface totally land?
 
       REAL( 8 ), ALLOCATABLE, SAVE :: Y_DEGRADE ( : , : ) ! concentration array used
                                                           ! by degradation routines
@@ -219,6 +212,25 @@ C..SCRATCH LOCAL VARIABLES:
             LOGICAL,   INTENT( IN ) :: LIRRFLAG     ! Flag for IRR calculations
             REAL( 8 ), INTENT( IN ) :: CHEMSTEP     ! Chemistry integration interval (min) 
          END SUBROUTINE SMVGEAR
+         SUBROUTINE FIND_DEGRADED( JDATE, JTIME, CALL_DEGRADE )
+           INTEGER, INTENT( IN )  :: JDATE        ! current model date , coded YYYYDDD
+           INTEGER, INTENT( IN )  :: JTIME        ! current model time , coded HHMMSS
+           LOGICAL, INTENT( OUT ) :: CALL_DEGRADE ! whether to call degradation routines
+         END SUBROUTINE FIND_DEGRADED
+         SUBROUTINE INIT_DEGRADE( CBLK, TCELL, DCELL, PHOTO_CELL, NUMCELLS,
+     &                         JDATE, JTIME, BLKID )
+           REAL( 8 ), INTENT( IN ) :: CBLK ( :, : )      !  species concentration in cell
+           REAL( 8 ), INTENT( IN ) :: TCELL( : )         !  cell temperature  [ k ]
+           REAL( 8 ), INTENT( IN ) :: DCELL( : )         !  cell air density  [ kg/m^3 ]
+           REAL( 8 ), INTENT( IN ) :: PHOTO_CELL( :, : ) !  Photolysis table for cell [1/s]
+           INTEGER,   INTENT( IN ) :: NUMCELLS  ! number of grid cells in block
+           INTEGER,   INTENT( IN ) :: JDATE     ! current model date , coded YYYYDDD
+           INTEGER,   INTENT( IN ) :: JTIME     ! current model time , coded HHMMSS
+           INTEGER,   INTENT( IN ) :: BLKID     ! number for the block
+         END SUBROUTINE INIT_DEGRADE      
+         SUBROUTINE FINAL_DEGRADE( CBLK )
+           REAL( 8 ), INTENT( INOUT ) :: CBLK( :, : ) ! species conc in cell
+         END SUBROUTINE FINAL_DEGRADE
          SUBROUTINE HETCHEM_UPDATE_AERO( CGRID )
            REAL, POINTER :: CGRID( :,:,:,: )    !  species concentration in cell
          END SUBROUTINE HETCHEM_UPDATE_AERO       
@@ -262,11 +274,15 @@ C...Initialize and report data
 
          WRITE( LOGDEV, 92040 ) ERRMAX( 1 ), YLOW( 1 )
 
-         ALLOCATE( SEAWATER_ZONE( NCOLS, NROWS ) )
+         ALLOCATE( LAND_ZONE( NCOLS, NROWS ) )
          
          DO ROW = 1, NROWS
             DO COL = 1, NCOLS
-               SEAWATER_ZONE( COL,ROW ) =  OCEAN( COL,ROW ) + SZONE( COL,ROW )                  
+               IF( OCEAN( COL,ROW ) + SZONE( COL,ROW ) .GT. 0.0 )THEN
+                   LAND_ZONE( COL,ROW ) = .FALSE.
+               ELSE
+                   LAND_ZONE( COL,ROW ) = .TRUE.
+               END IF
              END DO
          END DO
 
@@ -296,20 +312,6 @@ C:WTH set up degradation array
 
          ALLOCATE( Y_DEGRADE( BLKSIZE, NSPCSD ) )
 
-#ifdef sens
-         CALL INIT_DDM3D_CHEM()
-
-C For higher order sensitivities
-         IF ( HIGH ) THEN
-            DO IRXN = 1, NRXNS
-               IF( NREACT( IRXN ) .LE. 1 ) THEN
-                  ORDER1( IRXN ) = .TRUE.
-               ELSE
-                  ORDER1( IRXN ) = .FALSE.
-               END IF
-            END DO
-         END IF
-#endif
       ENDIF      ! First call
 
 #ifdef sunws
@@ -359,21 +361,6 @@ C   store the initial surface area so that it can be updated after the
 C   solver finds a solution.
 
       CALL HETCHEM_RATES( TA, PRES, QV, CONC, DENS )
-
-#ifdef sens
-C Set the date and hour counters used in sensitivity calls
-      DATENUM = 1 + JDATE - STARTDATE 
-
-C For reaction rate sensitivities
-      DO NP = 1, NPMAX
-         IF ( IPT( NP ) .EQ. 5 ) THEN
-            CALL CKTIME( JDATE,JTIME,NP,RXNFLAG(NP) ) ! Rxnflag set to true if ipt=5 and time, date within bounds
-            IF ( IDATE( NP, DATENUM ) .NE. 1 ) RXNFLAG( NP ) = .FALSE.
-         ELSE
-            RXNFLAG( NP ) = .FALSE.
-         END IF
-      END DO
-#endif
       
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 c  Set flag for reordering of cells and put cells in sequential  
@@ -438,7 +425,11 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
             BLKSVOL( NCELL ) = 1.0 / DENS( COL,ROW,LEV )
             BLKPRES( NCELL ) = REAL( PA2ATM * PRES( COL, ROW, LEV ), 8 )
             BLKCH2O( NCELL ) = REAL( MAX( QV( COL,ROW,LEV ) * MAOMV * CONCOFM, 0.0 ), 8)
-            BLKSEAWATER (NCELL)  = MAX ( 0.0, ( SEAWATER_ZONE( COL,ROW ) - SEAICE (COL,ROW) ) )
+            IF( LAND_ZONE( COL,ROW ) .OR. SEAICE (COL,ROW) .GT. 0.0 )THEN
+                BLKLAND (NCELL) = .TRUE.
+            ELSE
+                BLKLAND (NCELL) = .FALSE.
+            END IF            
          ENDDO
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -459,9 +450,6 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                    CNEW( NCELL,ISPNEW ) = REAL( MAX( CONC( COL,ROW,LEV,SPC ), CONCMIN), 8 )
                END IF
                BLKCONC( NCELL, ISP ) = CNEW( NCELL,ISPNEW )
-#ifdef sens
-               CINIT( NCELL, ISP )   = CNEW( NCELL,ISPNEW )
-#endif
             ENDDO                 
          ENDDO
 
@@ -485,7 +473,7 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          ENDDO
          
 !        CALL CALCKS( NPHOTAB, RJBLK )
-         CALL CALC_RCONST( BLKTEMP, BLKPRES, BLKCH2O, RJBLK, BLKHET, LSUNLIGHT, BLKSEAWATER, RK, NUMCELLS )         
+         CALL CALC_RCONST( BLKTEMP, BLKPRES, BLKCH2O, RJBLK, BLKHET, LSUNLIGHT, BLKLAND, RK, NUMCELLS )
 
          IF ( LSUNLIGHT ) THEN
             HMAX = HMAXDAY( NCS )
@@ -499,7 +487,6 @@ C..WTH: Put concentrations into degradation array
 
          IF ( CALL_DEG ) THEN
             Y_DEGRADE = 0.0D0
-! Use FPP flag to check results from species degrade routines
             DO ISP = 1, NSPCSD
                DO NCELL = 1, NUMCELLS
                   CELLNUM = NORDCELL( OFFSET + NCELL )
@@ -510,28 +497,10 @@ C..WTH: Put concentrations into degradation array
                ENDDO                 
             ENDDO
 
-! Use FPP flag to check results from species degrade routines
-#ifdef verbose_gas
-            WRITE_BLOCK = .FALSE.
-            ICELL_WRITE = 1
-            DO NCELL = 1, NUMCELLS
-                CELLNUM = NORDCELL( OFFSET + NCELL )
-                COL = CCOL( CELLNUM )
-                ROW = CROW( CELLNUM )
-                LEV = CLEV( CELLNUM )
-                IF( LEV .EQ. 1 .AND. ROW .EQ. 1 .AND. COL .EQ. 1 )THEN
-                    WRITE_BLOCK = .TRUE.
-                    ICELL_WRITE = NCELL
-                    WRITE_CELL( NCELL ) = .TRUE.
-                ELSE
-                    WRITE_CELL( NCELL ) = .FALSE.
-                END IF
-            END DO
-#endif
 C..initialize degradation routines
-            NCELLS = NUMCELLS 
-            CALL INIT_DEGRADE_BLK( Y_DEGRADE, BLKTEMP, BLKDENS, BLKPRES, BLKCH2O, RJBLK, 
-     &                         JDATE, JTIME )
+              
+            CALL INIT_DEGRADE( Y_DEGRADE, BLKTEMP, BLKDENS, RJBLK, 
+     &                         NUMCELLS, JDATE, JTIME, BLKID )
   
          ENDIF
 
@@ -569,7 +538,7 @@ C..Output IC for a block
                WRITE( IUNBIC ) ( BLKTEMP( NCELL ),  NCELL = 1, NUMCELLS )
                WRITE( IUNBIC ) ( BLKPRES( NCELL ),  NCELL = 1, NUMCELLS )
                WRITE( IUNBIC ) ( BLKCH2O( NCELL ),  NCELL = 1, NUMCELLS )
-               WRITE( IUNBIC ) ( BLKSEAWATER( NCELL ),  NCELL = 1, NUMCELLS )
+               WRITE( IUNBIC ) ( BLKLAND( NCELL ),  NCELL = 1, NUMCELLS )
 
                DO ISP = 1, ISCHANG( NCS )
                   WRITE( IUNBIC ) CHEMISTRY_SPC( ISP ), ( BLKCONC( NCELL, ISP ),
@@ -597,7 +566,7 @@ C..Output IC for a cell
                WRITE( IUNCIC,93040 ) BLKTEMP( INUMCELL ) 
                WRITE( IUNCIC,93060 ) BLKCH2O( INUMCELL )
                WRITE( IUNCIC,93080 ) BLKPRES( INUMCELL )
-               WRITE( IUNCIC,93085 ) BLKSEAWATER( INUMCELL )
+               WRITE( IUNCIC,93085 ) BLKLAND( INUMCELL )
 
                DO NPH = 1, NMPHOT
                   IRXN = IPH( NPH, 1 )
@@ -647,8 +616,8 @@ C..debug output
      &                                      BLKTEMP( NUMCELLS )
                      WRITE( IUNDBG, 93300 ) BLKPRES( 1 ), BLKPRES( NMID ),
      &                                      BLKPRES( NUMCELLS ) 
-                     WRITE( IUNDBG, 93305 ) BLKSEAWATER( 1 ), BLKSEAWATER( NMID ),
-     &                                      BLKSEAWATER( NUMCELLS ) 
+                     WRITE( IUNDBG, 93305 ) BLKLAND( 1 ), BLKLAND( NMID ),
+     &                                      BLKLAND( NUMCELLS ) 
                   ENDIF
                ENDDO
             ENDIF
@@ -723,9 +692,6 @@ C..Update concentrations
                   ROW = CROW( CELLNUM )
                   COL = CCOL( CELLNUM )
                   LEV = CLEV( CELLNUM )
-#ifdef sens
-                  CFINI( NCELL, ISPOLD )   = CNEW( NCELL,ISP )
-#endif
                   IF( CONVERT_CONC( ISPOLD ) )THEN 
                      CONC( COL,ROW,LEV,SPC ) = REAL( REVERSE_CONV( ISPOLD ) 
      &                                       *       BLKDENS( NCELL ) * CNEW( NCELL,ISP ), 4)
@@ -750,7 +716,7 @@ C               END DO
 
 
 C  Update CGRID based on the degradation routines
-               CALL FINAL_DEGRADE_BLK( Y_DEGRADE )
+               CALL FINAL_DEGRADE( Y_DEGRADE )
                UPDATE_DEGRADED: DO ISP = 1, N_REACT
                   VAR = RXTANT_MAP( ISP )
                   IF( VAR .LE. 0 )CYCLE UPDATE_DEGRADED
@@ -769,39 +735,8 @@ C  Update CGRID based on the degradation routines
              
              IF ( LIRRBLK ) CALL PA_IRR_BLKENDC ( OFFSET, CCOL, CROW, CLEV,
      &                                            NORDCELL, NIRRCLS, IRRCELL )
-
-#ifdef sens
-            
-            DO NCELL = 1, NUMCELLS
-               DO IRXN = 1, NRXNS
-                  SRK( IRXN ) = RK( NCELL,IRXN )
-                  IF ( HIGH ) THEN
-                     IF ( NREACT( IRXN ) .LE. 1 ) THEN
-                        SRK2( IRXN ) = 0.0
-                     ELSE IF ( NREACT( IRXN ) .EQ. 2 ) THEN
-                        SRK2( IRXN ) = REAL( RK( NCELL,IRXN ), 4 )
-                     ELSE IF ( NREACT( IRXN ) .EQ. 3 ) THEN
-                        SRK2( IRXN ) = REAL( RK( NCELL,IRXN ),4 )
-                     ELSE
-                        SRK2( IRXN ) = 0.0
-                     END IF
-                  END IF
-              END DO
-
-              DO ISP = 1,NUMB_MECH_SPC
-!                  ISPOLD = INEW2OLD( ISP,NCS )
-!                   YCDDM( ISP ) = 0.5D0 * ( CINIT(NCELL,ISP)+CFINI( NCELL,ISP ) )
-                  YCDDM( ISP ) = CAVEG(NCELL,ISP)
-               END DO
-               CELLNUM = NORDCELL( OFFSET + NCELL )
-               COL = CCOL( CELLNUM )
-               ROW = CROW( CELLNUM )
-               LEV = CLEV( CELLNUM )
-                CALL SOLVE_DDM3D_CHEM( COL,ROW,LEV,CHEMSTEP )
-!               CALL SOLVE_DDM3D_CHEM( COL,ROW,LEV,CHEMSTEP,IOLD2NEW,INEW2OLD )
-            END DO
-#endif
          ENDIF
+
 500   CONTINUE
 
 ccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -915,7 +850,7 @@ C*********************** FORMAT STATEMENTS ****************************
 93040 FORMAT(   'TEMP', 1X, 1PE15.6 )
 93060 FORMAT(   'H2O ', 1X, 1PE15.6 )
 93080 FORMAT(   'PRES', 1X, 1PE15.6 )
-93085 FORMAT(   'SEAWATER', 1X, 1PE15.6 )
+93085 FORMAT(   'LAND', 1X, L15 )
 93100 FORMAT(   I3, 1X, 1PE15.6 )
 93120 FORMAT(   1X, 'Rate constants at start of irun=', I4, 
      &              ' block=', I4 )
@@ -929,7 +864,7 @@ C*********************** FORMAT STATEMENTS ****************************
 93260 FORMAT(   1X, 'C(0)= ', I3, 2X, 'H2O ', 2X, 3( 1PE20.10 ) )
 93280 FORMAT(   1X, 'TEMP (K)         =   ', 3( 1PE20.10 ) )
 93300 FORMAT(   1X, 'PRESS(ATM)       =   ', 3( 1PE20.10 ) )
-93305 FORMAT(   1X, 'SEAWATER (-)          =   ', 3( 1PE20.10 ) )
+93305 FORMAT(   1X, 'LAND(True/False) =   ', 3( L20 ) )
 93320 FORMAT(  /1X, 'Species concentrations at end of irun=', I4,
      &              ' Cell=', I5 )
 93340 FORMAT(   1x, 'C(end)= ', I3, 2x, A4, 2x, 1PE20.8)

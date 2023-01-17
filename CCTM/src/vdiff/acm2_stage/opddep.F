@@ -106,7 +106,7 @@ C Set output file characteristics based on COORD.EXT and open the dry dep file
          STIME3D = JTIME
          TSTEP3D = TSTEP
          CALL NEXTIME( SDATE3D, STIME3D, TSTEP3D ) !  start the next hour
-         NVARS3D = N_SPC_DDEP + N_BD_EMIS + N_BD_FLUX 
+         NVARS3D = N_SPC_DDEP + N_BD_EMIS + N_BD_FLUX
          NCOLS3D = GL_NCOLS
          NROWS3D = GL_NROWS
          NLAYS3D =     1

@@ -43,7 +43,6 @@ C-----------------------------------------------------------------------
       USE PA_IPRVARS
       USE PA_DEFN, Only: LFULLIRR, LPARTIRR, N_IPR_SPC, IRRNAME
       USE PA_PARSE
-      use get_env_module 
 
       IMPLICIT NONE
       
@@ -114,8 +113,6 @@ C Local Variables
       LOGICAL LRXINC( MXRXNS )  ! Flag to include reaction in prod,
                                 ! loss, or net operations
       REAL    COEFFS( MXRXNS )  ! Coefficients of operator reactions
-      INTEGER ASTAT
-      CHARACTER(200) :: PACM_NAME
 
 C-----------------------------------------------------------------------
 
@@ -126,13 +123,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       LRDONLY = .FALSE.
       LFMTTED = .TRUE.
 
-      !IOUT = GETEFILE ( PACM_REPORT, LRDONLY, LFMTTED, PNAME )
-      IOUT = JUNIT()
-      CALL GET_ENV( PACM_NAME, 'PACM_REPORT', 'PACM_REPORT' )
-      OPEN ( UNIT = IOUT, FILE = PACM_NAME, STATUS='UNKNOWN', FORM='FORMATTED', IOSTAT=ASTAT )
-      IF ( ASTAT .NE. 0 ) THEN
+      IOUT = GETEFILE ( PACM_REPORT, LRDONLY, LFMTTED, PNAME )
+      IF ( IOUT .LT. 0 ) THEN
          MSG = 'ERROR: Could not open PA_REPORT output file'
-         CALL M3EXIT( PNAME, IZERO, IZERO, MSG, ASTAT )
+         CALL M3EXIT( PNAME, IZERO, IZERO, MSG, XSTAT2 )
       END IF
 
 cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
@@ -193,9 +187,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
          DO NIPR = 1, N_IPR_SPC  
             DO N = 1, N_IPR_OPS( NIPR )
                ICOUNT = ICOUNT + 1
-               WRITE( IOUT, '(A17,I3,A4,A4,A4,A)' ) '      IPR_OUTPUT(', 
-     &                ICOUNT, ') = ', IPR_OPNAME( NIPR, N ),
-     &                ' of ', IPR_SPNAM( NIPR ) 
+               E1 = LEN_TRIM( IPR_OPNAME( NIPR,N ) )
+               WRITE( IOUT, 93160 ) ICOUNT, 
+     &                              IPR_OPNAME( NIPR, N )( 1:E1 ),  
+     &                              IPR_SPNAM( NIPR )
             END DO
          END DO
          WRITE( IOUT, 93000 ) 
@@ -793,6 +788,7 @@ C----------------------- Format Statements -----------------------------
      &        '   The referenced families are defined as follows:'/
      &        ' ' )
 93140 FORMAT( ' ' )
+93160 FORMAT( '      IPR_OUTPUT(', I3, ') = ', A, ' of ', A ) 
 93180 FORMAT( 20X, 'Integrated Reaction Rate Section'/
      &        '   A FULL IRR analysis has been requested. Each reaction', 
      &          ' rate will be'/

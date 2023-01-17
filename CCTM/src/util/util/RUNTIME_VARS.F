@@ -57,10 +57,6 @@
 !  10 Feb 2020 (D. Wong) 
 !     -- Added new environmental variable, MET_TSTEP, to enable
 !        running with temporally finer meteorology
-!  10 Jun 2021 (G. Sarwar)
-!     -- Added 'CB6R5M' and deleted "CB6R3M"
-!  4 Mar 2022 (G. Sarwar)
-!     -- Added 'CB6R5'
 !....................................................................
 
       MODULE RUNTIME_VARS
@@ -112,8 +108,7 @@
 
       ! Grid and High-Level Model Parameters
       LOGICAL :: NEW_START       = .TRUE.   ! Start New Simulation. Not a Restart
-      LOGICAL :: IGNORE_SOILINP  = .FALSE.   ! In case you don't have prev day
-      CHARACTER(300):: EXECUTION_ID = ''    ! Execution ID
+      CHARACTER(1) :: ISAM_NEW_START = 'Y'  ! Start New Simulation. Not a Restart for ISAM
       CHARACTER(16) :: GRID_NAME = ''       ! grid name selected from GRIDDESC
       CHARACTER(16) :: PROGNAME  = 'DRIVER' ! Program name selected from GRIDDESC
       INTEGER :: RUNLEN          = 480000   ! Run Length
@@ -170,31 +165,31 @@
       REAL    :: GLBL_RTOL = 1.0E-3  ! Relative Tolerance for Rosenbrock Solver
 
       ! Aerosols
-      LOGICAL :: IC_AERO_M2WET=.FALSE.! flag for specifying wet aerosol size parameters 
-                                      !   for initial conditions. FALSE = dry
-      LOGICAL :: BC_AERO_M2WET=.FALSE.! flag for specifying wet aerosol size parameters 
-                                      !   for boundary conditions. FALSE = dry
-      LOGICAL :: IC_AERO_M2USE=.TRUE. ! flag for using the second moment from the input file
-                                          !   for initial conditions. TRUE = use input 2nd moment
-      LOGICAL :: BC_AERO_M2USE=.TRUE. ! flag for using the second moment from the input file
-                                          !   for boundary conditions.TRUE = use input 2nd moment
+      LOGICAL :: AVISDIAG  = .FALSE. ! flag for PMDIAG and APMDIAG file [F], default
+      LOGICAL :: ZERO_PCSOA= .FALSE. ! flag for Zeroing out pcSOA formation
+      LOGICAL :: AOD       = .FALSE. ! flag for printing AOD file
+      LOGICAL :: PMDIAG    = .FALSE. ! flag for Instantaneous PM Diagnostic file
+      LOGICAL :: APMDIAG   = .FALSE. ! flag for Average PM Diagnostic file
+      INTEGER :: APMDIAG_ZLO  = 0    ! PM Diagnostic File Lower Layer
+      INTEGER :: APMDIAG_ZHI  = 0    ! PM Diagnostic File Upper Layer
+      INTEGER :: N_APMDIAG_SPC= 0    ! PM Diagnostic File Number of Species
+      CHARACTER(  16 ) :: APMDIAG_SPC( 200 ) = '' !PM Diagnostic File Species Names
 
       ! Cloud Parameters
       LOGICAL :: CLD_DIAG  = .FALSE. ! flag to output cloud diagnostic files
 
       ! Air-Surface Exchange
-      LOGICAL :: ABFLUX     = .FALSE. ! flag for ammonia bi-directional flux with in-lining depv
-      LOGICAL :: MOSAIC     = .FALSE. ! flag for STAGE mosaic - output land use specific deposition and deposition velocity
-      LOGICAL :: SFC_HONO   = .FALSE. ! flag for HONO interaction with surfaces 
-      LOGICAL :: PX_LSM     = .TRUE.  ! flag for WRF PX land surface model
-      LOGICAL :: CLM_LSM    = .FALSE. ! flag for WRF CLM land surface model
-      LOGICAL :: NOAH_LSM   = .TRUE.  ! flag for WRF NOAH land surface model
-      LOGICAL :: DEPV_DIAG  = .FALSE. ! flag for grid cell deposition velocity diagnostic file
-      Logical :: HGBIDI     = .FALSE. ! flag for Hg bidirectional exchange
+      LOGICAL :: ABFLUX    = .FALSE. ! flag for ammonia bi-directional flux with in-lining depv
+      LOGICAL :: MOSAIC    = .FALSE. ! flag for mosaic - luc specific deposition - within in-lining depv
+      LOGICAL :: SFC_HONO  = .FALSE. ! flag for HONO interaction with surfaces within in-lining depv
+      LOGICAL :: FST       = .FALSE. ! flag for mosaic - luc specific deposition - stomatal flux only - within in-lining depv
+      LOGICAL :: PX_LSM    = .TRUE.  ! flag for mosaic - luc specific deposition - stomatal flux only - within in-lining depv
+      LOGICAL :: CLM_LSM   = .FALSE. ! flag for mosaic - luc specific deposition - stomatal flux only - within in-lining depv
+      LOGICAL :: NOAH_LSM  = .TRUE.  ! flag for mosaic - luc specific deposition - stomatal flux only - within in-lining depv
+      LOGICAL :: STAGE     = .FALSE. ! flag for mosaic - luc specific deposition - stomatal flux only - within in-lining depv
+      LOGICAL :: DEPV_DIAG = .FALSE. ! flag for mosaic - luc specific deposition - stomatal flux only - within in-lining depv
+      Logical :: HGBIDI    = .FALSE. ! flag for Hg bidirectional exchange
       Logical :: BIDI_FERT_NH3 = .TRUE. ! flag to remove fertilizer ammonia from Bidirectional emissions
-      Logical :: STAGE_E20 = .TRUE.   ! flag for the Emerson et al. 2020 Aerosol deposition model PNAS https://www.pnas.org/cgi/doi/10.1073/pnas.2014761117
-      Logical :: STAGE_P22 = .FALSE.  ! flag for the Pleim et al. 2022 Aerosol deposition model
-      Logical :: STAGE_S22 = .FALSE.  ! flag for the Shu et al. 2022 Aerosol deposition model
       CHARACTER(16) :: DUST_LAND_SCHEME = "UNKNOWN" ! NLCD, USGS, etc
  
 
@@ -209,25 +204,22 @@
 
 
       ! Emissions Processes
-      CHARACTER( MAXLEN_CCTM_APPL ) :: STAGECTRL  = 'STAGECTRL_NML' ! STAGE Deposition Control Filename
-      CHARACTER( MAXLEN_CCTM_APPL ) :: MISC_CTRL  = 'MISC_CTRL_NML' ! Emission Control Filename
-      CHARACTER( MAXLEN_CCTM_APPL ) :: DESID_CTRL  = 'DESID_CTRL_NML' ! Emission Control Filename
-      CHARACTER( MAXLEN_CCTM_APPL ) :: DESID_CHEM_CTRL  = 'DESID_CHEM_CTRL_NML' ! Emission Control Filename
+      CHARACTER( MAXLEN_CCTM_APPL ) :: EMISSCTRL  = 'EMISSCTRL_NML' ! Emission Control Filename
       INTEGER :: EMLAYS_MX     = 0       ! Emission Layers
       INTEGER :: N_FILE_GR     = 0       ! Number of Gridded Emission Files
       INTEGER :: N_FILE_TR     = 0       ! NUmber of Tracer Emission Files
       LOGICAL :: EMISCHK       = .TRUE.  ! flag for checking that surrogate emissions 
                                                !   are present on emission files
-      LOGICAL :: BIOGEMIS_BEIS = .FALSE. ! flag to in-line biogenic VOC emissions
-      LOGICAL :: BIOGEMIS_MEGAN= .FALSE. ! flag to in-line MEGAN biogenic emissions
-      LOGICAL :: USE_MEGAN_LAI = .FALSE. ! flag to use MEGAN LAI values
-      LOGICAL :: MGN_ONLN_DEP  = .FALSE. ! flag to use ONLINE N deposition in BDSNP
-      LOGICAL :: BDSNP_MEGAN   = .FALSE. ! flag to use BDSNP for soil NO 
+      LOGICAL :: BIOGEMIS      = .FALSE. ! flag to in-line biogenic VOC emissions
       CHARACTER(16) :: SPPRO   = 'DEFAULT' ! requested speciation profile name
+      LOGICAL :: BIOGEMIS_SEASON=.FALSE. ! use frost switch file
+      LOGICAL :: ASSUME_SUMMER = .TRUE.  ! use summer normalized emissions
       LOGICAL :: BEMIS_DIAG    = .TRUE.  ! true: write diagnostic emiss file
       LOGICAL :: MGEMDIAG      = .FALSE. ! flag for MGEM diagnostic file
       LOGICAL :: OCEAN_CHEM    = .TRUE.  ! Flag for ocean halogen chemistry and sea spray aerosol emissions
       LOGICAL :: WB_DUST       = .FALSE. ! flag for On-Line Dust Emission Calculation
+      LOGICAL :: ERODE_AGLAND  = .FALSE.  ! Account for Erodible Agricultural Land when 
+                                               !   computing dust Emissions
       LOGICAL :: DUSTEM_DIAG   = .FALSE. ! flag for dustemis diagnostic file
       LOGICAL :: SSEMDIAG      = .FALSE. ! flag for SSEMIS diagnostic file
       LOGICAL :: LTNG_NO       = .FALSE. ! flag for online calculation of NO from lightning
@@ -246,6 +238,8 @@
       INTEGER :: PT_TIME       = 0       ! start time (HHMMSS)
       INTEGER :: IPVERT        = 0       ! Numerical flag for plume vertical spread method
       INTEGER :: REP_LAYR      = -1      ! Minimum layer for reporting srcs w/ high plumes
+      CHARACTER( 6 ) :: EMISDIAG = 'FALSE' ! Default Assumption for
+                                         !     Emissions Diagnostic File Output
       LOGICAL :: EMIS_SYM_DATE = .FALSE.  ! Overrider CMAQ not to check
                                           ! if the dates on the emissions file match that of 
                                           ! the interal model (representative day case)
@@ -267,30 +261,12 @@
       LOGICAL :: ADJ_STMSPC = .TRUE.  ! flag for normalizing sulfur tracking species
 
       ! ISAM
-      CHARACTER(1) :: ISAM_NEW_START = 'Y'  ! Start New Simulation. Not a Restart for ISAM
-      INTEGER :: ISAM_BLEV = 0              ! Beginning level saved to conc file
-      INTEGER :: ISAM_ELEV = 0              ! Ending level saved to conc file
-      INTEGER :: SA_NLAYS = 0               ! Number of layers saved to conc file
-      INTEGER :: AISAM_BLEV = 0             ! Beginning level saved to sa_aconc file
-      INTEGER :: AISAM_ELEV = 0             ! Ending level saved to sa_aconc file
-      INTEGER :: AVGSA_LAYS = 0             ! Number of layers saved to conc file
-      INTEGER :: ISAM_CHEM_BIAS = 5         ! which chemistry are biased in apportioning reaction yields
-                                            ! to source reactant
-                                            ! 1 for none so divided equally between sources' reactant
-                                            ! 2 for all products apportioned to sources with NO, NO2, NO3, HONO, ANO3
-                                            !   -equally if reactants are neither or both
-                                            ! 3 for all products apportioned to sources with Case 2 plus select OVOC species 
-                                            ! and radicals
-                                            !   -equally if reactants are neither or both
-                                            ! 4 for all products apportioned to sources with select OVOC species 
-                                            ! and radicals
-                                            !   -equally if reactants are neither or both
-                                            ! 5 to switch between Cases 2 and 3 based on whether
-                                            ! production H2O2 over production HNO3 less than VOC_NOX_TRANS
-                                   
-      REAL     :: VOC_NOX_TRANS = 0.35      ! H2O2 to HNO3 marking transition from NOx to VOC limiting O3 production 
-      INTEGER  :: ISAM_NOX_CASE = 2         ! option of ISAM_CHEM_BIAS representing NOx limiting O3 production
-      INTEGER  :: ISAM_VOC_CASE = 4         ! option of ISAM_CHEM_BIAS representing VOC limiting O3 production
+      INTEGER :: ISAM_BLEV = 0  ! Beginning level saved to conc file
+      INTEGER :: ISAM_ELEV = 0  ! Ending level saved to conc file
+      INTEGER :: SA_NLAYS = 0   ! Number of layers saved to conc file
+      INTEGER :: AISAM_BLEV = 0 ! Beginning level saved to sa_aconc file
+      INTEGER :: AISAM_ELEV = 0 ! Ending level saved to sa_aconc file
+      INTEGER :: AVGSA_LAYS = 0 ! Number of layers saved to conc file
 
       CONTAINS
           
@@ -320,14 +296,13 @@
 
 
       INTEGER          :: STATUS      ! ENV... status
-      CHARACTER( 400 ) :: STRTEMP
+      CHARACTER( 250 ) :: STRTEMP
       CHARACTER( 80 )  :: PBASE     
       INTEGER, PARAMETER :: EXIT_STATUS = 1
       INTEGER          :: ERROR
       INTEGER          :: VARDEV = -1
 
       LOGICAL          :: FOUND
-      LOGICAL          :: EFLAG = .FALSE.
       INTEGER          :: LOC, STR_LEN
       CHARACTER(10)    :: WRF_VERSION
 
@@ -366,14 +341,10 @@
  
       ! Determine if this run is a new start or a restart
       CALL GET_ENV ( NEW_START, 'NEW_START', NEW_START, VARDEV )
-
-      ! Determine if prev day soilinp is available for MEGAN
-      CALL GET_ENV ( IGNORE_SOILINP, 'IGNORE_SOILINP', IGNORE_SOILINP, VARDEV )
     
-      ! Get Execution ID
-      CALL GET_ENV ( STRTEMP, 'EXECUTION_ID', EXECUTION_ID, VARDEV )
-      EXECUTION_ID = STRTEMP(1:300)
-
+      ! Determine if this run is a new start or a restart
+      CALL GET_ENV ( ISAM_NEW_START, 'ISAM_NEW_START', ISAM_NEW_START, VARDEV )
+    
       ! Get Grid Name
       CALL GET_ENV ( STRTEMP, 'GRID_NAME', GRID_NAME, VARDEV )
       GRID_NAME = STRTEMP(1:16)
@@ -479,51 +450,7 @@
          CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
       END IF
 
-      ! PWRTFLAG
-      CALL GET_ENV ( PWRTFLAG, 'IOAPI_LOG_WRITE', PWRTFLAG, VARDEV )
-
-      ! Get Flag for Vertical Extraction
-      CALL GET_ENV ( LVEXT, 'VERTEXT', LVEXT, VARDEV )
-#ifdef parallel
-      ! Get Filepath for File Specifying Lon-Lat Coordinates for
-      ! Vertical Extraction
-      CALL GET_ENV ( VEXT_COORD_PATH, 'VERTEXT_COORD_PATH', VEXT_COORD_PATH, VARDEV )
-#else
-      IF( LVEXT ) THEN
-          LVEXT = .FALSE.
-          WRITE( OUTDEV,'(A)')'Option to extract a Vertical Column of Ouptut Data set to YES'
-          WRITE( OUTDEV,'(A)')'However, the serial version cannot execute the option'
-          WRITE( LOGDEV,'(A)')'Option to extract a Vertical Column of Ouptut Data set to YES'
-          WRITE( LOGDEV,'(A)')'However, the serial version cannot execute the option'
-      END IF
-#endif
-
-      ! Get Filename for Gas Species Namelist
-      CALL GET_ENV ( GC_NAMELIST, 'gc_matrix_nml', GC_NAMELIST, VARDEV )
-
-      ! Get Filename for Aerosol Species Namelist
-      CALL GET_ENV ( AE_NAMELIST, 'ae_matrix_nml', AE_NAMELIST, VARDEV )
-
-      ! Get Filename for Nonreactive Species Namelist
-      CALL GET_ENV ( NR_NAMELIST, 'nr_matrix_nml', NR_NAMELIST, VARDEV )
-
-      ! Get Filename for Tracer Species Namelist
-      CALL GET_ENV ( TR_NAMELIST, 'tr_matrix_nml', TR_NAMELIST, VARDEV )
-
 #ifdef isam
-      !-------------------------------------------------------------------------------------------------------
-      !>> ISAM
-      !-------------------------------------------------------------------------------------------------------
-      IF ( MYPE .EQ. 0 ) THEN
-         CALL LOG_SUBHEADING( OUTDEV, "ISAM setting and output options" )
-         WRITE( OUTDEV, '(6x,A)' ),'--Env Variable-- | --Value--'
-         WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
-      END IF
-
-
-      ! Determine if this ISAM run is a new start or a restart
-      CALL GET_ENV ( ISAM_NEW_START, 'ISAM_NEW_START', ISAM_NEW_START, VARDEV )
-    
       ! SA_ACONC Layer Specification
       CALL GET_ENV ( 'AISAM_BLEV_ELEV', NV, V_LIST2, VARDEV )
       IF ( NV .LE. 0 ) THEN   ! assume 1:NLAYS
@@ -555,42 +482,39 @@
          XMSG = 'Environment variable error for ISAM_BLEV_ELEV'
          CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
       END IF
-
-      ! Get species bias case
-      CALL GET_ENV ( ISAM_CHEM_BIAS, 'ISAM_O3_WEIGHTS', ISAM_CHEM_BIAS, VARDEV )
-      IF ( ISAM_CHEM_BIAS .LT. 1 .OR. ISAM_CHEM_BIAS .GT. 5 ) THEN
-         XMSG = 'ISAM_O3_WEIGHTS must equal 1 thru 5'
-         WRITE( OUTDEV, '(A)' )TRIM( XMSG )
-         CALL M3EXIT ( PNAME, 0, 0, XMSG, XSTAT1 )
-      END IF
-
-      IF ( ISAM_CHEM_BIAS .EQ. 5 ) THEN
-        EFLAG = .FALSE.
-      ! VOC_NOX_TRANS value, ratio of H2O2 over HNO3 production rates or concentration 
-          CALL GET_ENV ( VOC_NOX_TRANS, 'VOC_NOX_TRANS', VOC_NOX_TRANS, VARDEV )
-          CALL GET_ENV ( ISAM_NOX_CASE, 'ISAM_NOX_CASE', ISAM_NOX_CASE, VARDEV )
-          CALL GET_ENV ( ISAM_VOC_CASE, 'ISAM_VOC_CASE', ISAM_VOC_CASE, VARDEV )
-          IF ( ISAM_NOX_CASE .LT. 1 .OR. ISAM_NOX_CASE .GT. 4 ) THEN
-              XMSG = 'ISAM_NOX_CASE  must equal 1 thru 4'
-              WRITE( OUTDEV, '(A)' )TRIM( XMSG )
-              EFLAG = .TRUE.
-          END IF 
-          IF ( ISAM_VOC_CASE .LT. 1 .OR. ISAM_VOC_CASE .GT. 4 ) THEN
-              XMSG = 'ISAM_VOC_CASE  must equal 1 thru 4'
-              WRITE( OUTDEV, '(A)' )TRIM( XMSG )
-              EFLAG = .TRUE.
-          END IF 
-          IF ( ISAM_VOC_CASE .EQ. ISAM_NOX_CASE ) THEN
-              XMSG = 'ISAM_VOC_CASE  must NOT equal ISAM_NOX_CASE'
-              WRITE( OUTDEV, '(A)' )TRIM( XMSG )
-              XMSG = 'Set ISAM_O3_WEIGHTS to their value.'
-              WRITE( OUTDEV, '(A)' )TRIM( XMSG )
-              EFLAG = .TRUE.
-          END IF 
-          IF ( EFLAG ) CALL M3EXIT ( PNAME, 0, 0, 'Found errors in ISAM options', XSTAT1 )
-      END IF   
 #endif
       
+      ! PWRTFLAG
+      CALL GET_ENV ( PWRTFLAG, 'IOAPI_LOG_WRITE', PWRTFLAG, VARDEV )
+
+      ! Get Flag for Vertical Extraction
+      CALL GET_ENV ( LVEXT, 'VERTEXT', LVEXT, VARDEV )
+#ifdef parallel
+      ! Get Filepath for File Specifying Lon-Lat Coordinates for
+      ! Vertical Extraction
+      CALL GET_ENV ( VEXT_COORD_PATH, 'VERTEXT_COORD_PATH', VEXT_COORD_PATH, VARDEV )
+#else
+      IF( LVEXT ) THEN
+          LVEXT = .FALSE.
+          WRITE( OUTDEV,'(A)')'Option to extract a Vertical Column of Ouptut Data set to YES'
+          WRITE( OUTDEV,'(A)')'However, the serial version cannot execute the option'
+          WRITE( LOGDEV,'(A)')'Option to extract a Vertical Column of Ouptut Data set to YES'
+          WRITE( LOGDEV,'(A)')'However, the serial version cannot execute the option'
+      END IF
+#endif
+
+      ! Get Filename for Gas Species Namelist
+      CALL GET_ENV ( GC_NAMELIST, 'gc_matrix_nml', GC_NAMELIST, VARDEV )
+
+      ! Get Filename for Aerosol Species Namelist
+      CALL GET_ENV ( AE_NAMELIST, 'ae_matrix_nml', AE_NAMELIST, VARDEV )
+
+      ! Get Filename for Nonreactive Species Namelist
+      CALL GET_ENV ( NR_NAMELIST, 'nr_matrix_nml', NR_NAMELIST, VARDEV )
+
+      ! Get Filename for Tracer Species Namelist
+      CALL GET_ENV ( TR_NAMELIST, 'tr_matrix_nml', TR_NAMELIST, VARDEV )
+
       !-------------------------------------------------------------------------------------------------------
       !>> Chemistry and Photolysis
       !-------------------------------------------------------------------------------------------------------
@@ -640,17 +564,40 @@
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
-      ! Get flag for interpreting initial condition aerosol size distributions as dry
-      CALL GET_ENV ( IC_AERO_M2WET, 'IC_AERO_M2WET', IC_AERO_M2WET, VARDEV )
+      ! Get aerosol average diagnostic file flag.
+      CALL GET_ENV ( AVISDIAG, 'CTM_AVISDIAG', AVISDIAG, VARDEV )
 
-      ! Get flag for interpreting initial condition aerosol size distributions as dry
-      CALL GET_ENV ( BC_AERO_M2WET, 'BC_AERO_M2WET', BC_AERO_M2WET, VARDEV )
+      ! Retrieve the Environment Variable allowing the User to Toggle
+      ! the pcVOC emissions
+      CALL GET_ENV ( ZERO_PCSOA, 'CTM_ZERO_PCSOA', ZERO_PCSOA, VARDEV )
 
-      ! Get flag for using initial condition aerosol second moment
-      CALL GET_ENV ( IC_AERO_M2USE, 'IC_AERO_M2USE', IC_AERO_M2USE, VARDEV )
+      ! Get AOD diagnostic file flag.
+      CALL GET_ENV ( AOD, 'CTM_AOD', AOD, VARDEV )
 
-      ! Get flag for using initial condition aerosol second moment
-      CALL GET_ENV ( BC_AERO_M2USE, 'BC_AERO_M2USE', BC_AERO_M2USE, VARDEV )
+      ! Get flag for instantaneous PM diagnostic file.
+      CALL GET_ENV ( PMDIAG, 'CTM_PMDIAG', PMDIAG, VARDEV )
+
+      ! Get flag for average PM diagnostic file.
+      CALL GET_ENV ( APMDIAG, 'CTM_APMDIAG', APMDIAG, VARDEV )
+
+      ! APMDIAG Layer Specification 
+      CALL GET_ENV ( 'APMDIAG_BLEV_ELEV', NV, V_LIST2, VARDEV )
+      IF ( NV .LE. 0 ) THEN   ! assume 1:NLAYS
+         APMDIAG_ZLO = 1
+         APMDIAG_ZHI = -1
+      ELSE IF ( NV .EQ. 1 ) THEN ! Assume 1:CONC_BLEV_ELEV
+         APMDIAG_ZLO = 1
+         READ( V_LIST2( 2 ), '( I4 )' ) APMDIAG_ZHI
+      ELSE IF ( NV .EQ. 2 ) THEN ! Correct Input
+         READ( V_LIST2( 1 ), '( I4 )' ) APMDIAG_ZLO
+         READ( V_LIST2( 2 ), '( I4 )' ) APMDIAG_ZHI
+      ELSE 
+         XMSG = 'Environment variable error for APMDIAG_BLEV_ELEV'
+         CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
+      END IF
+       
+      ! APMDIAG File Species List 
+      CALL GET_ENV ( 'AVG_PMDIAG_SPCS', N_APMDIAG_SPC, APMDIAG_SPC, VARDEV )
 
       !-------------------------------------------------------------------------------------------------------
       !>> sulfur tracking option
@@ -700,11 +647,19 @@
       ! Flag for HONO interaction with leaf and building surfaces
       CALL GET_ENV ( SFC_HONO, 'CTM_SFC_HONO', SFC_HONO, VARDEV )
          
+      ! Mosaic method to get land-use specific stomatal flux
+      IF ( MOSAIC ) THEN
+         CALL GET_ENV ( FST, 'CTM_FST', FST, VARDEV )
+      END IF
+
       ! Flag CLM LSM
       CALL GET_ENV ( CLM_LSM, 'CLM_VERSION', CLM_LSM, VARDEV )
 
       ! Flag for NOAH LSM
       CALL GET_ENV ( NOAH_LSM, 'NOAH_VERSION', NOAH_LSM, VARDEV )
+
+      ! Flag for Surface Tiled Aerosol and Gaseous Exchange (STAGE) model
+      CALL GET_ENV ( STAGE, 'CTM_STAGE', STAGE, VARDEV )
 
       ! CTM_DEPV_FILE
       CALL GET_ENV ( DEPV_DIAG, 'CTM_DEPV_FILE', DEPV_DIAG, VARDEV )
@@ -718,18 +673,6 @@
       ! Flag for using BELD Land Use for WindBlown Dust 
       CALL GET_ENV ( STRTEMP, 'CTM_WBDUST_BELD', DUST_LAND_SCHEME, VARDEV )
       DUST_LAND_SCHEME = STRTEMP( 1:16)
-
-      ! Get Name of STAGE Control File
-      CALL GET_ENV ( STAGECTRL, 'STAGECTRL_NML', STAGECTRL, VARDEV )
-
-      ! Flag for Surface Tiled Aerosol and Gaseous Exchange (STAGE) model Pleim et al. 2022 Aerosol Deposition Option
-      CALL GET_ENV ( STAGE_P22, 'CTM_STAGE_P22', STAGE_P22, VARDEV )
-
-      ! Flag for Surface Tiled Aerosol and Gaseous Exchange (STAGE) model Emerson et al. 2020 Aerosol Deposition Option
-      CALL GET_ENV ( STAGE_E20, 'CTM_STAGE_E20', STAGE_E20, VARDEV )
-
-      ! Flag for Surface Tiled Aerosol and Gaseous Exchange (STAGE) model Shu et al. 2022 (CMAQ v5.3) Aerosol Deposition Option
-      CALL GET_ENV ( STAGE_S22, 'CTM_STAGE_S22', STAGE_S22, VARDEV )
  
       !-------------------------------------------------------------------------------------------------------
       !>> Transport Processes
@@ -765,6 +708,10 @@
       !-------------------------------------------------------------------------------------------------------
       !>> Emission Environment Variables 
       !-------------------------------------------------------------------------------------------------------
+      
+      IF ( INDEX( MECHNAME, 'CB6R3M' ) .GT. 0 ) then
+         USE_MARINE_GAS_EMISSION = .TRUE.
+      END IF
 
       IF ( MYPE .EQ. 0 ) THEN 
          CALL LOG_SUBHEADING( OUTDEV, "Emissions Parameters" )
@@ -772,13 +719,11 @@
          WRITE( OUTDEV, '(6x,A)' ), REPEAT( '-',80 )
       END IF
 
+      ! Get Name of Emission Control File
+      CALL GET_ENV ( EMISSCTRL, 'EMISSCTRL_NML', EMISSCTRL, VARDEV )
+
       ! Number of Layers for Emissions
       CALL GET_ENV ( EMLAYS_MX, 'CTM_EMLAYS', EMLAYS_MX, VARDEV )
-
-      ! Get Name of Emission Control File
-      CALL GET_ENV ( MISC_CTRL, 'MISC_CTRL_NML', MISC_CTRL, VARDEV )
-      CALL GET_ENV ( DESID_CTRL, 'DESID_CTRL_NML', DESID_CTRL, VARDEV )
-      CALL GET_ENV ( DESID_CHEM_CTRL,'DESID_CHEM_CTRL_NML', DESID_CHEM_CTRL, VARDEV )
 
       ! Get number of different Gridded File Emissions Streams
       CALL GET_ENV ( N_FILE_GR, 'N_EMIS_GR', N_FILE_GR, VARDEV )
@@ -790,18 +735,20 @@
       ! present on emissions files
       CALL GET_ENV (  EMISCHK, 'CTM_EMISCHK', EMISCHK, VARDEV )
  
-      ! CTM_BIOGEMIS_BE
-      CALL GET_ENV ( BIOGEMIS_BEIS, 'CTM_BIOGEMIS_BE', BIOGEMIS_BEIS, VARDEV )
-
-      ! CTM_BIOGEMIS_MG
-      CALL GET_ENV(BIOGEMIS_MEGAN, 'CTM_BIOGEMIS_MG', BIOGEMIS_MEGAN,VARDEV )
-      CALL GET_ENV(USE_MEGAN_LAI, 'USE_MEGAN_LAI',USE_MEGAN_LAI,VARDEV )
-      CALL GET_ENV(MGN_ONLN_DEP, 'MGN_ONLN_DEP',MGN_ONLN_DEP,VARDEV )
-      CALL GET_ENV(BDSNP_MEGAN, 'BDSNP_MEGAN',BDSNP_MEGAN,VARDEV )
+      ! CTM_BIOGEMIS
+      CALL GET_ENV ( BIOGEMIS, 'CTM_BIOGEMIS', BIOGEMIS, VARDEV )
 
       ! Get the speciation profile to use
       CALL GET_ENV ( SPPRO, 'BIOG_SPRO', SPPRO, VARDEV )
  
+      ! Bioseason Switch Flag
+      CALL GET_ENV ( BIOGEMIS_SEASON, 'BIOSW_YN', BIOGEMIS_SEASON, VARDEV )
+
+      IF ( .NOT. BIOGEMIS_SEASON ) THEN
+         ! Assume_Summer flag
+         CALL GET_ENV ( ASSUME_SUMMER, 'SUMMER_YN', ASSUME_SUMMER, VARDEV )
+      END IF
+
       ! Biogenic Emission Diag File
       CALL GET_ENV ( BEMIS_DIAG, 'B3GTS_DIAG', BEMIS_DIAG, VARDEV )
  
@@ -813,6 +760,9 @@
 
       ! Flag for Online Calculation of Windblown dust emissions
       CALL GET_ENV ( WB_DUST, 'CTM_WB_DUST', WB_DUST, VARDEV )
+
+      ! Get env var for erodible agriculture land fraction
+      !CALL GET_ENV ( ERODE_AGLAND, 'CTM_ERODE_AGLAND', ERODE_AGLAND, VARDEV )
 
       ! Get env var for diagnostic output
       CALL GET_ENV ( DUSTEM_DIAG, 'CTM_DUSTEM_DIAG', DUSTEM_DIAG, VARDEV )
@@ -873,6 +823,9 @@
 !        PLAY_BASE( NV ) = STRTEMP
 !     END DO
        
+      ! Determine user-defined default for emissions diagnostics
+      CALL GET_ENV ( EMISDIAG, 'EMISDIAG', EMISDIAG, VARDEV )
+
       ! Determine user-defined default for emissions date override for representative days
       CALL GET_ENV ( EMIS_SYM_DATE, 'EMIS_SYM_DATE', EMIS_SYM_DATE, VARDEV )
  
@@ -924,13 +877,6 @@
          XMSG = 'Environment variable error for PA_BLEV_ELEV'
          CALL M3EXIT( 'INIT_ENV_VARS', JDATE, JTIME, XMSG, EXIT_STATUS )
       END IF
-
-      IF ( OCEAN_CHEM ) THEN
-       IF ( (INDEX( MECHNAME, 'CB6R5M_AE7_AQ') .GT. 0 ) .OR. 
-     &      (INDEX( MECHNAME, 'CB6R5_AE7_AQ' ) .GT. 0) ) then     
-       USE_MARINE_GAS_EMISSION = .TRUE.
-       ENDIF
-      ENDIF
 
 ! for MPAS
 #ifdef mpas

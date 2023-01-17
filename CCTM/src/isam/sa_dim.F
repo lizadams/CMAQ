@@ -27,7 +27,7 @@ C
 
         USE UTILIO_DEFN
         USE SA_DEFN
-        USE DESID_VARS, ONLY: DESID_N_SRM
+        USE EMIS_VARS, ONLY: N_EM_SRM
 
         IMPLICIT NONE
 
@@ -74,28 +74,8 @@ C...Assign Tag Indices To ICON, BCON, OTHER *in that order*
           TAGNAME( OTHRTAG ) = "OTH"
           TAGNAME( ICONTAG ) = "ICO"
 
+           
           CALL GET_NSPC_SA 
 
-          N_SPCTAG = NSPC_SA * NTAG_SA
-
-          CALL GET_MAP_SAtoCGR ()
-
-          ! Allocate arrays of species indices, tagging indices, and
-          ! variable names for the combined species-tags
-          ! i.e. set s_spctag, t_spctag, and vnam_spctag
-          ALLOCATE ( S_SPCTAG( N_SPCTAG ), STAT=IOST )
-          CALL CHECKMEM( IOST, 'S_SPCTAG', PNAME )
-          ALLOCATE ( T_SPCTAG( N_SPCTAG ), STAT=IOST )
-          CALL CHECKMEM( IOST, 'T_SPCTAG', PNAME )
-          ALLOCATE ( VNAM_SPCTAG( N_SPCTAG ), STAT=IOST )
-          CALL CHECKMEM( IOST, 'VNAM_SPCTAG', PNAME )
-          ALLOCATE ( BCON_SPC( N_SPCTAG ), STAT=IOST )
-          CALL CHECKMEM( IOST, 'BCON_SPC', PNAME )
-
-          ! Assign BCON tag indicies used in advection
-          BCON_SPC = .FALSE.
-          BCON_SPC( ((BCONTAG - 1)*NSPC_SA+1) : (NSPC_SA*BCONTAG) ) = .TRUE.
-
-           
         END SUBROUTINE SA_DIM
 

@@ -81,8 +81,8 @@ C-----------------------------------------------------------------------
 
       USE CGRID_SPCS          ! CGRID mechanism species
       USE GRID_CONF
-      USE DESID_VARS, ONLY : VDEMIS_DIFF, DESID_LAYS
-      USE DESID_MODULE, ONLY : DESID_INIT, DESID_DRIVER
+      USE EMIS_VARS, ONLY : VDEMIS_DIFF, EMLAYS
+      USE EMIS_DEFN, ONLY : EMIS_INIT, GET_EMIS
       USE DEPV_DEFN
       USE ASX_DATA_MOD
 !      USE MPAS_DATA_MOD
@@ -93,12 +93,11 @@ C-----------------------------------------------------------------------
 !      USE LSM_MOD, Only: n_lufrac
       USE SEDIMENTATION
       USE VDIFF_DIAG
-      USE PA_UPDATE
-      USE PA_DEFN, ONLY : LIPR, BUDGET_DIAG
+      USE PA_DEFN, Only: LIPR ! Process Anaylsis control and data variables
 
 #ifdef isam
       USE SA_DEFN, Only: ITAG, N_SPCTAG, VNAM_SPCTAG, SA_DDEP, SA_BIDI, ISAM, NTAG_SA, 
-     &                   S_SPCTAG, NSPC_SA, ISAM_SPEC, OTHRTAG
+     &                   VNAM_SPCTAG, NSPC_SA, SPC_NAME, OTHRTAG
 #endif
 
 #ifdef sens
@@ -134,12 +133,10 @@ C Local Variables:
       INTEGER, SAVE :: WSTEP  = 0               ! local write counter
       INTEGER  STATUS                           ! ENV... status
 
-      REAL             FCMSF                          ! loop local RMSFX4( C,R )
+      REAL             FCMSF                         ! loop local RMSFX4( C,R )
 
-      REAL, ALLOCATABLE, SAVE :: CNGRD( :,:,:,: )     ! cgrid aero in mixing ratio
+      REAL, ALLOCATABLE, SAVE :: CNGRD( :,:,:,: )    ! cgrid aero in mixing ratio
       REAL, ALLOCATABLE, SAVE :: DDEP     ( :,:,: )   ! ddep accumulator
-      REAL, ALLOCATABLE, SAVE :: DDEP0    ( :,:,: )   ! ddep initial before call to vdiffacmx
-      REAL, ALLOCATABLE, SAVE :: NH3_EMIS0( :,: )     ! NH3_EMIS0 initial before call to get_depv
       REAL, ALLOCATABLE, SAVE :: ICMP     ( :,:,: )   ! component flux accumlator 
       REAL     :: WRDD( NCOLS,NROWS )                 ! ddep write buffer
 
@@ -177,6 +174,18 @@ C Local Variables
 #endif
 
       INTERFACE
+         SUBROUTINE PA_UPDATE_EMIS ( PNAME, VDEMIS_DIFF, JDATE, JTIME, TSTEP )
+            CHARACTER( * ), INTENT( IN )  :: PNAME
+            REAL,           INTENT( IN )  :: VDEMIS_DIFF( :,:,:,: )
+            INTEGER,        INTENT( IN )  :: JDATE, JTIME
+            INTEGER,        INTENT( IN )  :: TSTEP( 3 )
+         END SUBROUTINE PA_UPDATE_EMIS
+         SUBROUTINE PA_UPDATE_DDEP ( PNAME, DDEP, JDATE, JTIME, TSTEP )
+            CHARACTER( * ), INTENT( IN )  :: PNAME
+            REAL,           INTENT( IN )  :: DDEP( :,:,: )
+            INTEGER,        INTENT( IN )  :: JDATE, JTIME
+            INTEGER,        INTENT( IN )  :: TSTEP( 3 )
+         END SUBROUTINE PA_UPDATE_DDEP
          SUBROUTINE CONV_CGRID ( CGRID, JDATE, JTIME, CNGRD )
             REAL, POINTER :: CGRID( :,:,:,: )
             INTEGER,        INTENT( IN )  :: JDATE, JTIME
@@ -221,11 +230,6 @@ C-----------------------------------------------------------------------
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
 
-         IF ( BUDGET_DIAG .OR. LIPR ) THEN
-            ALLOCATE( NH3_EMIS0( NCOLS,NROWS), STAT = ASTAT )
-            CALL CHECKMEM( ASTAT,'NH3_EMIS0',PNAME )
-         END IF
-
 C create global maps
          IF ( .NOT. VDIFF_MAP_INIT( ) ) THEN
             XMSG = 'Failure initializing index mapping module'
@@ -264,13 +268,6 @@ C Allocate and initialize dry deposition array
             CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
          DDEP = 0.0   ! array assignment
-         
-         ALLOCATE ( DDEP0( N_SPC_DEPV,NCOLS,NROWS ), STAT = ASTAT )
-         IF ( ASTAT .NE. 0 ) THEN
-            XMSG = 'Failure allocating DDEP0'
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-         DDEP0 = 0.0   ! array assignment
  
          ALLOCATE ( ICMP( LCMP,NCOLS,NROWS ), STAT = ASTAT )
          IF ( ASTAT .NE. 0 ) THEN
@@ -282,7 +279,7 @@ C Allocate and initialize dry deposition array
          CALL LOG_HEADING( LOGDEV, "Initialize Emissions Module" )
 
 C Allocate and initialize emissions
-         IF ( .NOT. DESID_INIT ( JDATE, JTIME, TSTEP( 1 ) ) ) THEN
+         IF ( .NOT. EMIS_INIT ( JDATE, JTIME, TSTEP( 1 ) ) ) THEN
             XMSG = 'Failure initializing emissions module'
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
@@ -296,21 +293,22 @@ C Allocate and initialize emissions
          SA_DDEP = 0.0
 #endif
 
-C Set up for budget accumulation and process analysis
-         CALL LOG_HEADING( LOGDEV, "Initialize Surface Exchange for Process Analysis" )
+C Set up for process analysis
+         IF ( LIPR ) THEN
+            CALL LOG_HEADING( LOGDEV, "Initialize Surface Exchange for Process Analysis" )
 
-         IF ( BUDGET_DIAG .OR. LIPR ) THEN
-            ALLOCATE ( EMIS_PA( NCOLS,NROWS,NLAYS,N_CGRID_SPC ), STAT = ASTAT )
+            ALLOCATE ( EMIS_PA( NCOLS,NROWS,EMLAYS,N_SPC_DIFF ), STAT = ASTAT )
             IF ( ASTAT .NE. 0 ) THEN
                XMSG = 'EMIS_PA memory allocation failed'
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
-            ALLOCATE ( DDEP_PA( NCOLS,NROWS,N_CGRID_SPC ), STAT = ASTAT )
+            ALLOCATE ( DDEP_PA( NCOLS,NROWS,N_SPC_DEPV ), STAT = ASTAT )
             IF ( ASTAT .NE. 0 ) THEN
                XMSG = 'DDEP_PA memory allocation failed'
                CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
             END IF
          END IF
+
 C Set up for grav. settling
          IF ( GRAV_SETL ) THEN
             CALL LOG_HEADING( LOGDEV, "Set Up Gravitational Settling" )
@@ -354,7 +352,7 @@ C Set up for grav. settling
 
 #ifdef isam
         IF ( SA_BIDI ) THEN
-          NH3_ISAM_IDX  = INDEX1( 'NH3', NSPC_SA, ISAM_SPEC(:,OTHRTAG) )
+          NH3_ISAM_IDX  = INDEX1( 'NH3', NSPC_SA, SPC_NAME(:,OTHRTAG) )
           ALLOCATE ( ISAM_DEPV( N_SPCTAG ), 
      &               NH3_TAG_FRACTION( NTAG_SA ), STAT = ASTAT )
           IF ( ASTAT .NE. 0 ) THEN
@@ -364,7 +362,8 @@ C Set up for grav. settling
           ISAM_DEPV     = 0
           DO ITAG = 1, N_SPCTAG
             DO V = 1, N_SPC_DEPV
-              ISAM_SPECIES =  ISAM_SPEC( S_SPCTAG(ITAG),1 )
+              IBGN         = INDEX( VNAM_SPCTAG( ITAG ), '_', .FALSE. ) - 1
+              ISAM_SPECIES = VNAM_SPCTAG( ITAG )( 1:IBGN )
               IF ( TRIM( ISAM_SPECIES ) .EQ. DV2DF_SPC( V ) ) THEN
                 ISAM_DEPV( ITAG ) = V
               END IF
@@ -409,7 +408,6 @@ C read & interpolate met data
       CALL GET_MET ( MDATE, MTIME, MSTEP )
 
 C read & interpolate deposition velocities
-      IF ( BUDGET_DIAG .OR. LIPR ) NH3_EMIS0 = NH3_EMIS
       CALL GET_DEPV ( MDATE, MTIME, TSTEP, CGRID )      
 
       IF ( GRAV_SETL ) THEN
@@ -420,20 +418,19 @@ C Calculate the changes in the layer J-,K-mode aerosol concentrations
       END IF
 
 C read & interpolate emissions data => VDEMIS_DIFF from EMIS_DEFN module
-      CALL DESID_DRIVER ( MDATE, MTIME, TSTEP, CGRID )
+      CALL GET_EMIS ( MDATE, MTIME, TSTEP, CGRID )
 
-      IF ( BUDGET_DIAG .OR. LIPR ) THEN
-         EMIS_PA = 0.0
+      IF ( LIPR ) THEN
          DO S = 1, N_SPC_DIFF
-            DO L = 1, DESID_LAYS
+            DO L = 1, EMLAYS
                DO R = 1, NROWS
                   DO C = 1, NCOLS
-                     EMIS_PA( C,R,L,DIFF_MAP(S) ) = VDEMIS_DIFF( S,L,C,R )
+                     EMIS_PA( C,R,L,S ) = VDEMIS_DIFF( S,L,C,R )
                   END DO
                END DO
             END DO
          END DO
-         CALL PA_UPDATE_EMIS ( EMIS_PA, JDATE, JTIME, TSTEP )
+         CALL PA_UPDATE_EMIS ( 'VDIF', EMIS_PA, JDATE, JTIME, TSTEP )
       END IF
 
       CALL EDDYX ( EDDYV )
@@ -456,9 +453,6 @@ C EDDYV returned = Kz, where Kz is in m**2/sec
          S_DDEP = 0.0
 #endif
       END IF
-
-C Store Deposition Change in Budget and Process Analysis Arrays
-      IF ( BUDGET_DIAG .OR. LIPR ) DDEP0 = DDEP
 
 C Calculate the change in concentration and dry dep from vertical diffusion and vsed
 C Note: cngrd is the argument keyword (from the INTERFACE); CNGRD is the actual argument
@@ -484,32 +478,7 @@ C Note: cngrd is the argument keyword (from the INTERFACE); CNGRD is the actual 
             END DO
          END IF
       END IF
- 
-C Store Deposition Change in Budget and Process Analysis Arrays
-      IF ( BUDGET_DIAG .OR. LIPR ) THEN
-         DDEP_PA = 0.0
-         DO V = 1, N_SPC_DEPV
-            IF ( ABFLUX .AND. V .EQ. DD2DV(NH3_HIT) ) THEN 
-               ! For Ammonia, take Bidirectional Flux into account
-               ! if those processes are implemented
-               DO R = 1, NROWS
-                  DO C = 1, NCOLS
-                     DDEP_PA( C,R,MAP_DEPVtoCGRID(V)) = DDEP( V,C,R ) - DDEP0( V,C,R )
-     &                                            + NH3_EMIS( C,R ) - NH3_EMIS0( C,R )
-                  END DO
-               END DO
-            ELSE
-               ! All other species
-               DO R = 1, NROWS
-                  DO C = 1, NCOLS
-                     DDEP_PA( C,R,MAP_DEPVtoCGRID(V)) = DDEP( V,C,R ) - DDEP0( V,C,R )
-                  END DO
-               END DO
-            END IF
-         END DO
-         CALL PA_UPDATE_DDEP ( DDEP_PA, JDATE, JTIME, TSTEP )
-      END IF
- 
+
 C Revert non-molar mixing ratio species and re-order CGRID
       CALL REV_CGRID ( CNGRD, MDATE, MTIME, CGRID )
 
@@ -730,6 +699,16 @@ C Write other diagnostics
             CALL WRASX_MEDIA( MDATE, MTIME )
          END IF 
 
+         IF ( LIPR ) THEN
+            DO V = 1, N_SPC_DEPV
+               DO R = 1, NROWS
+                  DO C = 1, NCOLS
+                     DDEP_PA( C,R,V ) = DDEP( V,C,R )
+                  END DO
+               END DO
+            END DO
+            CALL PA_UPDATE_DDEP ( 'VDIF', DDEP_PA, JDATE, JTIME, TSTEP )
+         END IF
 
 #ifdef isam
          WRDD = 0.0

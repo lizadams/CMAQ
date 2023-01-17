@@ -145,17 +145,17 @@
          FALLOFF_T11 = K1 + K2 * CAIR + K3
          RETURN
        END FUNCTION FALLOFF_T11
-       REAL( 8 ) FUNCTION HALOGEN_FALLOFF(PRESS,A1,B1,A2,B2,A3)
+       REAL( 8 ) FUNCTION HALOGEN_FALLOFF(PRESS,A1,B1,A2,B2)
          IMPLICIT NONE
+         REAL( 8 ), PARAMETER    :: MAX_RATE = 2.6750D-06  ! Maximum loss rate (1/sec)
          REAL( 8 ), INTENT( IN ) :: PRESS
          REAL( 8 ), INTENT( IN ) :: A1
          REAL( 8 ), INTENT( IN ) :: B1
          REAL( 8 ), INTENT( IN ) :: A2
          REAL( 8 ), INTENT( IN ) :: B2
-         REAL( 8 ), INTENT( IN ) :: A3 ! Maximum loss rate (1/sec)
          INTRINSIC DEXP
          HALOGEN_FALLOFF = A1 * DEXP( B1 * PRESS ) + A2 * DEXP( B2 * PRESS )
-         HALOGEN_FALLOFF = DMIN1 (A3, HALOGEN_FALLOFF )
+         HALOGEN_FALLOFF = DMIN1 (MAX_RATE, HALOGEN_FALLOFF )
          RETURN
        END FUNCTION HALOGEN_FALLOFF
 
@@ -201,7 +201,7 @@
        RETURN
        END SUBROUTINE SPECIAL_RATES
  
-       SUBROUTINE CALC_RCONST( BLKTEMP, BLKPRES, BLKH2O, RJBLK, BLKHET, LSUNLIGHT, SEAWATER, RKI, NUMCELLS )
+       SUBROUTINE CALC_RCONST( BLKTEMP, BLKPRES, BLKH2O, RJBLK, BLKHET, LSUNLIGHT, LAND, RKI, NUMCELLS )
 
 !**********************************************************************
 
@@ -231,7 +231,7 @@
         REAL( 8 ),           INTENT( IN  ) :: BLKHET ( :, : )   ! heterogeneous rate constants, ???/min
         INTEGER,             INTENT( IN  ) :: NUMCELLS          ! Number of cells in block 
         LOGICAL,             INTENT( IN  ) :: LSUNLIGHT         ! Is there sunlight? 
-        REAL( 8 ),           INTENT( IN  ) :: SEAWATER( : )     ! fractional area of OPEN+SURF 
+        LOGICAL,             INTENT( IN  ) :: LAND( : )         ! Is the surface totally land? 
         REAL( 8 ),           INTENT( OUT ) :: RKI ( :, : )      ! reaction rate constant, ppm/min 
 !..Parameters: 
 
@@ -382,12 +382,10 @@
 !  Reaction Label TR15            
                 RKI( NCELL,  711) =  RJBLK( NCELL, IJ_ACRO_09 )
 
-                IF ( SEAWATER (NCELL) .GT. 0.001D0 ) THEN
+                IF( .NOT. LAND( NCELL ) )THEN
 !  Reaction Label HAL_Ozone       
-                   RKI( NCELL,  721) = SEAWATER (NCELL) *  SFACT * HALOGEN_FALLOFF( BLKPRES( NCELL ),   6.7006D-11,   1.0743D+01,  & 
-     &                                                           3.4153D-08,  -6.7130D-01,         2.0000D-06 )
-                ELSE
-                   RKI( NCELL,  721) = 0.0D0 
+                   RKI( NCELL,  721) =  SFACT * HALOGEN_FALLOFF( BLKPRES( NCELL ),   2.8964D-11,   1.1998D+01,  & 
+     &                                                           0.0000D+00,         0.0000D+00 )
                 END IF
 
             END DO 

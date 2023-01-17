@@ -103,17 +103,17 @@ C RETRIEVE THE SPECIES SAVED TO INTEGRAL AVERAGE CONCENTRATION FILE
 
          IF ( N_ACONC_VARS .EQ. 0 .OR. ACONC_FILE_SPCS( 1 ) .EQ. 'ALL' ) THEN
             V = 0
-            DO VAR = 1, N_GC_CONC
+            DO VAR = 1, N_GC_SPC
                V = V + 1
-               ACONC_FILE_SPCS( V ) = GC_CONC( VAR )
+               ACONC_FILE_SPCS( V ) = GC_SPC( VAR )
             END DO
-            DO VAR = 1, N_AE_CONC
+            DO VAR = 1, N_AE_SPC
                V = V + 1
-               ACONC_FILE_SPCS( V ) = AE_CONC( VAR )
+               ACONC_FILE_SPCS( V ) = AE_SPC( VAR )
             END DO
-            DO VAR = 1, N_NR_CONC
+            DO VAR = 1, N_NR_SPC
                V = V + 1
-               ACONC_FILE_SPCS( V ) = NR_CONC( VAR )
+               ACONC_FILE_SPCS( V ) = NR_SPC( VAR )
             END DO
             DO VAR = 1, N_TR_SPC
                V = V + 1

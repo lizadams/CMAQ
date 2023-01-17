@@ -10,21 +10,21 @@ To modify or change photochemistry, requires modifying or replacing the modules 
 
 To select a predefined mechanism configuration in CMAQ, set the *Mechanism* variable in the build scripts to a one of the mechanism subdirectories located under $CMAQ_MODEL/CCTM/src/MECHS. The below table lists mechanisms available in this version of the CMAQ model.
 
-Table 1.  CMAQv5.4 Chemical Mechanisms
+Table 1.  CMAQv5.3 Chemical Mechanisms
 
 |**Mechanism Name** | **Photochemistry**                                   | **Model Species<sup>1,2</sup>**    | **Cloud Chemistry Module<sup>3</sup>** |
 | ----------------- | ---------------------------------------------------- | -------------------- | ---------------------- |
-| cb6r3_ae7_aq      | [Carbon Bond 6 version r3 with aero7 treatment of SOA](mechanism_information/cb6r3_ae7_aq/mech_cb6r3_ae7_aq.md) |  [species table](mechanism_information/cb6r3_ae7_aq/cb6r3_ae7_aq_species_table.md)                 | acm_ae7          |
-| cb6r5_ae7_aq      | [Carbon Bond 6 version r5 with aero7 treatment of SOA](mechanism_information/cb6r5_ae7_aq/mech_cb6r5_ae7_aq.md) |  [species table](mechanism_information/cb6r5_ae7_aq/cb6r5_ae7_aq_species_table.md)                 | acm_ae7          |
-| cb6r5hap_ae7_aq   | [Carbon Bond 6 version r5 with air toxics and aero7 treatment of SOA](mechanism_information/cb6r5_ae7_aq/mech_cb6r5_ae7_aq.md) | [species table](mechanism_information/cb6r5hap_ae7_aq/cb6r5hap_ae7_aq_species_table.md)               | acm_ae7          |
-| cb6r5_ae7_aqkmt2  | [Carbon Bond 6 version r5 with aero7 treatment of SOA](mechanism_information/cb6r5_ae7_aq/mech_cb6r5_ae7_aq.md) | [species table](mechanism_information/cb6r5_ae7_aq/cb6r5_ae7_aq_species_table.md)                   | acm_ae7_kmt2          |
-| cb6r5m_ae7_aq     | [Carbon Bond 6 version r5 with aero7 treatment of SOA and DMS and marine halogen chemistry](mechanism_information/cb6r5m_ae7_aq/mech_cb6r5m_ae7_aq.md) | [species table](mechanism_information/cb6r5m_ae7_aq/cb6r5m_ae7_aq_species_table.md)                   | acm_ae7_aq          |
-| racm2_ae6_aq      | [Regional Atmospheric Chemistry Mechanism version 2 with aero6 treatment of SOA](mechanism_information/racm2_ae6_aq/mech_racm2_ae6_aq.md) | [species table](mechanism_information/racm2_ae6_aq/racm2_ae6_aq_species_table.md)                   | acm_ae6          |
-| saprc07tic_ae7i_aq | [State Air Pollution Research Center version 07tc with extended isoprene chemistry and aero7i treatment of SOA]( mechanism_information/saprc07tic_ae7i_aq/mech_saprc07tic_ae7i_aq.md) | [species table](mechanism_information/saprc07tic_ae7i_aq/saprc07tic_ae7i_aq_species_table.md)                   | acm_ae7          |
-| saprc07tic_ae7i_aqkmt2 | [State Air Pollution Research Center version 07tc with extended isoprene chemistry and aero7i treatment of SOA](mechanism_information/saprc07tic_ae7i_aq/mech_saprc07tic_ae7i_aq.md)  | [species table](mechanism_information/saprc07tic_ae7i_aq/saprc07tic_ae7i_aq_species_table.md)                   | acm_ae7_kmt2          |
-| saprc07tc_ae6_aq | [State Air Pollution Research Center version 07tc with aero6 treatment of SOA](mechanism_information/saprc07tc_ae6_aq/mech_saprc07tc_ae6_aq.md)  | [species table](mechanism_information/saprc07tc_ae6_aq/saprc07tc_ae6_aq_species_table.md)                   | acm_ae6         |       
-| cracmm1_aq | [Community Regional Atmospheric Chemistry Multiphase Mechanism version 1.0](mechanism_information/cracmm1_aq/mech_cracmm1_aq.md)  | [species table](mechanism_information/cracmm1_aq/cracmm1_aq_species_table.md)                   | acm     |       
-| cracmm1amore_aq | [Community Regional Atmospheric Chemistry Multiphase Mechanism version 1.0 with AMORE isoprene condensation](mechanism_information/cracmm1amore_aq/mech_cracmm1amore_aq.md)  | [species table](mechanism_information/cracmm1amore_aq/cracmm1amore_aq_species_table.md)                   | acm     |       
+| cb6r3_ae7_aq      | [Carbon Bond 6 version r3 with aero7 treatment of SOA](mechanism_information/cb6r3_ae7_aq/mech_cb6r3_ae7_aq.md) |  [species table 1](mechanism_information/cb6r3_ae7_aq/cb6r3_ae7_aq_species_table.md)                 | acm_ae7          |
+| cb6r3_ae7_aqkmt2    | [Carbon Bond 6 version r3 with aero7 treatment of SOA](mechanism_information/cb6r3_ae7_aq/mech_cb6r3_ae7_aq.md) | [species table 1](mechanism_information/cb6r3_ae7_aq/cb6r3_ae7_aq_species_table.md)                   | acm_ae7_kmt2          |
+| cb6r3m_ae7_kmtbr  | [Carbon Bond 6 version r3 with aero7 treatment of SOA and DMS and marine halogen chemistry](mechanism_information/cb6r3m_ae7_kmtbr/mech_cb6r3m_ae7_kmtbr.md) | [species table 2](mechanism_information/cb6r3m_ae7_kmtbr/cb6r3m_ae7_kmtbr_species_table.md)                   | acm_ae7_kmtbr          |
+| cb6r3_ae6_aq      | [Carbon Bond 6 version r3 with aero6 treatment of SOA](mechanism_information/cb6r3_ae6_aq/mech_cb6r3_ae6_aq.md) | [species table 3](mechanism_information/cb6r3_ae6_aq/cb6r3_ae6_aq_species_table.md)                   | acm_ae6          |
+| cb6mp_ae6_aq      | [Carbon Bond 6 version r3 with air toxics and aero6 treatment of SOA](mechanism_information/cb6r3_ae6_aq/mech_cb6r3_ae6_aq.md) | [species table 4](mechanism_information/cb6mp_ae6_aq/cb6mp_ae6_aq_species_table.md)                   | acm_ae6          |
+| racm2_ae6_aq      | [Regional Atmospheric Chemistry Mechanism version 2 with aero6 treatment of SOA](mechanism_information/racm2_ae6_aq/mech_racm2_ae6_aq.md) | [species table 5](mechanism_information/racm2_ae6_aq/racm2_ae6_aq_species_table.md)                   | acm_ae6          |
+| saprc07tic_ae7i_aq | [State Air Pollution Research Center version 07tc with extended isoprene chemistry and aero7i treatment of SOA]( mechanism_information/saprc07tic_ae7i_aq/mech_saprc07tic_ae7i_aq.md) | [species table 6](mechanism_information/saprc07tic_ae7i_aq/saprc07tic_ae7i_aq_species_table.md)                   | acm_ae7          |
+| saprc07tic_ae7i_aqkmt2 | [State Air Pollution Research Center version 07tc with extended isoprene chemistry and aero7i treatment of SOA](mechanism_information/saprc07tic_ae7i_aq/mech_saprc07tic_ae7i_aq.md)  | [species table 6](mechanism_information/saprc07tic_ae7i_aq/saprc07tic_ae7i_aq_species_table.md)                   | acm_ae7_kmt2          |
+| saprc07tic_ae6i_aq | [State Air Pollution Research Center version 07tc with extended isoprene chemistry and aero6i treatment of SOA]( mechanism_information/saprc07tic_ae6i_aq/mech_saprc07tic_ae6i_aq.md) | [species table 7](mechanism_information/saprc07tic_ae6i_aq/saprc07tic_ae6i_aq_species_table.md)                   | acm_ae6          |
+| saprc07tic_ae6i_aqkmti | [State Air Pollution Research Center version 07tc with extended isoprene chemistry and aero6i treatment of SOA](mechanism_information/saprc07tic_ae6i_aq/mech_saprc07tic_ae6i_aq.md)  | [species table 7](mechanism_information/saprc07tic_ae6i_aq/saprc07tic_ae6i_aq_species_table.md)                   | acm_ae6_kmti          |
+| saprc07tc_ae6_aq | [State Air Pollution Research Center version 07tc with aero6 treatment of SOA](mechanism_information/saprc07tc_ae6_aq/mech_saprc07tc_ae6_aq.md)  | [species table 8](mechanism_information/saprc07tc_ae6_aq/saprc07tc_ae6_aq_species_table.md)                   | acm_ae6         |       
 
 1. mechanisms can share the same model species but differ cloud chemistry
 2. species tables define model species in a mechanism's GC, AE, and NR namelists.
@@ -56,7 +56,7 @@ This release of CMAQ includes a runtime option that provides detailed informatio
 setenv STM_SO4TRACK Y
 ```
 
-Sulfur tracking species are added to the AE and NR groups at runtime if you enable this option.  Table 2 provides a list of inorganic sulfur tracking species.  Table 3 lists additional tracking species for the loss of inorganic sulfate to organosulfate for chemical mechanisms that include this loss pathway (SAPRC07TIC_AE6I, SAPRC07TIC_AE7I, CB6R3_AE7, or CB6R5M_AE7 mechanisms).
+Sulfur tracking species are added to the AE and NR groups at runtime if you enable this option.  Table 2 provides a list of inorganic sulfur tracking species.  Table 3 lists additional tracking species for the loss of inorganic sulfate to organosulfate for chemical mechanisms that include this loss pathway (SAPRC07TIC_AE6I, SAPRC07TIC_AE7I, CB6R3_AE7, or CB6R3M_AE7 mechanisms).
 
 Table 2. Sulfur Tracking Species
 
@@ -78,7 +78,7 @@ Table 2. Sulfur Tracking Species
 |AE           |ASO4ICBCK   | 96.0 |ASO4K from boundary and initial conditions |
 |NR           |SULF_ICBC   | 98.0 |Sulfuric acid vapor (SULF) from boundary and initial conditions |
 
-Table 3.  Additional Tracking Species Representing Loss of Inorganic Sulfate to Organosulfate (only included if using SAPRC07TIC_AE6I, SAPRC07TIC_AE7I, CB6R3_AE7, or CB6R5M_AE7 mechanisms).
+Table 3.  Additional Tracking Species Representing Loss of Inorganic Sulfate to Organosulfate (only included if using SAPRC07TIC_AE6I, SAPRC07TIC_AE7I, CB6R3_AE7, or CB6R3M_AE7 mechanisms).
 
 |Species Group|Species Name| MW   | Description |
 |:------------|:-----------|:-----|:------------|

@@ -1,15 +1,22 @@
+ BASE = ../CSQY_TABLE_PROCESSOR
 
-ifndef EXEC
-  MODEL = CSQY_TABLE_PROCESSOR.EXE
-else
-  MODEL = $(EXEC)
+ ifndef APPL
+    APPL = test
+ endif 
+
+ MODEL = $(BASE)_$(APPL)
+
+#COMPILER = INTEL
+#COMPILER = PGF90
+#COMPILER = GFORT
+
+ifndef COMPILER
+#COMPILER = INTEL
+#COMPILER = PGF90
+ COMPILER = GFORT
 endif
 
-ifndef compiler
- compiler = gcc   # other options (intel | pgi )
-endif
- 
-ifeq ($(compiler),intel)
+ifeq ($(COMPILER),INTEL)
 
 FC = ifort
 CC = icc
@@ -21,7 +28,7 @@ f90_FLAGS = -free -fp-model source -fpe0 -O0 -check uninit -warn nounused -check
 C_FLAGS =  -O2  -DFLDMN=1
 LINK_FLAGS = 
 
-else ifeq ($(compiler),pgi)
+else ifeq ($(COMPILER),PGF90)
  FC = pgf90
  CC = pgcc
  F_FLAGS   = -Mfixed -Mextend -Mbounds -O0 -traceback -Mchkfpstk -Mchkptr -Mchkstk -traceback -Ktrap=fp -I . -g
@@ -31,7 +38,7 @@ else ifeq ($(compiler),pgi)
  C_FLAGS =  -O2  -DFLDMN=1
  LINK_FLAGS = -Bstatic  -Bstatic_pgi
 
-else ifeq ($(compiler),gcc)
+else ifeq ($(COMPILER),GFORT)
  FC    = gfortran
  CC    = gcc
  f_FLAGS   = -ffixed-form -ffixed-line-length-132 -funroll-loops -O0 -ffpe-trap=invalid,zero -g -finit-character=32 -I. -fcheck=all -fbounds-check
@@ -43,22 +50,18 @@ else ifeq ($(compiler),gcc)
  LINK_FLAGS = 
 
 else
- ERROR1 = "Makefile not configured to support the specified compiler, $(compiler). User must modify Makefile."
+ ERROR1 = "Makefile not configured to support the specified compiler, $(COMPILER). User must modify Makefile."
 endif
 
 ifdef ERROR1
  $(error $(ERROR1))
 endif
 
-ifdef INPDIR
- MECH_INC   = $(INPDIR)
-else
- ERROR2 = "BuildRun script error: Input directory containing RXNS_DATA_MODULE.F90 not defined"
-endif
 
-ifdef ERROR2
- $(error $(ERROR2))
-endif
+ MECH_INC   = $(GC_INC)
+ TRAC_INC   = $(GC_INC)
+ PROCAN_INC = $(GC_INC)
+
 
 LIBRARIES = 
 
@@ -150,4 +153,4 @@ $(MODEL): $(OBJECTS)
 	$(CC) $(C_FLAGS) -c $<
 
 clean:
-	rm -f $(OBJECTS) *.o $(MODEL)_* *.mod
+	rm -f $(OBJECTS) *.o $(BASE)_* *.mod

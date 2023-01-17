@@ -46,11 +46,6 @@ C**********************************************************************
 #ifdef isam
       USE SA_IRR_DEFN
 #endif
-#ifdef sens
-      USE DDM3D_CHEM, ONLY: YCDDM
-      USE CGRID_SPCS, ONLY: GC_SPC
-#endif 
-R5      USE DEGRADE_ROUTINES, ONLY : DEGRADE, SA_DEGRADE_STEP
 
 R0
 
@@ -71,8 +66,7 @@ C..PARAMETERS:
       REAL( 8 ), PARAMETER :: DTMIN   = 1.0D-08    ! Smallest time step allowed, min
       REAL( 8 ), PARAMETER :: EPSLON  = 1.0D-30    ! Small number
       REAL( 8 ), PARAMETER :: MAXPRED = 1.0D+03    ! Upper limit on predicted conc
-      REAL( 8 ), PARAMETER :: ZERO    = 1.0D-40    ! effective zero
-      REAL( 8 ), PARAMETER :: FLOOR   = 1.0D-08    ! Min conc for RTOL 
+      REAL( 8 ), PARAMETER :: ZERO    = 1.0D-40    ! effective zero 
 
 C..EXTERNAL FUNCTIONS:
 
@@ -128,6 +122,14 @@ R5      REAL( 8 ) DTG         ! Time step in degrade routines, sec
       LOGICAL, SAVE  :: LOPEN = .FALSE.
 #endif
 
+R5      INTERFACE ! for degrade algorithm
+R5        SUBROUTINE DEGRADE( CBLK, DT, JDATE, JTIME )
+R5          REAL( 8 ), INTENT( IN ) :: CBLK( : )      ! array holding species concentrations
+R5          REAL( 8 ), INTENT( IN ) :: DT             ! time step for integrations [sec]
+R5          INTEGER,   INTENT( IN ) :: JDATE          ! current model date , coded YYYYDDD
+R5          INTEGER,   INTENT( IN ) :: JTIME          ! current model time , coded HHMMSS
+R5        END SUBROUTINE
+R5      END INTERFACE
 
 C**********************************************************************
 
@@ -167,9 +169,6 @@ C**********************************************************************
 
        END IF
 
-#ifdef sens
-       YCDDM = 0.0D0
-#endif
 
 c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 #ifdef hrdebug
@@ -235,13 +234,12 @@ c++++++++++++++++++++++++Debug section++++++++++++++++++++++++++++++++++
 
 ! Initial PA_IRR 
       IF( CALL_IRR ) CALL PA_IRR ( .TRUE., RKI, YC, DTC )
-R5      SA_DEGRADE_STEP = 0      
       TSTEP_EBI: DO    ! EBI time-step loop
          
          SUBSTEP_EBI: DO NINR = 1, N_INR_STEPS   ! time substeps loop 
 !  first attempt is sub time-step equals EBI time-step
 
-            IF( LEBI_CONV ) YC0 = YC   ! Set ICs for EBI iterations
+            IF( LEBI_CONV ) FORALL( S = 1:NUMB_MECH_SPC )YC0( S ) = YC( S )   ! Set ICs for EBI iterations
 
             ITER_SUBSTEP: DO ITER = 1, NEBITER  ! iteration loop solving for sub time-step
 
@@ -304,9 +302,10 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
                DO S = 1, NUMB_MECH_SPC
                   LEBISPFL( S ) = .FALSE.
                   YCP( S ) = MAX( ZERO, YCP( S ) )
-                  AERROR( S ) = MAX( ABS( YC(S)-YCP(S) ), EPSLON )
-                  RERROR( S ) = AERROR( S ) / MAX( FLOOR, ABS( YC(S)+YCP(S) ) )
-                  IF( RERROR( S ) .GT. RTOL(S) .OR. AERROR( S ) .GT. 1.0D-5 )THEN
+                  AERROR( S ) = ABS( YC(S)-YCP(S) ) 
+                  RERROR( S ) = AERROR( S ) / ABS( YC(S)+YCP(S) )
+                   IF( RERROR( S ) .GT. RTOL(S) .OR. AERROR( S ) .GT. 1.0D-5 )THEN
+!                 IF( RERROR( S ) .GT. RTOL(S)  )THEN
                      LEBI_CONV     = .FALSE.
                      LEBISPFL( S ) = .TRUE.
                   END IF
@@ -349,9 +348,6 @@ R5                DO S = 1, NUMB_MECH_SPC
 R5                   M = CGRID_INDEX( S )
 R5                   YCCELL( M ) = YC( S )
 R5                END DO
-#if defined(isam) || defined(verbose_isam)
-R5                SA_DEGRADE_STEP = SA_DEGRADE_STEP + 1
-#endif             
 R5                IF( CALL_DEG )CALL DEGRADE(YCCELL, DTG, JDATE, JTIME) ! :WTH Call degradation routine
 R5
                  IF( CALL_IRR ) CALL PA_IRR ( .FALSE., RKI, YC, DTC )
@@ -359,12 +355,6 @@ R5
                  IF( NEBI .EQ. N_EBI_STEPS )UPDATE_SOLD = .TRUE.
                  CALL SA_IRR_UNBLOCKED ( .FALSE., RKI, YC, DTC )
                  UPDATE_PROBABILITIES = .FALSE.
-#endif
-
-#ifdef sens
-C Update the sum for the average over the chemistry integration
-                 YCDDM = YCDDM
-     &                 + ( ( 0.5D0 * DTC ) * ( YC + YC0 )  )
 #endif
 
                  CYCLE SUBSTEP_EBI ! solve for next sub time-step
@@ -393,7 +383,7 @@ C Update the sum for the average over the chemistry integration
                   END DO
                END IF
 
-               YC = YC0   ! Set ICs for EBI time-step
+               FORALL( S = 1:NUMB_MECH_SPC )YC( S ) = YC0( S )   ! Set ICs for EBI time-step
 
                DTC = 0.5D0 * DTC
 
@@ -421,7 +411,7 @@ C Update the sum for the average over the chemistry integration
          IF( LEBI_CONV )THEN 
              NEBI        = 1 + NEBI
 ! test for completing final EBI time-step
-             IF( NEBI .GT. N_EBI_STEPS )EXIT TSTEP_EBI
+             IF( NEBI .GT. N_EBI_STEPS )RETURN
 ! test whether backups were done
              IF( NBKUPS .EQ. 0 )CYCLE TSTEP_EBI 
 ! Reset NBKUPS, N_INR_STEPS and sub-time step
@@ -431,13 +421,6 @@ C Update the sum for the average over the chemistry integration
          END IF
          
       END DO TSTEP_EBI
-
-#ifdef sens
-! Compute average over integration and filter values
-      YCDDM = YCDDM / CHEMSTEP
-      WHERE (  YCDDM .LT. 1.0D-25 ) YCDDM = 0.0D0
-#endif
-
 
       RETURN
 

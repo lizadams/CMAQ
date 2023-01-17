@@ -159,6 +159,7 @@ C Local variables:
       INTEGER       ITER
 
       CHARACTER( 96 ) :: XMSG = ' '
+      INTEGER, SAVE :: ASPC                ! pointer in CGRID to transported RHOJ
       REAL          RJ1( NLAYS )           ! local adjusted RHOJ
       REAL          RJ2( NLAYS )           ! local RHOJM at tstep + 1
       REAL          RJT( NLAYS )           ! local adjusted RHOJ
@@ -252,6 +253,9 @@ C Get dx3 from the GRID_CONF(VGRD) F90 module
          END DO
 !         WRITE( LOGDEV,* ) ' '
 
+C Pointer to transported RHOJ
+         ASPC = GC_STRT - 1 + N_GC_SPCD
+
 C Create global map to CGRID
          SPC = 0
          DO VAR = 1, N_GC_TRNS
@@ -283,7 +287,7 @@ C Create global map to CGRID
 #endif
          END DO
  
-         ADV_MAP( N_SPC_ADV ) = RHOJ_LOC
+         ADV_MAP( N_SPC_ADV ) = ASPC
 
       END IF                    ! if firstime
 

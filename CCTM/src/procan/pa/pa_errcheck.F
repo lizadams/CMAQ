@@ -47,6 +47,7 @@ C-----------------------------------------------------------------------
       USE PA_IPRVARS
       USE PA_VARS
       USE PA_PARSE
+      USE PA_IPRDEF, Only: NOPNAMES, OPNAME
       USE PA_DEFN
 
       IMPLICIT NONE
@@ -546,7 +547,21 @@ cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
       LERROR = .FALSE.
       DO 180 NOUT = 1, N_IPR_SPC
          NOPS = N_IPR_OPS( NOUT )
-         IF ( NOPS .EQ. 0 ) THEN
+         IF ( NOPS .GT. 0 ) THEN
+            DO N = 1, NOPS
+               INDX = INDEX1( IPR_OPNAME( NOUT,N ), NOPNAMES, OPNAME )
+               IF ( INDX .EQ. 0 ) THEN
+                  WRITE( MSG, 94520 )
+                  CALL M3MESG( MSG )
+                  WRITE( MSG, 94540 ) IPR_OPNAME( NOUT,N ), 
+     &                                IPR_SPNAM( NOUT )
+                  CALL M3MESG( MSG )
+                  LERROR = .TRUE.
+               ELSE
+                  IPR_OPNAME( NOUT,N ) = OPNAME( INDX )
+               END IF
+            END DO
+         ELSE
             DO N = 1, NPRCS
                IPR_OPNAME( NOUT,N ) = PROCNAME( N )
             END DO
@@ -817,6 +832,8 @@ C---------------------- Format Statements -----------------------------
 94460 FORMAT( '       Invalid operation name: ', A16 ) 
 94480 FORMAT( 'ERROR: Invalid species name for IPR_OUTPUT operation' )
 94500 FORMAT( '       Invalid name: ', A16 )
+94520 FORMAT( 'ERROR: Invalid operator name for IPR_OUTPUT operation' )
+94540 FORMAT( '       Invalid name: ', A16, ' for species ', A )
 94560 FORMAT( 'ERROR: The total number of reactions in the IRR_OUTPUT',
      &               ' operation exceeds the maximum allowable of 500' )
 94580 FORMAT( '       IRR_OUTPUT name ', I3, ': ', A16 )

@@ -50,8 +50,6 @@ C-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
       USE CGRID_SPCS            ! CGRID mechanism species
-      USE XY_BUDGET
-      USE PA_DEFN, ONLY: LIPR
       USE UTILIO_DEFN
 #ifdef parallel
       USE SE_MODULES            ! stenex (using SE_COMM_MODULE, SE_UTIL_MODULE)
@@ -94,16 +92,19 @@ C Advected species dimension
 C File Variables:
 
       REAL, ALLOCATABLE, SAVE :: BCON( :,: )    ! boundary concentrations
+      REAL         RHOJ( NCOLS,NROWS )          ! RhoJ
 
 C Local Variables:
 
 
       INTEGER       ALLOCSTAT
 
+      INTEGER, SAVE :: ASPC                     ! RHOJ index in CGRID
+
       CHARACTER( 16 ) :: PNAME = 'HADVPPM'
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
+      LOGICAL, SAVE :: FIRST_BC = .TRUE.
       LOGICAL, ALLOCATABLE, SAVE :: XYFIRST( : )
-      REAL, ALLOCATABLE, SAVE :: CGRID0( :,:,: ), XADV(:,:,:), YADV(:,:,:)
 
 
       CHARACTER( 96 ) :: XMSG = ' '
@@ -115,17 +116,16 @@ C Local Variables:
       INTEGER      FTIME                        ! interpolation time
       INTEGER      SYNCSTEP
 
-      INTEGER      LVL                ! loop counters
-      LOGICAL      L_WRITE_WARNING
+      INTEGER      COL, ROW, LVL                ! loop counters
+      LOGICAL      LSTAT
 
 C Required interface for allocatable array dummy arguments
 
       INTERFACE
-         SUBROUTINE RDBCON ( FDATE, FTIME, TSTEP, LVL, BCON,
-     &                       L_WRITE_WARNING )
+         SUBROUTINE RDBCON ( FDATE, FTIME, TSTEP, LVL, BCON, LSTAT )
             INTEGER, INTENT( IN )  :: FDATE, FTIME, TSTEP, LVL
             REAL,    INTENT( OUT ) :: BCON( :,: )
-            LOGICAL, INTENT( INOUT ) :: L_WRITE_WARNING
+            LOGICAL, INTENT( INOUT ) :: LSTAT
          END SUBROUTINE RDBCON
          SUBROUTINE X_PPM ( CGRID, FDATE, FTIME, TSTEP, LVL, BCON )
             REAL, POINTER          :: CGRID( :,:,:,: )
@@ -167,13 +167,7 @@ C Get CGRID offsets
             CALL M3EXIT ( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
          END IF
 
-         IF ( LIPR ) THEN
-            ALLOCATE ( DELC_XADV( NCOLS,NROWS,NLAYS,NSPCSD ),
-     &                 DELC_YADV( NCOLS,NROWS,NLAYS,NSPCSD ),
-     &                 XADV( NCOLS,NROWS,NSPCSD ),
-     &                 YADV( NCOLS,NROWS,NSPCSD ),
-     &                 CGRID0( NCOLS,NROWS,NSPCSD ) )
-         END IF
+         ASPC = GC_STRT - 1 + N_GC_SPCD
 
 #ifdef sens
          ALLOCATE ( BSEN( NBNDY,N_SPC_ADV,NPMAX ), STAT = ALLOCSTAT )
@@ -187,13 +181,7 @@ C Get CGRID offsets
 
       SYNCSTEP = TIME2SEC( TSTEP( 2 ) )
 
-      ! Initialize Budget Variables
-      IF (LIPR) THEN
-        DELC_XADV = 0.0
-        DELC_YADV = 0.0
-      END IF
-
-      L_WRITE_WARNING = .TRUE.
+      LSTAT = .FALSE.
       DO 301 LVL = 1, NLAYS
 
          STEP = TIME2SEC ( ASTEP( LVL ) )
@@ -201,16 +189,9 @@ C Get CGRID offsets
          FDATE = JDATE
          FTIME = JTIME
 
-         IF ( LIPR ) THEN
-            XADV = 0.0
-            YADV = 0.0
-         END IF
-
 101      CONTINUE
 
-         CALL RDBCON ( FDATE, FTIME, ASTEP( LVL ), LVL, BCON, L_WRITE_WARNING )
-
-         IF ( LIPR ) CGRID0( :,:,: ) = CGRID( :,:,LVL,: )
+         CALL RDBCON ( FDATE, FTIME, ASTEP( LVL ), LVL, BCON, LSTAT )
 
          IF ( XYFIRST( LVL ) ) THEN
 
@@ -218,17 +199,9 @@ C Get CGRID offsets
 
             CALL X_PPM ( CGRID, FDATE, FTIME, ASTEP( LVL ), LVL, BCON )
 !           CALL LCKSUMMER ( 'X_PPM', CGRID, FDATE, FTIME, LVL )
-            IF ( LIPR ) THEN
-               XADV( :,:,: ) = XADV( :,:,: ) + CGRID( :,:,LVL,: ) - CGRID0( :,:,: )
-               CGRID0( :,:,: ) = CGRID( :,:,LVL,: )
-            END IF
 
             CALL Y_PPM ( CGRID, FDATE, FTIME, ASTEP( LVL ), LVL, BCON )
 !           CALL LCKSUMMER ( 'Y_PPM', CGRID, FDATE, FTIME, LVL )
-            IF ( LIPR ) THEN
-               YADV( :,:,: ) = YADV( :,:,: ) + CGRID( :,:,LVL,: ) - CGRID0( :,:,: )
-               CGRID0( :,:,: ) = CGRID( :,:,LVL,: )
-            END IF
 
          ELSE
 
@@ -236,17 +209,9 @@ C Get CGRID offsets
 
             CALL Y_PPM ( CGRID, FDATE, FTIME, ASTEP( LVL ), LVL, BCON )
 !           CALL LCKSUMMER ( 'Y_PPM', CGRID, FDATE, FTIME, LVL )
-            IF ( LIPR ) THEN
-               YADV( :,:,: ) = YADV( :,:,: ) + CGRID( :,:,LVL,: ) - CGRID0( :,:,: )
-               CGRID0( :,:,: ) = CGRID( :,:,LVL,: )
-            END IF
 
             CALL X_PPM ( CGRID, FDATE, FTIME, ASTEP( LVL ), LVL, BCON )
 !           CALL LCKSUMMER ( 'X_PPM', CGRID, FDATE, FTIME, LVL )
-            IF ( LIPR ) THEN
-               XADV( :,:,: ) = XADV( :,:,: ) + CGRID( :,:,LVL,: ) - CGRID0( :,:,: )
-               CGRID0( :,:,: ) = CGRID( :,:,LVL,: )
-            END IF
 
          END IF
 
@@ -256,11 +221,22 @@ C Get CGRID offsets
             GO TO 101
          END IF
 
-         IF (LIPR ) THEN
-           DELC_XADV( :,:,LVL,: ) = DELC_XADV( :,:,LVL,: ) + XADV( :,:,: )
-           DELC_YADV( :,:,LVL,: ) = DELC_YADV( :,:,LVL,: ) + YADV( :,:,: )
-         END IF
 301   CONTINUE
+ 
+      !Print warning if any aerosol BCs violated the size distribution parameters
+      IF ( LSTAT ) THEN 
+         IF ( FIRST_BC ) THEN
+            FIRST_BC = .FALSE.
+            WRITE( XMSG2, '(A)' ),
+     &            'ATTENTION: Applying fix to aerosol Boundary Conditions' //
+     &            ' for aerosol modes. Set verbose_rdbcon preprocessor' //
+     &            ' flag to learn more.'
+            WRITE( LOGDEV, * )
+            CALL LOG_MESSAGE( LOGDEV, XMSG2 )
+            WRITE( LOGDEV, * )
+         END IF
+      END IF
+ 
  
       RETURN
       END

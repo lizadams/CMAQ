@@ -49,8 +49,8 @@ C-----------------------------------------------------------------------
 
       USE CGRID_SPCS          ! CGRID mechanism species
       USE GRID_CONF
-      USE DESID_VARS, ONLY : VDEMIS_DIFF,DESID_LAYS
-      USE DESID_PARAM_MODULE, ONLY : DESID_N_SRM
+      USE EMIS_VARS, ONLY : VDEMIS_DIFF,EMLAYS
+      USE EM_PARAM_MODULE, ONLY : N_EM_SRM
       USE DEPV_DEFN
       USE ASX_DATA_MOD
       USE VDIFF_MAP
@@ -59,12 +59,11 @@ C-----------------------------------------------------------------------
 !      USE LSM_MOD, ONLY: N_LUFRAC
       USE VDIFF_DIAG, NLPCR => NLPCR_MEAN
       USE HGRD_DEFN,only : COLSX_PE, ROWSX_PE
-      USE BDSNP_MOD, ONLY: GET_N_DEP
 #ifdef isam
       USE SA_DEFN, ONLY: N_SPCTAG, ISAM, VNAM_SPCTAG, TRANSPORT_SPC,
      &                   SA_VDEMIS_DIFF, ITAG, NTAG_SA, NSPC_SA,
-     &                   S_SPCTAG, T_SPCTAG, SA_DDEP, OTHRTAG, ISAM_SPEC,
-     &                   L_NO3, SA_BIDI, BIDITAG, L_NH4
+     &                   S_SPCTAG, T_SPCTAG, SA_DDEP, OTHRTAG, SPC_NAME,
+     &                   L_NITRATE, SA_BIDI, BIDITAG, L_NH4
 #endif
 
 #ifdef sens
@@ -103,7 +102,6 @@ C Local Variables:
       CHARACTER( 16 ), SAVE :: PNAME = 'VDIFFACMX'
 
       LOGICAL, SAVE :: FIRSTIME = .TRUE.
-      LOGICAL, SAVE :: SPECLOG = .TRUE.             ! For BDSNP
 
       REAL, ALLOCATABLE, SAVE :: DD_FAC     ( : )   ! combined subexpression
       REAL, ALLOCATABLE, SAVE :: DDBF       ( : )   ! secondary DDEP
@@ -324,7 +322,7 @@ C set auxiliary depv arrays
          END DO
 ! find NO2 in tracked species
          DO S = 1, NSPC_SA
-            IF( ISAM_SPEC( S,1 ) .EQ. 'NO2' )THEN
+            IF( SPC_NAME( S,1 ) .EQ. 'NO2' )THEN
                 ISAM_INDEX_NO2 = S
                 EXIT
             END IF            
@@ -333,7 +331,7 @@ C set auxiliary depv arrays
 ! find NH3 in tracked species
          IF ( SA_BIDI ) THEN
            DO S = 1, NSPC_SA
-              IF( ISAM_SPEC( S,1 ) .EQ. 'NH3' )THEN
+              IF( SPC_NAME( S,1 ) .EQ. 'NH3' )THEN
                   ISAM_INDEX_NH3 = S
                   EXIT
               END IF
@@ -352,7 +350,8 @@ C set auxiliary depv arrays
          ITAG = 0
          WRITE(LOGDEV,'(/,A7,1X,2(A16,1X))')'JSPCTAG','ISAM_SPECIES','DEPV Value'
          DO JSPCTAG = 1, N_SPCTAG
-            ISAM_SPECIES = ISAM_SPEC( S_SPCTAG( JSPCTAG ),1 )
+            IBGN         = INDEX( VNAM_SPCTAG( JSPCTAG ), '_', .FALSE. ) - 1
+            ISAM_SPECIES = VNAM_SPCTAG( JSPCTAG )( 1:IBGN )
             IF( TRIM( ISAM_SPECIES ) .EQ. 'HONO' )THEN
                ITAG = ITAG + 1
                INDEX_SA_HONO( ITAG ) = JSPCTAG
@@ -362,8 +361,14 @@ C set auxiliary depv arrays
                     ISAM_DEPV( JSPCTAG ) = V
                END IF  
             END DO
+            IF ( ISAM_DEPV( JSPCTAG ) .GT. 0 ) THEN
+               V = ISAM_DEPV( JSPCTAG )
+               WRITE(LOGDEV,'(I4,4X,2(A16,1X))')JSPCTAG,ISAM_SPECIES,DV2DF_SPC( V )
+            ELSE
+               WRITE(LOGDEV,'(I4,4X,2(A16,1X))')JSPCTAG,ISAM_SPECIES,'NONE'
+            END IF   
         END DO       
-        WRITE(LOGDEV,'(/,A4,1X,A13,1X,A16)')'ITAG','INDEX_SA_HONO','ISAM_SPECIES'
+        WRITE(LOGDEV,'(/,A4,1X,A13,1X,A16))')'ITAG','INDEX_SA_HONO','ISAM_SPECIES'
         DO ITAG = 1, NTAG_SA
            JSPCTAG = INDEX_SA_HONO( ITAG )
            IF ( JSPCTAG .GT. 0 ) THEN
@@ -379,7 +384,8 @@ C set auxiliary depv arrays
         IF ( ABFLUX .AND. L_NH4 ) THEN
           ITAG = 0
           DO JSPCTAG = 1, N_SPCTAG
-            ISAM_SPECIES = ISAM_SPEC( S_SPCTAG( JSPCTAG ),1 )
+            IBGN         = INDEX( VNAM_SPCTAG( JSPCTAG ), '_', .FALSE. ) - 1
+            ISAM_SPECIES = VNAM_SPCTAG( JSPCTAG )( 1:IBGN )
             IF( TRIM( ISAM_SPECIES ) .EQ. 'NH3' )THEN
                ITAG = ITAG + 1
                INDEX_SA_NH3( ITAG ) = JSPCTAG
@@ -544,7 +550,7 @@ C-----------------------------------------------------------------------
 #endif
 
 #ifdef isam
-         IF( L_NO3 .AND. SFC_HONO ) THEN
+         IF( L_NITRATE .AND. SFC_HONO ) THEN
 ! compute the flux partitioning for HONO from NO2 surface reaction
             DO ITAG = 1, NTAG_SA
                SA_NO2( ITAG ) = MAX( ISAM( C,R,1,ISAM_INDEX_NO2,ITAG ), 1.0E-30 )
@@ -558,8 +564,8 @@ C-----------------------------------------------------------------------
 #endif
  
          EMIS = 0.0      ! array assignment
-         IF ( DESID_N_SRM .GE. 1 ) 
-     &        EMIS( :,1:DESID_LAYS ) = DTS * VDEMIS_DIFF( :,:,C,R )
+         IF ( N_EM_SRM .GE. 1 ) 
+     &        EMIS( :,1:EMLAYS ) = DTS * VDEMIS_DIFF( :,:,C,R )
 
 #ifdef isam
          SAEMIS = 0.0
@@ -571,7 +577,7 @@ C-----------------------------------------------------------------------
          END IF
 
 ! collapse ISAM emissions array
-         DO L = 1, DESID_LAYS
+         DO L = 1, EMLAYS
             DO ITAG = 1, NTAG_SA
                BOT = (ITAG-1)*NSPC_SA+1
                TOP = NSPC_SA*ITAG
@@ -583,7 +589,7 @@ C-----------------------------------------------------------------------
 #ifdef sens
          S_EMIS = 0.0
          DO NP = 1, NPMAX
-            S_EMIS( :,1:DESID_LAYS,NP ) = DTS * SVDEMIS_DIFF( :,:,C,R,NP )
+            S_EMIS( :,1:EMLAYS,NP ) = DTS * SVDEMIS_DIFF( :,:,C,R,NP )
          END DO
 #endif
 
@@ -712,52 +718,9 @@ C Don't add HONO emissions as negative dep flux
                      S_DDBF( V, NP ) = S_DDBF( V, NP ) + THETA * DD_FAC( V ) * SENS ( S,1,NP )
                   END DO
 #endif
-  
 C --------- END of HET HONO RX ----------
 
                ELSE
-
-C Pass selected N species to the BDSNP Soil NO emissions scheme
-
-                  IF ( BDSNP_MEGAN ) THEN
-
-                    IF(SPECLOG) then
-                      IF( V .eq. N_SPC_DEPV)  THEN
-                       SPECLOG = .false. ! no need to do any species more than once
-                       WRITE( LOGDEV,*) 'BDSNP Species list complete', speclog
-                      END IF
-                    END IF
-
-                    IF ( (INDEX(TRIM( DV2DF_SPC( V ) ), 'NH3') .NE. 0) .OR.
-     &                 (INDEX(TRIM( DV2DF_SPC( V ) ), 'NH4') .NE. 0) .OR.         
-     &                 (INDEX(TRIM( DV2DF_SPC( V ) ), 'HNO3').NE. 0) .OR.
-     &                 (INDEX(TRIM( DV2DF_SPC( V ) ), 'NO3') .NE. 0) .OR.
-     &                 (INDEX(TRIM( DV2DF_SPC( V ) ), 'NO2') .NE. 0) .OR.
-     &                 (INDEX(TRIM( DV2DF_SPC( V ) ), 'PAN') .NE. 0)) THEN
-
-
-                      IF( SPECLOG ) THEN !write species each time it is used
-                        WRITE( LOGDEV,*) 'BDSNP Dry Species Used:', TRIM(DV2DF_SPC( V ) ), V, N_SPC_DEPV
-                      END IF
-
-                      IF ( ( DDBF(V)- DDEP( V,C,R) ) .LT. 0.0 ) THEN !negative error checking
-
-                       XMSG = 'Negative Deposition'
-!                  WRITE( LOGDEV,*) 'BDSNP Negative Deposition vdiff, variable:', 
-!     &            TRIM( DV2DF_SPC( V )), ( DDBF(V)- DDEP( V,C,R) ), C, R                  
-!                      CALL M3EXIT( PNAME, MDATE, MTIME, XMSG, XSTAT1 )
-                       CALL GET_N_DEP (DV2DF_SPC( V ), 0/
-     &                           DTSEC, C, R )
-                      else
-                       CALL GET_N_DEP (DV2DF_SPC( V ), ( DDBF(V)- DDEP( V,C,R) )/
-     &                           DTSEC, C, R )
-                      END IF !end negative error checking
-
-                     
-                    END IF !end species check
-                  
-                  END IF !end BDSNP check
-
                   S = DV2DF( V )
                   CONC( S,1 ) = POL( V ) + ( CONC( S,1 ) - POL( V ) ) * EFAC1( V )
                   DDBF( V ) = DDBF( V ) + THETA * ( DD_FAC( V ) * CONC( S,1 ) 
@@ -1061,6 +1024,7 @@ C --------- HET HONO RX -----------------
                   DDBF( V ) = DDBF( V ) + THBAR * DD_FAC( V ) * CONC( S,1 )
 C Don't add HONO emissions as negative dep flux
 !     &                      - DTDENS1 * DD_CONV( V ) * PLDV( V,C,R ) )
+
 #ifdef sens
                   DO NP = 1, NPMAX
                      SENS( S,1,NP ) = S_POL( NP,V ) + ( SENS( S,1,NP ) - S_POL( NP,V ) ) * EFAC2( V )
@@ -1124,7 +1088,6 @@ c Recalculate bidi NH3 deposition
 
 301      CONTINUE                 ! end sub time loop
 
-
          DO L = 1, NLAYS
             DO V = 1, N_SPC_DIFF
                CNGRD( DIFF_MAP( V ),L,C,R ) = CONC( V,L )
@@ -1135,7 +1098,6 @@ c Recalculate bidi NH3 deposition
                   ISAM( C,R,L,S_SPCTAG( JSPCTAG ),T_SPCTAG( JSPCTAG ) ) = SACONC( JSPCTAG,L )
                END IF
             END DO
- 
 #endif
          END DO
 

@@ -40,7 +40,7 @@ C-----------------------------------------------------------------------
 
 #ifdef isam
       USE SA_DEFN, ONLY: ISAM, N_SPCTAG, NTAG_SA, ITAG, OTHRTAG,
-     &                   ISAM_PVO3_MAP, ISAM_SPEC, L_OZONE,
+     &                   ISAM_PVO3_MAP, SPC_NAME, L_OZONE,
      &                   ISAMRGN_NUM, ISAMRGN_MAP, NSPC_SA
       USE em_param_module, ONLY: EM_REG_FAC, N_EM_RGN
 #endif
@@ -99,7 +99,7 @@ C..Scratch Local Variables:
 
       REAL, ALLOCATABLE, SAVE :: CSTARZ( :,: ) ! cstar at 58hPa estimated by polynomial fit
       REAL, ALLOCATABLE, SAVE :: CXX( :,: )    ! intermediate quadratic (< 0 for any lat.)
-      REAL ::  PV( NCOLS,NROWS,NLAYS )   ! potential vorticity
+      REAL PV( NCOLS,NROWS,NLAYS )             ! potential vorticity
       REAL PRES( NCOLS,NROWS,NLAYS )           ! Air pressure [ Pa ]
 
 #ifdef isam
@@ -145,7 +145,7 @@ C Scale only top layer O3 to PV
          END IF
 
 #ifdef isam
-        IF ( L_OZONE ) S_O3  = INDEX1( 'O3', NSPC_SA, ISAM_SPEC(:,OTHRTAG) )
+        IF ( L_OZONE ) S_O3  = INDEX1( 'O3', NSPC_SA, SPC_NAME(:,OTHRTAG) )
 #endif
 
       END IF      ! First time

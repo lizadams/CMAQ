@@ -1,6 +1,6 @@
 #! /bin/csh -f
 
-# ====================== HR2DAYv5.4.X Run Script ======================
+# ====================== HR2DAYv5.3.X Run Script ======================
 # Usage: run.hr2day.csh >&! hr2day.log &
 #
 # To report problems or request help with this script/program:
@@ -20,7 +20,7 @@
  source ./config_cmaq.csh
 
 #> Set General Parameters for Configuring the Simulation
- set VRSN      = v54              #> Code Version
+ set VRSN      = v532              #> Code Version
  set PROC      = mpi               #> serial or mpi
  set MECH      = cb6r3_ae7_aq      #> Mechanism ID
  set APPL      = Bench_2016_12SE1        #> Application Name (e.g. Gridname)
@@ -82,8 +82,7 @@
 # setenv HOURS_8HRMAX 17
 
 #> define species (format: "Name, units, From_species, Operation")
-#>  operations : {SUM, AVG, MIN, MAX, HR@MIN, HR@MAX, @MAXT, MAXDIF, 
-#>                8HRMAX, W126, @8HRMAXO3, HR@8HRMAX, SUM06}
+#>  operations : {SUM, AVG, MIN, MAX, @MAXT, MAXDIF, 8HRMAX, SUM06}
  setenv SPECIES_1 "O3,ppbV,O3,8HRMAX"
  
 #> Optional desired first and last processing date. The program will
