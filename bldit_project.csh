@@ -17,7 +17,9 @@
 #> directory.
 
 
+
  set CMAQ_HOME =  /[your_install_path]/
+
 
 #> This section allows users to choose explicitly which tools
 #> to make available from the repo. For each selected tool,
