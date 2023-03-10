@@ -24,6 +24,8 @@
 !   D. Wong - July 15: initial version
 !   D. Wong 19 May 2016 - renamed ACONC_END_TIME to AVG_FILE_ENDTIME
 !   F. Sidi 09 Sep 2019 - Replaced L_ACONC_WVEL(depreciated) with W_VEL
+!   D. Wong 25 Jan 2023 - Get description from INIT_CONC_1
+!   D. Wong 20 Mar 2023 - correct to get description from CTM_CONC_1
 !-----------------------------------------------------------------------
 
       USE GRID_CONF             ! horizontal & vertical domain specifications
@@ -94,7 +96,7 @@
 
          IF ( IO_PE_INCLUSIVE ) THEN
 
-! Get default file header attibutes from CONC file (assumes file already open)
+! Get default file header attibutes from CTM_CONC_1 file (assumes file already open)
 
             IF ( .NOT. DESC3( CTM_CONC_1 ) ) THEN
                XMSG = 'Could not get '
@@ -186,7 +188,7 @@
             IF ( W_VEL ) THEN
                VAR = VAR + 1 
                VTYPE3D( VAR ) = M3REAL
-               VNAME3D( VAR ) = 'W_VEL'
+               VNAME3D( VAR ) = 'WVEL'
                UNITS3D( VAR ) = 'm s-1'
                VDESC3D( VAR ) = 'Vertical Wind Velocity'
             END IF
@@ -227,102 +229,6 @@
             END IF
 
          END IF   ! MYPE = 0
-
-      ELSE
-
-! File exists. Make sure it matches requested output.
-
-         IF ( .NOT. DESC3( CTM_CONC_1 ) ) THEN
-            XMSG = 'Could not get '
-     &           // TRIM( CTM_CONC_1 )
-     &           // ' file description'
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-
-         TSTEP_RF = TSTEP3D
-         NTHIK_RF = NTHIK3D
-         NCOLS_RF = NCOLS3D
-         NROWS_RF = NROWS3D
-         GDTYP_RF = GDTYP3D
-         P_ALP_RF = P_ALP3D
-         P_BET_RF = P_BET3D
-         P_GAM_RF = P_GAM3D
-         XCENT_RF = XCENT3D
-         YCENT_RF = YCENT3D
-         XORIG_RF = XORIG3D
-         YORIG_RF = YORIG3D
-         XCELL_RF = XCELL3D
-         YCELL_RF = YCELL3D
-         VGTYP_RF = VGTYP3D
-         VGTOP_RF = VGTOP3D
-
-         IF ( .NOT. DESC3( A_CONC_1 ) ) THEN
-            XMSG = 'Could not get '
-     &           // TRIM( A_CONC_1 )
-     &           // ' file description'
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT1 )
-         END IF
-
-         IF ( N_ACONC_VARS .NE. NVARS3D ) THEN
-            WRITE( XMSG, '( A, 2I6 )' )
-     &      'Number of variables don''t match file: ', N_ACONC_VARS, NVARS3D
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-         END IF
-
-         DO SPC = 1, N_ASPCS
-            DO VAR = 1, NVARS3D
-               IF ( ACONC_FILE_SPCS( SPC ) .EQ. VNAME3D( VAR ) ) GO TO 101
-            END DO
-            XMSG = 'Could not find ' // ACONC_FILE_SPCS( SPC )
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-101         CONTINUE
-         END DO
-
-         IF ( A_NLYS .NE. NLAYS3D ) THEN
-            WRITE( XMSG, '( A, 2I6 )' )
-     &      'Number of layers don''t match file: ', A_NLYS, NLAYS3D
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-         END IF
-
-! Check other header data with CONC file as reference
-
-         IF ( TSTEP_RF .NE. TSTEP3D .OR.
-     &        NTHIK_RF .NE. NTHIK3D .OR.
-     &        NCOLS_RF .NE. NCOLS3D .OR.
-     &        NROWS_RF .NE. NROWS3D .OR.
-     &        GDTYP_RF .NE. GDTYP3D ) THEN
-              XMSG = 'Header inconsistent on existing A_CONC_1'
-              CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-         END IF
-         IF ( P_ALP_RF .NE. P_ALP3D .OR.
-     &        P_BET_RF .NE. P_BET3D .OR.
-     &        P_GAM_RF .NE. P_GAM3D ) THEN
-              XMSG = 'Header inconsistent on existing A_CONC_1'
-              CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-         END IF
-         IF ( XCENT_RF .NE. XCENT3D .OR.
-     &        YCENT_RF .NE. YCENT3D ) THEN
-              XMSG = 'Header inconsistent on existing A_CONC_1'
-              CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-         END IF
-         IF ( XORIG_RF .NE. XORIG3D .OR.
-     &        YORIG_RF .NE. YORIG3D ) THEN
-            XMSG = 'Header inconsistent on existing A_CONC_1'
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-         END IF
-         IF ( XCELL_RF .NE. XCELL3D .OR.
-     &        YCELL_RF .NE. YCELL3D ) THEN
-            XMSG = 'Header inconsistent on existing A_CONC_1'
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-         END IF
-         IF ( VGTYP_RF .NE. VGTYP3D ) THEN
-            XMSG = 'Header inconsistent on existing A_CONC_1'
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-         END IF
-         IF ( VGTOP_RF .NE. VGTOP3D ) THEN
-            XMSG = 'Header inconsistent on existing A_CONC_1'
-            CALL M3EXIT( PNAME, JDATE, JTIME, XMSG, XSTAT2 )
-         END IF
 
       END IF   ! .NOT. OPEN A_CONC_1
 
