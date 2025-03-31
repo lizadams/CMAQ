@@ -1,8 +1,9 @@
 #!/bin/csh -f
 
+
 # ===================== WRF-CMAQ Run Script =========================
-# Usage: run_cctm_Bench_2018_12SE1.WRFCMAQ.csh >& run_cctm_Bench_2018_12SE1.WRFCMAQ.log &
-# Slurm Usage: sbatch run_cctm_Bench_2018_12SE1.WRFCMAQ.csh 
+# Usage: run_cctm_Bench_2018_12NE3.WRFCMAQ.csh >& run_cctm_Bench_2018_12NE3.WRFCMAQ.log &
+# Slurm Usage: sbatch run_cctm_Bench_2018_12NE3.WRFCMAQ.csh 
 #
 # To report problems or request help with this script/program:
 #             http://www.epa.gov/cmaq    (EPA CMAQ Website)
@@ -11,7 +12,7 @@
 
 set NPROCS = 32
 
-set wrfv    = 4.4
+set wrfv    = 4.5.1
 set version = sw_feedback
 set option  = 3
 
@@ -24,7 +25,7 @@ echo 'Start Model Run At ' `date`
 #> Choose compiler and set up CMAQ environment with correct 
 #> libraries using config.cmaq. Options: intel | gcc | pgi
  if ( ! $?compiler ) then
-   setenv compiler intel
+   setenv compiler gcc
  endif
  if ( ! $?compilerVrsn ) then
    setenv compilerVrsn Empty
@@ -40,7 +41,7 @@ echo 'Start Model Run At ' `date`
 setenv CTM_DIAG_LVL 0 
 
 #> Set General Parameters and Labels for Configuring the Simulation
-set VRSN        = ${wrfv}54          #> Code Version
+set VRSN        = ${wrfv}55          #> Code Version
 set PROC        = mpi                #> serial or mpi
 set MECH        = cb6r5_ae7_aq       #> Mechanism ID
 set APPL        = Bench_2018_12NE3   #> Application Name (e.g. Domain)
@@ -57,11 +58,11 @@ set EXEC      = wrf.exe
 
 # Set Working, Input, and Output Directories
 set WORKDIR     = ${PWD}                                  # Pathname of current Working Directory
-set WRF_DIR     = $WORKDIR/BLD_WRFv4.4_CCTM_v54_intel18.0 # Location of WRF-CMAQ Install
+set WRF_DIR     = $WORKDIR/BLD_WRFv${wrfv}_CCTM_v55_gcc # Location of WRF-CMAQ Install
 set INPDIR      = ${CMAQ_DATA}/2018_12NE3               # Input directory for WRF & CMAQ
 set OUTPUT_ROOT = $WORKDIR                                # output root directory
 set output_direct_name = WRFCMAQ-output-${version}        # Output Directory Name
-setenv OUTDIR $OUTPUT_ROOT/$output_direct_name   # output files and directories
+setenv OUTDIR ${CMAQ_DATA}/$output_direct_name   # output files and directories
 set NMLpath     = $WRF_DIR/cmaq                           # path with *.nml file mechanism dependent
 
 echo ""
@@ -76,7 +77,7 @@ echo "Executable Name is $EXEC"
 #> Set Start and End Days for looping
 setenv NEW_START TRUE             # Set to FALSE for model restart
 set START_DATE = "2018-07-01"     # beginning date (July 1, 2016)
-set END_DATE   = "2018-07-01"     # ending date    (July 14, 2016)
+set END_DATE   = "2018-07-02"     # ending date    (July 14, 2016)
 
 #> Set Timestepping Parameters
 set STTIME     = 000000           # beginning GMT time (HHMMSS)
@@ -161,8 +162,8 @@ set wrf_hr = $NSTEPS
 
 # Output Species and Layer Options
 # CONC file species; comment or set to "ALL" to write all species to CONC
-setenv CONC_SPCS "O3 NO ANO3I ANO3J NO2 FORM ISOP NH3 ANH4I ANH4J ASO4I ASO4J" 
-setenv CONC_BLEV_ELEV " 1 1"  # CONC file layer range; comment to write all layers to CONC
+#setenv CONC_SPCS "O3 NO ANO3I ANO3J NO2 FORM ISOP NH3 ANH4I ANH4J ASO4I ASO4J" 
+#setenv CONC_BLEV_ELEV " 1 1"  # CONC file layer range; comment to write all layers to CONC
 
 # ACONC file species; comment or set to "ALL" to write all species to ACONC
 # setenv AVG_CONC_SPCS "O3 NO CO NO2 ASO4I ASO4J NH3" 
@@ -194,9 +195,22 @@ setenv CTM_BIDI_FERT_NH3     T   #> subtract fertilizer NH3 from emissions becau
 setenv CTM_HGBIDI            N   #> mercury bi-directional flux for in-line deposition velocities [ N ]
 setenv CTM_SFC_HONO          Y   #> surface HONO interaction [ Y ]
 setenv CTM_GRAV_SETL         Y   #> vdiff aerosol gravitational sedimentation [ Y ]
+setenv CTM_PVO3              N   #> consider potential vorticity module for O3 transport from the stratosphere
+                                 #> In WRF-CMAQ model, option also can activate calculating potential vorticity
+                                 #> [default: N]
+
 setenv CTM_BIOGEMIS_BE Y         #> calculate in-line biogenic emissions with BEIS [ default: N ]
 setenv CTM_BIOGEMIS_MG N         #> turns on MEGAN biogenic emission [ default: N ]
 setenv BDSNP_MEGAN N             #> turns on BDSNP soil NO emissions [ default: N ]
+
+setenv AEROSOL_OPTICS 3      #> sets method for determining aerosol optics affecting photolysis
+                             #> frequencies ( 3 is the default value )
+                             #>  VALUES 1 thru 3 determined Uniformly Volume Mixed spherical
+                             #>      (1-Tabular Mie; 2-Mie Calculation; 3-Case Approx to Mie Theory)
+                             #>  VALUES 4 thru 6 attempts to use core-shell mixing model when the
+                             #>      aerosol mode has signficant black carbon core otherwise use Volume Mixed
+                             #>      model where optics determined by
+                             #>      (4-Tabular Mie; 5-Mie Calculation; 6-Case Approx to Mie Theory)
 
 setenv CTM_TURN_ON_PV        N   # WRF-CMAQ ONLY turn on/off PV [ N -- make sure compiled with pv on ]
 
@@ -707,7 +721,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
         #echo "Deleting output file: $file"
         /bin/rm -f $file  
      end
-     /bin/rm -f ${OUTDIR}/CCTM_EMDIAG*${RUNID}_${YYYYMMDD}.nc
+     /bin/rm -f ${OUTDIR}/CCTM_DESID*${CTM_APPL}.nc
 
   else
      #> error if previous log files exist
@@ -738,6 +752,7 @@ while ($TODAYJ <= $STOP_DAY )  #>Compare dates in terms of YYYYJJJ
   setenv INIT_CONC_1 $ICpath/$ICFILE
   setenv BNDY_CONC_1 $BCpath/$BCFILE
   setenv OMI $OMIpath/$OMIfile
+  setenv MIE_TABLE $OUTDIR/mie_table_coeffs_${compilerString}.txt
   setenv OPTICS_DATA $OMIpath/$OPTfile
  #setenv XJ_DATA $JVALpath/$JVALfile
   set TR_DVpath = $METpath
@@ -948,9 +963,9 @@ End_Of_Namelist
       ln -sf $METpath/wrffdda_d01 wrffdda_d01
       ln -sf $METpath/wrfsfdda_d01 wrfsfdda_d01
       if (${WRF_RSTFLAG} == .false.) then
-         ln -sf $METpath/wrfinput_d01 wrfinput_d01
+    	 ln -sf $METpath/wrfinput_d01 wrfinput_d01
       else if (${WRF_RSTFLAG} == .TRUE.) then
-         ln -sf $METpath/wrfrst_d01_${TODAYG}_00:00:00
+	 ln -sf $METpath/wrfrst_d01_${TODAYG}_00:00:00
       endif
       ln -sf $METpath/wrflowinp_d01 wrflowinp_d01
 

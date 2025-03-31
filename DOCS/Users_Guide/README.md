@@ -4,10 +4,28 @@
 The CMAQ User's Guide is designed to support the installation, configuration, and execution of the [Community Multiscale Air Quality (CMAQ)](http://www.epa.gov/cmaq) model on Linux systems. CMAQ users should be comfortable with Linux scripting conventions and have some familiarity with the Fortran programming language. Users should also have some familiarity with atmospheric structure, and the physical and chemical processes that occur in the atmosphere. 
 
 Note: While this User's Guide is packaged with the code when it is downloaded or cloned, users are encouraged to go [online](https://github.com/USEPA/CMAQ/blob/main/DOCS/Users_Guide/README.md) for the latest version.
-
-# Table of Contents
-
-[CMAQ Tutorials:](Tutorials/README.md) A series of short tutorials provide practical examples of how to set up and run CMAQ. 
+<!--
+```{toctree}
+:hidden:
+CMAQ_UG_ch01_overview.md
+CMAQ_UG_ch02_program_structure.md
+CMAQ_UG_ch03_preparing_compute_environment.md
+CMAQ_UG_ch04_model_inputs.md
+CMAQ_UG_ch05_running_a_simulation.md
+CMAQ_UG_ch06_model_configuration_options.md
+CMAQ_UG_ch07_model_outputs.md
+CMAQ_UG_ch08_analysis_tools.md
+CMAQ_UG_ch09_process_analysis.md
+CMAQ_UG_ch10_HDDM-3D.md
+CMAQ_UG_ch11_ISAM.md
+CMAQ_UG_ch12_sulfur_tracking.md
+CMAQ_UG_ch13_WRF-CMAQ.md
+CMAQ_UG_ch14_MPAS-CMAQ.md
+Appendix <./Appendix/README.md>
+```
+END_OF_COMMENT
+-->
+## Table of Contents
 
 [Chapter 1 (Overview):](CMAQ_UG_ch01_overview.md) CMAQ background, features, requirements and support resources.
 
@@ -35,6 +53,8 @@ Note: While this User's Guide is packaged with the code when it is downloaded or
 
 [Chapter 13 (WRF-CMAQ):](CMAQ_UG_ch13_WRF-CMAQ.md) WRF-CMAQ model for simulating interactions between chemistry and weather.
 
+[Chapter 14 (MPAS-CMAQ):](CMAQ_UG_ch14_MPAS-CMAQ.md) CMAQ is coulpled with the global Model for Prediction Across Scales (MPAS) allowing for seamless mesh refinement from global to local scales.
+
 [Tables and Figures:](CMAQ_UG_tables_figures.md) List of Tables and Figures.
 
 [Appendix A (Model Options):](Appendix/CMAQ_UG_appendixA_model_options.md) List of model options in configuration, compilation and run scripts.
@@ -51,4 +71,6 @@ Note: While this User's Guide is packaged with the code when it is downloaded or
 
 ***
 
-CMAQ User's Guide (c) 2022<br>
+CMAQv5.5 User's Guide <br>
+
+
